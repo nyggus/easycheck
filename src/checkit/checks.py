@@ -226,8 +226,6 @@ def check_if(condition, error=AssertionError, message=None):
     """
     if not condition:
         _raise(error, message)
-    else:
-        pass
 
 
 def check_if_not(condition, error=AssertionError, message=None):
@@ -529,7 +527,7 @@ def check_all_ifs(*args):
     for i, this_check in enumerate(args):
         function, *arguments = this_check
         try:
-            run_this_check = function(arguments)
+            run_this_check = function(*arguments)
             run_this_check = True
         except Exception as e:
             run_this_check = e
@@ -576,7 +574,7 @@ def check_argument(argument_name,
     >>> def foo(x):
     ...    check_argument('x', x, expected_choices=('first choice',
     ...                                             'second_choice'))
-    ...    pass
+    ...    # whatever foo is doing...
     >>> foo('first choice')
     >>> foo('no choice')
     Traceback (most recent call last):
@@ -761,12 +759,3 @@ def _raise(error, message=None):
         raise error
     else:
         raise error(message)
-
-
-def check_if_in_iterable(item, iterable, error=ValueError, message=None):
-    # TO BE REMOVED: check_if(2 in [2, 3, 4]) is clearer and more readable
-    """Check if item is in iterable.
-
-    >>> check_if_in_iterable(2, [2, 3, 4])
-    """
-    check_if(item in iterable, error=error, message=message)
