@@ -3,12 +3,23 @@ checkit
 
 checkit is a lightweight tool for running functionized assertions within Python code, outside of testing, though it can be used in testing, too. The idea is to use the checkit functions in a similar way as assertions: when a condition you check is met, nothing happens; if it's violated, an exception is raised. Nonetheless, while you should not use assertions in your Python code, the checkit functions are designed to be used in code. You can of course use them in testing (whether pytests or doctests).
 
-The main checkit functions (starting off with check_) are designed so that they cna be used as easy-to-understand one-liners. They can be used instead of if-blocks, which you normally use to check conditions and raise exceptions if the conditions are not met. The checkit approach has two main advantages:
+The main checkit functions (starting off with check_) are designed so that they cna be used as easy-to-understand one-liners. They can be used instead of if-blocks, which you normally use to check conditions and raise exceptions if the conditions are not met. The checkit approach has two main advantages:He
 
 (i) it saves a little space; not much, since most of the time you'll end up with one line of code instead of two; but mainly
 (ii) it increases code simplicity and readability, since both the names of checkit functions and their arguments are designed in such a way that the reader immediately knows what is being checked.
 
 NOTE: the checkit package should be used to check conditions in assertion-like situations. use checkit when you want to ensure that everything is right so that you can follow, or that something is wrong; if something is wrong indeed, you can easily handle exceptions. So, checkit is not designed to be used to check conditions in your code (like in if-elif blocks that do not raise exceptions). 
+
+Dev installation
+---------------
+
+.. code-block:: text
+
+    python -m venv env
+    . env/bin/activate
+    pip install -e .
+    pip install pytest wheel
+    python setup.py sdist bdist_wheel
 
 Installing
 ----------
