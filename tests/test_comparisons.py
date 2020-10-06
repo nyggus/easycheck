@@ -2,7 +2,13 @@ import pytest
 import sys
 import checkit
 
-from checkit.comparisons import *
+from checkit.comparisons import (equal,
+                                 less_than, lt,
+                                 less_than_or_equal, lte,
+                                 greater_than, gt,
+                                 greater_than_or_equal, gte,
+                                 get_possible_operators,
+                                 )
 
 
 def test_equal():
