@@ -13,7 +13,7 @@ from checkit.comparisons import (equal,
 
 from checkit.checks import (check_if,
                             check_if_not,
-                            check_if_instance,
+                            check_instance,
                             check_if_paths_exist,
                             check_length,
                             check_all_ifs,
@@ -72,25 +72,25 @@ def test_check_length():
     assert check_length(10, 1, assign_length_to_numbers=True) is None
 
 
-def test_check_if_instance():
-    assert check_if_instance(['string'], list) is None
-    assert check_if_instance('string', str) is None
-    assert check_if_instance((1, 2), tuple) is None
-    assert check_if_instance(
+def test_check_instance():
+    assert check_instance(['string'], list) is None
+    assert check_instance('string', str) is None
+    assert check_instance((1, 2), tuple) is None
+    assert check_instance(
         (1, 2), (tuple, list),
         message='Neither tuple nor list'
     ) is None
-    assert check_if_instance((i for i in range(3)), Generator) is None
+    assert check_instance((i for i in range(3)), Generator) is None
     with pytest.raises(TypeError):
-        check_if_instance(
+        check_instance(
             'souvenir',
             (tuple, list),
             message='Neither tuple nor list'
         )
     with pytest.raises(TypeError):
-        check_if_instance((i for i in range(3)), tuple)
+        check_instance((i for i in range(3)), tuple)
     with pytest.raises(TypeError):
-        check_if_instance((i for i in range(3)), tuple, message='This is not tuple.')
+        check_instance((i for i in range(3)), tuple, message='This is not tuple.')
 
 
 def test_compare():

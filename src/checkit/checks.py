@@ -79,10 +79,10 @@ Instead of the following if-block to check its instance:
 ...    raise TypeError('A string is needed')
 
 You do the following:
->>> check_if_instance(my_string, str, message='This is not a string')
+>>> check_instance(my_string, str, message='This is not a string')
 
 If the condition is not met, it will raise TypeError:
->>> check_if_instance('string', list, message='List is required here')
+>>> check_instance('string', list, message='List is required here')
 Traceback (most recent call last):
     ...
 TypeError: List is required here
@@ -293,7 +293,7 @@ def check_length(item,
     check_if(condition_to_check, error=error, message=message)
 
 
-def check_if_instance(item, expected_instance, error=TypeError, message=None):
+def check_instance(item, expected_instance, error=TypeError, message=None):
     """Check if item has type of expected_instance.
 
     The param expected_instance can be a tuple of instances. If the condition
@@ -305,32 +305,32 @@ def check_if_instance(item, expected_instance, error=TypeError, message=None):
     >>> check_if(my_none_object is None, error=TypeError)
 
     or
-    >>> check_if_instance(my_none_object, None)
+    >>> check_instance(my_none_object, None)
 
     The former approach is Pythonic while the latter less so, but we keep this
-    functionality so that you can use the check_if_instance function also for
+    functionality so that you can use the check_instance function also for
     None objects.
 
-    >>> check_if_instance(['string'], list)
-    >>> check_if_instance('string', str)
-    >>> check_if_instance((1, 2), tuple)
-    >>> check_if_instance([1, 2], (tuple, list),
+    >>> check_instance(['string'], list)
+    >>> check_instance('string', str)
+    >>> check_instance((1, 2), tuple)
+    >>> check_instance([1, 2], (tuple, list),
     ...                           message='Neither tuple nor list')
-    >>> check_if_instance('souvenir',
+    >>> check_instance('souvenir',
     ...                   (tuple, list),
     ...                   message='Neither tuple nor list')
     Traceback (most recent call last):
         ...
     TypeError: Neither tuple nor list
-    >>> check_if_instance((i for i in range(3)), tuple)
+    >>> check_instance((i for i in range(3)), tuple)
     Traceback (most recent call last):
         ...
     TypeError
-    >>> check_if_instance((i for i in range(3)), tuple, message='This is not tuple.')
+    >>> check_instance((i for i in range(3)), tuple, message='This is not tuple.')
     Traceback (most recent call last):
         ...
     TypeError: This is not tuple.
-    >>> check_if_instance((i for i in range(3)), Generator)
+    >>> check_instance((i for i in range(3)), Generator)
     """
     if expected_instance is None:
         check_if(item is None,
@@ -517,9 +517,9 @@ def check_all_ifs(*args):
         '(check_function, *args).'
     )
     for arg in args:
-        check_if_instance(arg,
-                          tuple,
-                          message=tuple_error_message)
+        check_instance(arg,
+                       tuple,
+                       message=tuple_error_message)
 
     results_of_checks = dict()
     for i, this_check in enumerate(args):
@@ -599,6 +599,8 @@ def check_argument(argument_name,
     Traceback (most recent call last):
         ...
     checks.ArgumentValueError: Provided condition violated for x
+    
+    >>> assert check_argument('error', TypeError, expected_instance=type) is None
 
     You can also define quite complex checks:
     >>> def check_glm_args(glm_args):
@@ -637,10 +639,10 @@ def check_argument(argument_name,
 
     if expected_instance is not None:
         instance_message = f'Incorrect instance of {argument_name}'
-        check_if_instance(item=argument,
-                          expected_instance=expected_instance,
-                          error=error,
-                          message=instance_message)
+        check_instance(item=argument,
+                       expected_instance=expected_instance,
+                       error=error,
+                       message=instance_message)
     if expected_choices is not None:
         choices_message = (
             f'{argument_name}\'s value, {argument}, '
