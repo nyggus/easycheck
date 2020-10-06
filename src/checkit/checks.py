@@ -683,6 +683,60 @@ def check_argument(argument_name,
                  message=condition_message)
 
 
+def catch_check(check_function, *args, **kwargs):
+    # I am so small and have problems with kwargs. This test does not pass:
+    # >> > print(catch_check(check_if, kwargs={'condition': 2>2, 'error': ValueError}))
+    # What am I doing wrong?
+    # I will add pytests once we have it.
+    """Catch exception raised by checkit functions.
+    
+    Most checkit functions return None when the check is fine and raise
+    an exception otherwise. You can use this function to change this behavior:
+    It still returns None when everything is fine, but instead of raising
+    the exception in case of problems, it returns this exception formatted
+    as string.
+    
+    >>> catch_check(check_if, 2==2)
+    >>> catch_check(check_if, 2>2)
+    'AssertionError()'
+    >>> my_check = catch_check(check_if, 2>2, ValueError)
+    >>> print(my_check)
+    ValueError()
+    >>> print(catch_check(check_if, kwargs={'condition': 2>2, 'error': ValueError}))
+    ValueError()
+    >>> print(catch_check(check_length, [2, 2], 3))
+    LengthError()
+    >>> print(catch_check(check_instance, 25, float, ValueError, 'This is no float!'))
+    ValueError('This is no float!')
+    """
+    check_if(hasattr(check_function, '__call__'),
+             error=TypeError,
+             message='check_function does not seem to be a checkit function')
+    check_if_not(check_function == check_all_ifs,
+                 error=ValueError,
+                 message=('Do not use catch_check for check_all_ifs because'
+                          ' it returns its checks.'))
+    check_argument(
+        argument_name=check_function.__name__,
+        argument=check_function,
+        expected_choices=(
+            check_if,
+            check_if_not,
+            check_argument,
+            check_comparison,
+            check_if_paths_exist,
+            check_instance,
+            check_length,
+        )
+    )
+    breakpoint()
+    try:
+        check_function(*args, **kwargs)
+        return None
+    except Exception as e:
+        return repr(e)
+
+
 def _compare(item_1, operator, item_2):
     # Maybe we should make it compare() so that the users will use it?
     # But it's nothing really fascinating about it, the user can
