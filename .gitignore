@@ -57,6 +57,7 @@ ENV/
 env.bak/
 venv.bak/
 venv_*/
+venv-*/
 
 # Wing project
 project_check_it.wpr
