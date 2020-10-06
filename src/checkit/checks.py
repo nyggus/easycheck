@@ -504,7 +504,7 @@ def check_all_ifs(*args):
     ...    (check_if, 2 > 1),
     ...    (check_if_not, 'a' == 'a', ValueError, 'Wrong!')
     ...    )
-    {'1: check_if': True, '2: check_if_not': ValueError("Wrong!")}
+    {'1: check_if': True, '2: check_if_not': ValueError(\'Wrong!\')}
 
     Style suggestion:
         Use coding style you prefer, but in our opinion you can increase
