@@ -467,8 +467,6 @@ def check_comparison(item_1, operator, item_2,
 
 
 def check_all_ifs(*args):
-    # A moze po prostu check_all()?
-    # TO NIE DZIALA!!! PATRZ W PYTEST
     """Check all multiple conditions and return all checks.
 
     If you want to check several conditions, you can simply check them
@@ -506,7 +504,7 @@ def check_all_ifs(*args):
     ...    (check_if, 2 > 1),
     ...    (check_if_not, 'a' == 'a', ValueError, 'Wrong!')
     ...    )
-    {'1: check_if': True, '2: check_if_not': AssertionError()}
+    {'1: check_if': True, '2: check_if_not': ValueError("Wrong!")}
 
     Style suggestion:
         Use coding style you prefer, but in our opinion you can increase
