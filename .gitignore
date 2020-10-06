@@ -60,3 +60,6 @@ venv_*/
 
 # Wing project
 project_check_it.wpr
+
+# Batch scripts
+*.bat
