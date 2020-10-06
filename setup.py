@@ -10,9 +10,10 @@ setuptools.setup(
     author_email="nyggus@gmail.com",
     description="A tool for simple functionalized assertions in Python",
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type="text/x-rst",
     url="https://github.com/nyggus/checkit",
-    packages=setuptools.find_packages(),
+    packages=setuptools.find_packages(where='src'),
+    package_dir={'': 'src'},
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
