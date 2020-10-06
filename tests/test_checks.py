@@ -3,12 +3,33 @@ import pytest
 import sys
 import checkit
 
-from checkit.checks import *
-from checkit.comparisons import *
-from checkit.checks import (_compare,
+from checkit.comparisons import (equal,
+                                 less_than, lt,
+                                 less_than_or_equal, lte,
+                                 greater_than, gt,
+                                 greater_than_or_equal, gte,
+                                 get_possible_operators,
+                                 )
+
+from checkit.checks import (check_if,
+                            check_if_not,
+                            check_if_instance,
+                            check_if_paths_exist,
+                            check_length,
+                            check_all_ifs,
+                            check_argument,
+                            check_comparison,
+                            ComparisonError,
+                            ArgumentValueError,
+                            LengthError,
+                            IncorrectOperatorError,
+                            _compare,
                             _parse_error_and_message_from,
                             _clean_message,
-                            _raise)
+                            _raise,
+                            )
+
+from collections.abc import Generator
 
 
 def test_check_if():
@@ -167,19 +188,19 @@ def test_check_all_ifs():
         (check_if, 2 > 1),
         (check_if, 'a' == 'a')
     )
-    assert all(multiple_check_1[key] for key in multiple_check_1)
+    assert all(value for key, value in multiple_check_1.items())
 
     multiple_check_2 = check_all_ifs(
         (check_if, 2 > 1),
         (check_if_not, 'a' == 'a')
     )
-    assert any(type(multiple_check_2[key]) == AssertionError for key in multiple_check_2)
+    assert any(type(value) == AssertionError for key, value in multiple_check_2.items())
 
     multiple_check_3 = check_all_ifs(
         (check_if, 2 > 1),
         (check_if_not, 'a' == 'a', ValueError)
     )
-    assert any(type(multiple_check_2[key]) == ValueError for key in multiple_check_2)
+    assert any(type(value) == ValueError for key, value in multiple_check_3.items())
 
 
 def test_check_if_paths_exist():
@@ -319,5 +340,3 @@ def test_check_argument_mix():
             argument=glm_args,
             expected_instance=tuple,
             expected_condition=check_glm_args(glm_args))
-
-
