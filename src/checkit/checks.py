@@ -331,16 +331,30 @@ def check_instance(item, expected_instance, error=TypeError, message=None):
         ...
     TypeError: This is not tuple.
     >>> check_instance((i for i in range(3)), Generator)
+
+    You can include None:
+    >>> check_instance('a', (str, None))
+    >>> check_instance(None, expected_instance=(str, None))
+
     """
     if expected_instance is None:
         check_if(item is None,
                  error=error,
                  message=message
                  )
-    else:
-        check_if(isinstance(item, expected_instance),
-                 error=error,
-                 message=message)
+        return None
+
+    if isinstance(expected_instance, (list, tuple)):
+        if any(i is None for i in expected_instance):
+            if item is None:
+                return None
+            else:
+                expected_instance = tuple(i
+                                          for i in expected_instance
+                                          if i is not None)
+    check_if(isinstance(item, expected_instance),
+             error=error,
+             message=message)
 
 
 def check_if_paths_exist(paths,
