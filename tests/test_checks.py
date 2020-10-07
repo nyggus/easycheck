@@ -22,11 +22,13 @@ from checkit.checks import (check_if,
                             ComparisonError,
                             ArgumentValueError,
                             LengthError,
-                            IncorrectOperatorError,
+                            OperatorError,
                             _compare,
                             _parse_error_and_message_from,
                             _clean_message,
                             _raise,
+                            _return_from_check_if_paths_exist,
+                            _check_checkit_arguments,
                             )
 
 from collections.abc import Generator
@@ -205,7 +207,7 @@ def test_check_all_ifs():
 
 def test_check_if_paths_exist():
     with pytest.raises(ValueError):
-        check_if_paths_exist('Q:/Op/Oop/', _type='buuu')
+        check_if_paths_exist('Q:/Op/Oop/', execution_mode='buuu')
     with pytest.raises(FileNotFoundError):
         check_if_paths_exist('Z:/Op/Oop/')
     with pytest.raises(IOError):
@@ -213,7 +215,7 @@ def test_check_if_paths_exist():
     with pytest.raises(FileNotFoundError):
         check_if_paths_exist(['Q:/Op/Oop/'] + os.listdir('.'))
     assert check_if_paths_exist(os.listdir('.')) is None
-    assert check_if_paths_exist(os.listdir('.'), _type='return')
+    assert check_if_paths_exist(os.listdir('.'), execution_mode='return')
 
 
 def test_raise():
@@ -340,3 +342,101 @@ def test_check_argument_mix():
             argument=glm_args,
             expected_instance=tuple,
             expected_condition=check_glm_args(glm_args))
+
+
+def test_return_from_check_if_paths_exist():
+    # I don't know how to test the error returned because you cannot simply
+    # compare ...[0] == FileNotFoundError().
+    my_return = _return_from_check_if_paths_exist(
+        error=FileNotFoundError,
+        message=None,
+        paths=[])
+    assert isinstance(my_return[0], Exception)
+    assert my_return[1] == []
+
+    my_return_2 = _return_from_check_if_paths_exist(
+        error=FileNotFoundError,
+        message='No such file',
+        paths='D:/this_dir/this_path.csv')
+    assert isinstance(my_return_2[0], Exception)
+    assert my_return_2[1] == 'D:/this_dir/this_path.csv'
+
+
+def test_check_checkit_arguments():
+    assert _check_checkit_arguments(error=LengthError) is None
+    with pytest.raises(NameError):
+        _check_checkit_arguments(error=NonExistingError)
+        _check_checkit_arguments(error=NonExistingError())
+    with pytest.raises(TypeError):
+        _check_checkit_arguments(error='NonExistingError')
+        _check_checkit_arguments(error=NameError())
+
+    with pytest.raises(TypeError):
+        _check_checkit_arguments(error=LengthError, message=False)
+    assert _check_checkit_arguments(error=LengthError, message='This is error') is None
+    with pytest.raises(TypeError):
+        _check_checkit_arguments(error=LengthError, message=25)
+
+    assert _check_checkit_arguments(error=ValueError, condition='a' == 'a') is None
+    assert _check_checkit_arguments(condition='a' == 'a') is None
+    assert _check_checkit_arguments(error=ValueError, condition=2 > 1) is None
+    assert _check_checkit_arguments(error=ValueError, condition=2 < 1) is None
+    assert _check_checkit_arguments(error=ValueError, condition=2 == '2') is None
+    assert _check_checkit_arguments(condition=2 == '2') is None
+    with pytest.raises(ValueError):
+        _check_checkit_arguments(error=ValueError, condition='not a comparison')
+        _check_checkit_arguments(condition='not a comparison')
+
+    for this_operator in get_possible_operators():
+        assert _check_checkit_arguments(operator=this_operator) is None
+        with pytest.raises(OperatorError):
+            _check_checkit_arguments(operator=this_operator.__name__)
+
+    assert _check_checkit_arguments(assign_length_to_numbers=True) is None
+    assert _check_checkit_arguments(assign_length_to_numbers=False) is None
+    for this_assignment in ('nothing', 22, [1]):
+        with pytest.raises(TypeError):
+            _check_checkit_arguments(assign_length_to_numbers=this_assignment)
+
+    assert _check_checkit_arguments(execution_mode='return') is None
+    assert _check_checkit_arguments(execution_mode='raise') is None
+    for this_mode in ('nothing', 22, [1]):
+        with pytest.raises(ValueError):
+            _check_checkit_arguments(execution_mode=this_mode)
+
+    for this_length in (0, 3, 5, 7):
+        assert _check_checkit_arguments(expected_length=this_length) is None
+        assert _check_checkit_arguments(expected_length=float(this_length)) is None
+    assert _check_checkit_arguments(expected_length=(5)) is None
+    for this_length in ('0', [3], LengthError):
+        with pytest.raises(TypeError):
+            _check_checkit_arguments(expected_length=this_length)
+
+    for this_instance in (str, int, float, bool, tuple, list, Generator):
+        assert _check_checkit_arguments(expected_instance=this_instance) is None
+    for this_instance in ('str', 25):
+        with pytest.raises(TypeError):
+            _check_checkit_arguments(expected_instance=this_instance)
+    assert _check_checkit_arguments(expected_instance=(str, tuple, list)) is None
+    with pytest.raises(TypeError):
+        _check_checkit_arguments(expected_instance=(str, tuple, list, 26))
+
+    assert _check_checkit_arguments(
+        expected_instance=(str, tuple, list),
+        condition=2 < 2,
+        expected_length=3,
+        execution_mode='raise',
+        assign_length_to_numbers=True
+    ) is None
+
+    with pytest.raises(TypeError):
+        _check_checkit_arguments(
+            expected_instance=(str, tuple, list),
+            condition=2 < 2,
+            expected_length=3,
+            execution_mode='raise',
+            assign_length_to_numbers='yes'
+        )
+
+
+
