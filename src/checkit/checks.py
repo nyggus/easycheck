@@ -784,7 +784,7 @@ def catch_check(check_function, *args, **kwargs):
     ValueError
     >>> print(my_check)
     <BLANKLINE>
-    >>> catch_check(check_if, kwargs={'condition': 2>2, 'error': ValueError})
+    >>> catch_check(check_if, condition=2>2, error=ValueError)
     ValueError()
     >>> catch_check(check_length, [2, 2], 3)
     LengthError()
