@@ -164,7 +164,7 @@ class LengthError(Exception):
     pass
 
 
-class IncorrectOperatorError(Exception):
+class OperatorError(Exception):
     """Exception class used for catching incorrect operators."""
     pass
 
@@ -223,7 +223,13 @@ def check_if(condition, error=AssertionError, message=None):
     ...    (a < 50 and b > 100) or
     ...    isinstance(c, str)
     ...    )
+    
+    This function does not use checkit checks for its arguments, since it would
+    lead to infinite recursion.
     """
+    _check_checkit_arguments(error=error,
+                             message=message,
+                             condition=condition)
     if not condition:
         _raise(error, message)
 
@@ -251,6 +257,10 @@ def check_if_not(condition, error=AssertionError, message=None):
         ...
     AssertionError
     """
+    _check_checkit_arguments(error=error,
+                             message=message,
+                             condition=condition)
+
     check_if(not condition, error=error, message=message)
 
 
@@ -259,7 +269,8 @@ def check_length(item,
                  operator=equal,
                  error=LengthError,
                  message=None,
-                 assign_length_to_numbers=False):
+                 assign_length_to_numbers=False,
+                 execution_mode='raise'):
     """Compare the length of item with expected_length, using condition.
 
     The operator can be from among get_possible_operators().
@@ -280,11 +291,13 @@ def check_length(item,
     >>> check_length(2, 1, assign_length_to_numbers=True)
     >>> check_length(2, 0, operator=gt, assign_length_to_numbers=True)
     """
-    check_if(
-        operator in get_possible_operators(),
-        error=IncorrectOperatorError,
-        message=f'Unknown operator'
-    )
+    _check_checkit_arguments(error=error,
+                             message=message,
+                             operator=operator,
+                             expected_length=expected_length,
+                             assign_length_to_numbers=assign_length_to_numbers,
+                             execution_mode=execution_mode)
+
     if assign_length_to_numbers:
         if isinstance(item, (int, float, complex, bool)):
             item = [item]
@@ -337,6 +350,10 @@ def check_instance(item, expected_instance, error=TypeError, message=None):
     >>> check_instance(None, expected_instance=(str, None))
 
     """
+    _check_checkit_arguments(error=error,
+                             message=message,
+                             expected_instance=expected_instance)
+
     if expected_instance is None:
         check_if(item is None,
                  error=error,
@@ -360,13 +377,13 @@ def check_instance(item, expected_instance, error=TypeError, message=None):
 def check_if_paths_exist(paths,
                          error=FileNotFoundError,
                          message=None,
-                         _type='raise'):
+                         execution_mode='raise'):
     """Check if paths exists, and if not even raise error or return.
 
     Param paths is either a string or a list/tuple.
 
-    The function's behavior depends on _type. If you want to learn which
-    paths do not exist, choose _type='return', in which case you will get
+    The function's behavior depends on execution_mode. If you want to learn which
+    paths do not exist, choose execution_mode='return', in which case you will get
     True if all the files exist, and a tuple of False, error(message),
     paths (the last item being non-existing paths).
 
@@ -377,31 +394,27 @@ def check_if_paths_exist(paths,
     >>> check_if_paths_exist(os.listdir()[0])
     >>> check_if_paths_exist(os.listdir())
 
-    >>> check_if_paths_exist('Q:/Op/Oop/', _type='return')
-    (False, <class 'FileNotFoundError'>, 'Q:/Op/Oop/')
-    >>> check_if_paths_exist(os.listdir()[0], _type='return')
-    True
-    >>> check_if_paths_exist(os.listdir(), _type='return')
-    True
+    >>> check_if_paths_exist('Q:/Op/Oop/', execution_mode='return')
+    (FileNotFoundError(), 'Q:/Op/Oop/')
+    >>> check_if_paths_exist(os.listdir()[0], execution_mode='return')
+    (None, None)
+    >>> check_if_paths_exist(os.listdir(), execution_mode='return')
+    (None, [])
     """
-    check_if(_type in ('raise', 'return'),
-             error=ValueError,
-             message=('Unrecognized _type '
-                      '(must from either "raise" or "return")'))
+    _check_checkit_arguments(error=error,
+                             message=message,
+                             execution_mode=execution_mode)
 
     if isinstance(paths, str):
         path = Path(paths)
-        if _type == 'raise':
+        if execution_mode == 'raise':
             check_if(path.exists(), error=error, message=message)
         else:
             file_exists = path.exists()
             if not file_exists:
-                if message:
-                    return False, error(message), paths
-                else:
-                    return False, error, paths
+                return _return_from_check_if_paths_exist(error, message, paths)
             else:
-                return True
+                return None, None
     elif isinstance(paths, (tuple, list)):
         paths_exist = [Path(path).exists() for path in paths]
         if not all(paths_exist):
@@ -409,18 +422,34 @@ def check_if_paths_exist(paths,
                 path for path in paths
                 if not Path(path).exists()
             ]
-            if _type == 'raise':
+            if execution_mode == 'raise':
                 _raise(error, message)
-            elif _type == 'return':
-                if message:
-                    return False, error(message), non_existing_paths
-                else:
-                    return False, error, non_existing_paths
+            elif execution_mode == 'return':
+                return _return_from_check_if_paths_exist(error, message, non_existing_paths)
         else:
-            if _type == 'return':
-                return True
+            if execution_mode == 'return':
+                return None, []
     else:
         raise TypeError('Argument paths must be string, tuple of strigs, or list of strings')
+
+
+def _return_from_check_if_paths_exist(error, message, paths):
+    """
+    >>> _return_from_check_if_paths_exist(
+    ...    error=FileNotFoundError,
+    ...    message=None,
+    ...    paths=[])
+    (FileNotFoundError(), [])
+    >>> _return_from_check_if_paths_exist(
+    ...    error=FileNotFoundError,
+    ...    message='No such file',
+    ...    paths='D:/this_dir/this_path.csv')
+    (FileNotFoundError('No such file'), 'D:/this_dir/this_path.csv')
+    """
+    if message:
+        return error(message), paths
+    else:
+        return error(), paths
 
 
 def check_comparison(item_1, operator, item_2,
@@ -473,7 +502,7 @@ def check_comparison(item_1, operator, item_2,
         this_text, equal, example_text; etc.
     """
     check_if(operator in get_possible_operators(),
-             error=IncorrectOperatorError,
+             error=OperatorError,
              message='Incorrect operator')
     check_if(_compare(item_1, operator, item_2),
              error=error,
@@ -683,25 +712,7 @@ def check_argument(argument_name,
                  message=condition_message)
 
 
-def map_str_exception(Exception_as_string):
-    exceptions = {
-        'ValueError': ValueError,
-        'LengthError': LengthError,
-        'TypeError': TypeError,
-        'ZeroDivisionError': ZeroDivisionError,
-        'NameError': NameError,
-        'IncorrectOperatorError': IncorrectOperatorError,
-    }
-
-
 def catch_check(check_function, *args, **kwargs):
-    # I am so small and have problems with kwargs. This test does not pass:
-    # >> > print(catch_check(check_if, kwargs={'condition': 2>2, 'error': ValueError}))
-    # What am I doing wrong?
-    # I will add pytests once we have it.
-
-    # And look at the last test below. How can we raise an exception when we have it
-    # as string?
     """Catch exception raised by checkit functions.
     
     Most checkit functions return None when the check is fine and raise
@@ -849,7 +860,7 @@ def _compare(item_1, operator, item_2):
     """
     check_if(
         operator in get_possible_operators(),
-        error=IncorrectOperatorError,
+        error=OperatorError,
         message='Incorrect operator'
     )
     return operator(item_1, item_2)
@@ -914,3 +925,66 @@ def _raise(error, message=None):
         raise error
     else:
         raise error(message)
+
+
+def _check_checkit_arguments(error=None,
+                             message=None,
+                             condition=None,
+                             operator=None,
+                             assign_length_to_numbers=None,
+                             execution_mode=None,
+                             expected_length=None,
+                             expected_instance=None):
+    """Check common arguments in checkit functions.
+    
+    The check does use use checkit functions but standard if-conditions
+    (for instance, to avoid recursions, but also to ensure that the checks
+    are done using a standard-library-based approach).
+    Other arguments should be checked using in other ways.
+    
+    >>> _check_checkit_arguments(error=LengthError)
+    >>> _check_checkit_arguments(error=ValueError)
+    
+    But
+    >>> _check_checkit_arguments(error=ValueError())
+    Traceback (most recent call last):
+        ...
+    TypeError: 'ValueError' object is not callable
+    >>> _check_checkit_arguments(error=LengthError, message=False)
+    Traceback (most recent call last):
+        ...
+    TypeError: message must be either None or string
+    >>> _check_checkit_arguments(error=ValueError, condition=2<1)
+    """
+    if error is not None:
+        if not isinstance(error(), Exception):
+            raise TypeError('error must be an exception')
+    if message is not None:
+        if not isinstance(message, str):
+            raise TypeError('message must be either None or string')
+    if condition is not None:
+        if not isinstance(condition, bool):
+            raise ValueError('The condition does not give a True/False answer')
+    if operator is not None:
+        if operator not in get_possible_operators():
+            raise OperatorError('Unacceptable operator. Check get_possible_operators()')
+    if expected_length is not None:
+        if not isinstance(expected_length, (int, float)):
+            raise TypeError('expected_length should be an integer (or a float)')
+    if assign_length_to_numbers is not None:
+        if not isinstance(assign_length_to_numbers, bool):
+            raise TypeError('assign_length_to_numbers should be a bool')
+    if execution_mode is not None:
+        if not execution_mode in ('raise', 'return'):
+            raise ValueError('execution_mode should be either "raise" or "return"')
+    if expected_instance is not None:
+        if not isinstance(expected_instance, (tuple, list)):
+            if not isinstance(expected_instance, type):
+                raise TypeError('expected_instance must be a valid type')
+        else:
+            expected_instance = [i for i in expected_instance if i is not None]
+            for instance in expected_instance:
+                if not isinstance(instance, type):
+                    raise TypeError('all items in expected_instance must be valid types')
+
+
