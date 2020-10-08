@@ -451,9 +451,6 @@ def _return_from_check_if_paths_exist(error, message, paths):
 def check_comparison(item_1, operator, item_2,
                      error=ValueError,
                      message=None):
-    # I used the above structure of arguments for purpose:
-    # line of item_1, operator, item_2  -> these are strictly related, like a comparison
-    # You like it?
     """Check if a comparison of two items is true.
 
     The operator should be from get_possible_operators().
@@ -760,13 +757,6 @@ def catch_check(check_function, *args, **kwargs):
 
 
 def catch_check(check_function, *args, **kwargs):
-    # I am so small and have problems with kwargs. This test does not pass:
-    # >> > print(catch_check(check_if, kwargs={'condition': 2>2, 'error': ValueError}))
-    # What am I doing wrong?
-    # I will add pytests once we have it.
-
-    # And look at the last test below. How can we raise an exception when we have it
-    # as string?
     """Catch exception raised by checkit functions.
     
     Most checkit functions return None when the check is fine and raise
@@ -832,10 +822,6 @@ def catch_check(check_function, *args, **kwargs):
 
 
 def _compare(item_1, operator, item_2):
-    # Maybe we should make it compare() so that the users will use it?
-    # But it's nothing really fascinating about it, the user can
-    # write 2 > 5 instead of compare(2, greater_than, 5). We need it here,
-    # but I don't think we need to share it with the users.
     """Compare item_1 and item_2 using operator.
 
     The operator should be from get_possible_operators().
