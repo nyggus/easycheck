@@ -440,7 +440,7 @@ def _return_from_check_if_paths_exist(error, message, paths):
     ...    error=FileNotFoundError,
     ...    message='No such file',
     ...    paths='D:/this_dir/this_path.csv') # doctest: +ELLIPSIS
-    (FileNotFoundError('No such file',...
+    (FileNotFoundError('No such file'...
     """
     if message:
         return error(str(message)), paths
