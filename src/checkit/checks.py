@@ -439,11 +439,11 @@ def _return_from_check_if_paths_exist(error, message, paths):
     >>> _return_from_check_if_paths_exist(
     ...    error=FileNotFoundError,
     ...    message='No such file',
-    ...    paths='D:/this_dir/this_path.csv')
-    (FileNotFoundError('No such file'), 'D:/this_dir/this_path.csv')
+    ...    paths='D:/this_dir/this_path.csv') # doctest: +ELLIPSIS
+    (FileNotFoundError('No such file',...
     """
     if message:
-        return error(message), paths
+        return error(str(message)), paths
     else:
         return error(), paths
 
@@ -539,11 +539,11 @@ def check_all_ifs(*args):
     ...    (check_if_not, 'a' == 'a')
     ...    )
     {'1: check_if': True, '2: check_if_not': AssertionError()}
-    >>> check_all_ifs(
+    >>> check_all_ifs( # doctest: +ELLIPSIS
     ...    (check_if, 2 > 1),
     ...    (check_if_not, 'a' == 'a', ValueError, 'Wrong!')
     ...    )
-    {'1: check_if': True, '2: check_if_not': ValueError(\'Wrong!\')}
+    {'1: check_if': True, '2: check_if_not': ValueError(\'Wrong!...
 
     Style suggestion:
         Use coding style you prefer, but in our opinion you can increase
@@ -796,8 +796,8 @@ def catch_check(check_function, *args, **kwargs):
     >>> catch_check(check_length, [2, 2], 3)
     LengthError()
     >>> my_check = catch_check(check_instance, 25, float, ValueError, 'This is no float!')
-    >>> my_check
-    ValueError('This is no float!')
+    >>> my_check # doctest: +ELLIPSIS
+    ValueError('This is no float!'...
     >>> print(str(my_check))
     This is no float!
     >>> my_check = catch_check(check_instance, 'a', int)
