@@ -108,11 +108,7 @@ for numbers), again using the operator parameter:
 >>> check_comparison(a, equal, c)
 
 When you're using Python 3.8 or newer, you can use the walrus operator with
-the checkit functions, like here:
->>> python_major_version, python_minor_version = sys.version_info[0:2]
->>> x, y = 4, 1.2
->>> if python_major_version == 3 and python_minor_version >= 8:
-...    check_if(new_variable := pow(x, y) > 5)
+the checkit functions.
 
 Additional comments about our intentions:
 We thought of adding functions like check_if_equal(item_1, item_2, message=None),
