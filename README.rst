@@ -340,6 +340,7 @@ Although we stress that checkit functions are dedicated to be used in code (unli
         check_length(b, 5)
               
 IDEA: makes aliases to be used in testing, like here:
+-----------------------------------------------------
 
 .. code-block:: python
 
