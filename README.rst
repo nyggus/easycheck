@@ -169,7 +169,7 @@ The checkit code could look like the following:
     
 You can of course handle this exception, for example like here:
 
-..code-block:: python
+.. code-block:: python
 
     def get_data(db_details, db_credentials, archived_data_file):
         data = get_data_from_db(db_details, db_credentials)
@@ -187,7 +187,7 @@ You can of course handle this exception, for example like here:
     
 Of course, you might use here a dedicated context manager. Sure, you can write it in a shorter way, without checkit, but the flow of information will not that that smooth, resulting in lower readability:
 
-..code-block:: python
+.. code-block:: python
 
     def get_data(db_details, db_credentials, archived_data_file):
             data = get_data_from_db(db_details, db_credentials)
@@ -203,9 +203,9 @@ Example 3: Readability: the check_argument function
 
 Compare the two following functions (the first one is the actual function from the checkit function), both doing the same thing, though with slightly different messages they might provide in terms an exception is raised. The first one is written in a classical way, while the second using the `check_argument()` function:
 
-..code-block:: python
+.. code-block:: python
 
-import checkit
+    import checkit
 
 
     def _check_checkit_arguments(error=None,
@@ -302,7 +302,7 @@ Example 4: Catching instead of raising exceptions
 
 If you do not want to raise exceptions but to catch them, you can do so using the `catch_check()` function:
 
-..code-block:: python
+.. code-block:: python
 
     my_check = catch_check(check_if, 2>2, ValueError)
     my_check
