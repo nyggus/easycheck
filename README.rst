@@ -305,7 +305,7 @@ If you do not want to raise exceptions but to catch them, you can do so using th
 .. code-block:: python
 
     >>> my_check = catch_check(check_if, 2>2, ValueError)
-    >>>my_check
+    >>> my_check
     ValueError()
     >>> type(my_check)
     <class 'ValueError'>
@@ -339,5 +339,25 @@ Although we stress that checkit functions are dedicated to be used in code (unli
         check_instance(b, tuple)
         check_length(b, 5)
               
+IDEA: makes aliases to be used in testing, like here:
+
+.. code-block: python
+
+    def test_something():
+        a, b = my_function_1(), my_function_2()
         
+        assert a == 2; 
+        # or
+        assert_if(a == 2)
         
+        assert isinstance(a, int)
+        # or
+        assert_instance(a, int)
+        
+        assert isinstance(b, tuple)
+        assert len(b) == 5
+        # or
+        assert_instance(b, tuple)
+        assert_length(b, 5)
+
+It would simply mean making :code:`assert_if = check_if; assert_instance = check_instance` and so on. What do you think about it? 
