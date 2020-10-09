@@ -578,6 +578,7 @@ def check_argument(argument_name,
                    expected_length=None,
                    expected_condition=None,
                    error=ArgumentValueError,
+                   message=None,
                    **kwargs):
     """Check if the user provided a correct argument value.
 
@@ -596,7 +597,10 @@ def check_argument(argument_name,
     from an attempt to apply the `int()` function to a string:
 
     >>> x = 'one'
-    >>> check_argument('x', x, expected_instance=int, condition=int(x) % 2 == 0)
+    >>> check_argument(
+    ...    'x', x,
+    ...    expected_instance=int,
+    ...    expected_condition=int(x) % 2 == 0)
     Traceback (most recent call last):
         ...
     ValueError: invalid literal for int() with base 10: 'one'
@@ -613,7 +617,7 @@ def check_argument(argument_name,
     >>> foo('no choice')
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: x's value, no choice, is not among valid values.
+    checks.ArgumentValueError: x's value, no choice, is not among valid values: ('first choice', 'second_choice').
 
     >>> x = 2; check_argument('x', x, expected_condition=x % 2 == 0)
     >>> x = 3; check_argument('x', x, expected_condition=x % 2 == 0)
@@ -621,11 +625,20 @@ def check_argument(argument_name,
         ...
     checks.ArgumentValueError: Provided condition violated for x
 
-    >>> x = 2.0
-    >>> check_argument('x', x, expected_instance=int, condition=int(x) % 2 == 0)
+    You can provide your own message, though:
+    >>> check_argument(
+    ...    'x', x,
+    ...    expected_condition=x % 2 == 0,
+    ...    message='Wrong, my friend!')
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: Incorrect instance of x
+    checks.ArgumentValueError: Wrong, my friend!
+    
+    >>> x = 2.0
+    >>> check_argument('x', x, expected_instance=int, expected_condition=int(x) % 2 == 0)
+    Traceback (most recent call last):
+        ...
+    checks.ArgumentValueError: Incorrect instance of x; valid instance(s): <class 'int'>
 
     >>> x = 3
     >>> check_argument('x',
@@ -674,24 +687,27 @@ def check_argument(argument_name,
                          ' to be checked')
 
     if expected_instance is not None:
-        instance_message = f'Incorrect instance of {argument_name}'
+        instance_message = _make_message(
+            message,
+            (f'Incorrect instance of {argument_name}; valid instance(s):'
+             f' {expected_instance}'))
         check_instance(item=argument,
                        expected_instance=expected_instance,
                        error=error,
                        message=instance_message)
     if expected_choices is not None:
-        choices_message = (
-            f'{argument_name}\'s value, {argument}, '
-            'is not among valid values.'
-        )
+        choices_message = _make_message(
+            message,
+            (f'{argument_name}\'s value, {argument}, '
+             f'is not among valid values: {expected_choices}.'))
         check_if(argument in expected_choices,
                  error=error,
                  message=choices_message)
     if expected_length is not None:
-        length_message = (
-            f'Unexpected length of {argument_name}'
-            f' (should be {expected_length})'
-        )
+        length_message = _make_message(
+            message,
+            (f'Unexpected length of {argument_name}'
+             f' (should be {expected_length})'))
         check_length(item=argument,
                      expected_length=expected_length,
                      error=error,
@@ -699,13 +715,28 @@ def check_argument(argument_name,
                      **kwargs
                      )
     if expected_condition is not None:
-        condition_message = f'Provided condition violated for {argument_name}'
+        condition_message = _make_message(
+            message,
+            f'Provided condition violated for {argument_name}')
         check_if(expected_condition,
                  error=error,
                  message=condition_message)
 
 
+def _make_message(message_provided, message_otherwise):
+    """
+    >>> _make_message(None, 'Otherwise')
+    'Otherwise'
+    >>> _make_message('Provided', 'Otherwise')
+    'Provided'
+    >>> _make_message('Provided', 'Otherwise')
+    'Provided'
+    """
+    return message_provided if message_provided else message_otherwise
+
+
 def catch_check(check_function, *args, **kwargs):
+    # TODO: The last test does not work
     """Catch exception raised by checkit functions.
     
     Most checkit functions return None when the check is fine and raise
@@ -727,7 +758,7 @@ def catch_check(check_function, *args, **kwargs):
     >>> print(catch_check(check_instance, 25, float, ValueError, 'This is no float!'))
     ValueError('This is no float!')
     >>> my_check = catch_check(check_instance('a', int))
-    >>> raise?????????????????????????????????????????
+    >>> raise my_check()
     """
     check_if(hasattr(check_function, '__call__'),
              error=TypeError,
@@ -949,16 +980,19 @@ def _check_checkit_arguments(error=None,
             raise ValueError('The condition does not give a True/False answer')
     if operator is not None:
         if operator not in get_possible_operators():
-            raise OperatorError('Unacceptable operator. Check get_possible_operators()')
+            raise OperatorError(
+                'Unacceptable operator. Check get_possible_operators()')
     if expected_length is not None:
         if not isinstance(expected_length, (int, float)):
-            raise TypeError('expected_length should be an integer (or a float)')
+            raise TypeError(
+                'expected_length should be an integer (or a float)')
     if assign_length_to_numbers is not None:
         if not isinstance(assign_length_to_numbers, bool):
             raise TypeError('assign_length_to_numbers should be a bool')
     if execution_mode is not None:
         if not execution_mode in ('raise', 'return'):
-            raise ValueError('execution_mode should be either "raise" or "return"')
+            raise ValueError(
+                'execution_mode should be either "raise" or "return"')
     if expected_instance is not None:
         if not isinstance(expected_instance, (tuple, list)):
             if not isinstance(expected_instance, type):
@@ -967,6 +1001,7 @@ def _check_checkit_arguments(error=None,
             expected_instance = [i for i in expected_instance if i is not None]
             for instance in expected_instance:
                 if not isinstance(instance, type):
-                    raise TypeError('all items in expected_instance must be valid types')
+                    raise TypeError(
+                        'all items in expected_instance must be valid types')
 
 
