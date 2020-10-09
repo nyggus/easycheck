@@ -29,6 +29,7 @@ from checkit.checks import (check_if,
                             _raise,
                             _return_from_check_if_paths_exist,
                             _check_checkit_arguments,
+                            _make_message,
                             )
 
 from collections.abc import Generator
@@ -439,4 +440,8 @@ def test_check_checkit_arguments():
         )
 
 
+def test_make_message():
+    assert _make_message(None, 'Otherwise') == 'Otherwise'
+    assert _make_message('Provided', 'Otherwise') == 'Provided'
+    assert _make_message('Provided', 'Otherwise') == 'Provided'
 
