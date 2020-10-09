@@ -64,3 +64,4 @@ project_check_it.wpr
 
 # Batch scripts
 *.bat
+*.sh
