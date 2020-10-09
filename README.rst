@@ -45,7 +45,7 @@ The package is covered with both doctests and pytests. You can run them using th
 Example 1: Use checkit in code
 ------------------------------
 
-The basic aim of checkit is to provide you with quick-to-use, simple and readable assertion-like functions to make sure that particular conditions you are interested in are met. They are assert-like because what you do is indeed similar to what assert expressions do, since the functions: (i) check a condition, (ii) do nothing when it's met, but (iii) raise an exception when it is not. However, checkit differs from assertions in one significant functionality: Unlike when using the `assert` expression, you can raise any error you want. What is perhaps more important, you are not supposed to use the assert expression in code outside of testing, but you can do so with checkit assert-like functions (starting off with check_).
+The basic aim of checkit is to provide you with quick-to-use, simple and readable assertion-like functions to make sure that particular conditions you are interested in are met. They are assert-like because what you do is indeed similar to what assert expressions do, since the functions: (i) check a condition, (ii) do nothing when it's met, but (iii) raise an exception when it is not. However, checkit differs from assertions in one significant functionality: Unlike when using the :code:`assert` expression, you can raise any error you want. What is perhaps more important, you are not supposed to use the assert expression in code outside of testing, but you can do so with checkit assert-like functions (starting off with check_).
 
 Of course, checkit is to help you when Python does not handle a particular situation. For example, it does so when you're trying to divide a number by zero, so you need not use checkit then. But there is a plethora of various situations which you want to handle.
 
@@ -65,9 +65,9 @@ Here are several examples of the simplest uses of checkit:
         
         return full_name.split(' ')[0]
     
-If something is wrong, the corresponding exception is raised. If you need to catch these exceptions and handle them accordingly, you can certainly do so (note that two different types of errors can be raised by `get_family_name()`).
+If something is wrong, the corresponding exception is raised. If you need to catch these exceptions and handle them accordingly, you can certainly do so (note that two different types of errors can be raised by :code:`get_family_name()`).
         
-Above, the `check_instance()` itself function can handle the None situation! This will make the code simpler and shorter:
+Above, the :code:`check_instance()` itself function can handle the None situation! This will make the code simpler and shorter:
 
 .. code-block:: python
     
@@ -118,7 +118,7 @@ with its non-checkit counterpart being rather less readable:
         
         return full_name.split(' ')[0]
 
-But the checkit module offers also a dedicated function for checking arguments, `check_argument`. It offers much more flexibility in some terms (combining various checks) but less in others (since it uses its own messages only). We could use the following approach to reach the same objective:
+But the checkit module offers also a dedicated function for checking arguments, :code:`check_argument`. It offers much more flexibility in some terms (combining various checks) but less in others (since it uses its own messages only). We could use the following approach to reach the same objective:
 
 .. code-block:: python
     
@@ -131,7 +131,7 @@ But the checkit module offers also a dedicated function for checking arguments, 
         
         return full_name.split(' ')[0]
 
-If the instance condition is violated, it would throw ArgumentValueError with the following message: "Incorrect instance of full_name; valid instance(s): <class 'str'>". If the expected_condition is violated, then the ArgumentValueError would be raised with the following message: "Provided condition violated for full_name". So, it's up to you which approach you will choose: the `check_argument()` function, which offers a dedicated API to check arguments, or a number of function calls that check the particular aspects of the argument you want to check. In `check_argument()`, you can also use a dedicated message, although this functionality is less obvious when you are checking several aspects of the argument at the same time (in which case it's better to use the in-built default messages).
+If the instance condition is violated, it would throw ArgumentValueError with the following message: "Incorrect instance of full_name; valid instance(s): <class 'str'>". If the expected_condition is violated, then the ArgumentValueError would be raised with the following message: "Provided condition violated for full_name". So, it's up to you which approach you will choose: the :code:`check_argument()` function, which offers a dedicated API to check arguments, or a number of function calls that check the particular aspects of the argument you want to check. In :code:`check_argument()`, you can also use a dedicated message, although this functionality is less obvious when you are checking several aspects of the argument at the same time (in which case it's better to use the in-built default messages).
 
 Example 2: Use checkit in code: handle errors
 ---------------------------------------------
@@ -196,12 +196,12 @@ Of course, you might use here a dedicated context manager. Sure, you can write i
                     data = f.readlines()
             return data
 
-Of course, the `open()` context manager will itself throw an error, but when you use the `check_if()` function and explicitely define an exception class, you clearly show the reader that you're checking if this file exists and raise a particular exception if it doesn't.
+Of course, the :code:`open()` context manager will itself throw an error, but when you use the :code:`check_if()` function and explicitely define an exception class, you clearly show the reader that you're checking if this file exists and raise a particular exception if it doesn't.
         
 Example 3: Readability: the check_argument function
 ---------------------------------------------------
 
-Compare the two following functions (the first one is the actual function from the checkit function), both doing the same thing, though with slightly different messages they might provide in terms an exception is raised. The first one is written in a classical way, while the second using the `check_argument()` function:
+Compare the two following functions (the first one is the actual function from the checkit function), both doing the same thing, though with slightly different messages they might provide in terms an exception is raised. The first one is written in a classical way, while the second using the :code:`check_argument()` function:
 
 .. code-block:: python
 
@@ -300,7 +300,7 @@ Unfortunately, we used the former version of the function in the package itself,
 Example 4: Catching instead of raising exceptions
 -------------------------------------------------
 
-If you do not want to raise exceptions but to catch them, you can do so using the `catch_check()` function:
+If you do not want to raise exceptions but to catch them, you can do so using the :code:`catch_check()` function:
 
 .. code-block:: python
 
@@ -341,7 +341,7 @@ Although we stress that checkit functions are dedicated to be used in code (unli
               
 IDEA: makes aliases to be used in testing, like here:
 
-.. code-block: python
+.. code-block:: python
 
     def test_something():
         a, b = my_function_1(), my_function_2()
