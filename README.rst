@@ -320,7 +320,7 @@ Example 5: Testing
 
 Although we stress that checkit functions are dedicated to be used in code (unlike classical assertions), it does not mean that they cannot be used in testing. We do use them from time to time in doctests (although we not to overuse them, to not risk accusations that we are testing our solution with our solution; this is why we do not use the module in pytests at all). But the checkit functions can easily replace many assertions. Consider the below pairs of assertions to be used in testing.
 
-.. code-block: python
+.. code-block:: python
 
     def test_something():
         a, b = my_function_1(), my_function_2()
