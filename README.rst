@@ -140,7 +140,7 @@ You want to connect to a database; if the connection fails for any reason, you w
 
 .. code-block:: python
 
-    import checkit.checks as checker
+    import checkit
     
     class DataBaseConnectionError(Exception):
         pass
@@ -159,7 +159,7 @@ The checkit code could look like the following:
 
     def get_data(db_details, db_credentials):
         data = get_data_from_db(db_details, db_credentials)
-        check_if(
+        checkit.check_if(
             data,
             error=DataBaseConnectionError,
             message='Cannot communicate with the database'
@@ -174,13 +174,13 @@ You can of course handle this exception, for example like here:
     def get_data(db_details, db_credentials, archived_data_file):
         data = get_data_from_db(db_details, db_credentials)
         try:
-            check_if(
-            data,
-            error=DataBaseConnectionError,
-            message='Cannot communicate with the database'
+            checkit.check_if(
+                data,
+                error=DataBaseConnectionError,
+                message='Cannot communicate with the database'
             )
         except DataBaseConnectionError:
-            check_if_file_exists(archived_data_file)
+            checkit.check_if_file_exists(archived_data_file)
             with open(archived_data_file) as f:
                 data = f.readlines()
         return data
@@ -339,12 +339,16 @@ Although we stress that checkit functions are dedicated to be used in code (unli
         check_instance(b, tuple)
         check_length(b, 5)
               
+
 IDEA: makes aliases to be used in testing, like here:
 -----------------------------------------------------
 
 .. code-block:: python
 
-    def test_something():
+    from checkit.testing import assert_if, assert_instance, assert_length
+	# or assert_len?
+	
+	def test_something():
         a, b = my_function_1(), my_function_2()
         
         assert a == 2; 
@@ -362,3 +366,49 @@ IDEA: makes aliases to be used in testing, like here:
         assert_length(b, 5)
 
 It would simply mean making :code:`assert_if = check_if; assert_instance = check_instance` and so on. What do you think about it? 
+
+
+IDEA: easy_mock
+---------------
+
+For the moment, just look at this. These are functions we originally have:
+
+.. code-block:: python
+
+    def read_from_data_base():
+        # the original function, which takes about 5 sec to run
+        import time
+        time.sleep(5)
+        something, success, data = 50, True, range(1000)
+        return something, success, data
+    def analyze_data(data):
+        # do whatever you need to do with the data
+        return sum(data)
+    
+So, we have a function that uses the data got by the read_from_data_base() function. You can write a doctest for read_from_data_base(), but it will take those five seconds. A doctest for the analyze_data() function, however, will require to run the read_from_data_base() function, something you want to avoid because of the time it would take. Here, the easy_mock comes to rescue. Here is how you could write a doctest for it:
+    
+.. code-block:: python
+
+	read_from_data_base = easy_mock(
+        read_from_data_base,
+        returns=(50, True, [20, 30, 40]))
+    *whatever, data = read_from_data_base()
+    results = analyze_data(data)
+	
+Of course, you could make it without the mock whatsoever, like here:
+
+.. code-block:: python
+
+	the_data = 50, True, [20, 30, 40])
+    *whatever, data = read_from_data_base()
+    results = analyze_data(data)
+
+but this approach loses the readability, in that you do not show the path from :code:`read_from_data_base()` to :code:`analyze_data()`. You could also do as follows:
+
+.. code-block:: python
+
+	def read_from_data_base(): return 50, True, [20, 30, 40])
+    *whatever, data = read_from_data_base()
+    results = analyze_data(data)
+
+but again, this solution misses the link between these two functions. What's more, if the reader does not know that the module has a function called :code:`read_from_data_base()`, this function will not even hint it. But when you've used :code:`easy_mock()`, it is not only a suggestion, but precise information that there is a function :code:`read_from_data_base()`, which is an important one (for that or another reason, but important enough for you to use mock it and use its mock), and which is either defined in the module or imported from elsewhere.
