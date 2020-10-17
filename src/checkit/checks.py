@@ -970,7 +970,10 @@ def _check_checkit_arguments(error=None,
     >>> _check_checkit_arguments(error=ValueError, condition=2<1)
     """
     if error is not None:
-        if not isinstance(error(), Exception):
+        try:
+            if not isinstance(error(), Exception):
+                raise TypeError('error must be an exception')
+        except:
             raise TypeError('error must be an exception')
     if message is not None:
         if not isinstance(message, str):
