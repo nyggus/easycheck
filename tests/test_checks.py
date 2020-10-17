@@ -94,6 +94,12 @@ def test_check_instance():
         check_instance((i for i in range(3)), tuple)
     with pytest.raises(TypeError):
         check_instance((i for i in range(3)), tuple, message='This is not tuple.')
+    with pytest.raises(TypeError):
+        check_instance(10, None)
+        check_instance('string', None)
+        check_instance((10, 20), None)
+        check_instance([10, 20], None)
+    assert check_instance(None, None) is None
 
 
 def test_compare():
@@ -185,6 +191,9 @@ def test_parse_error_and_message_from():
     assert error == 'ValueError'
     assert message is None
 
+    this_item_is_None = None
+    assert _parse_error_and_message_from(this_item_is_None) is None
+
 
 def test_check_all_ifs():
     multiple_check_1 = check_all_ifs(
@@ -197,26 +206,48 @@ def test_check_all_ifs():
         (check_if, 2 > 1),
         (check_if_not, 'a' == 'a')
     )
-    assert any(type(value) == AssertionError for key, value in multiple_check_2.items())
+    assert any(type(value) == AssertionError
+               for key, value in multiple_check_2.items())
 
     multiple_check_3 = check_all_ifs(
         (check_if, 2 > 1),
         (check_if_not, 'a' == 'a', ValueError)
     )
-    assert any(type(value) == ValueError for key, value in multiple_check_3.items())
+    assert any(type(value) == ValueError
+               for key, value in multiple_check_3.items())
 
 
 def test_check_if_paths_exist():
+    non_existing_path = 'Z:/Op/Oop/'
     with pytest.raises(ValueError):
-        check_if_paths_exist('Q:/Op/Oop/', execution_mode='buuu')
+        check_if_paths_exist(non_existing_path, execution_mode='buuu')
     with pytest.raises(FileNotFoundError):
-        check_if_paths_exist('Z:/Op/Oop/')
+        check_if_paths_exist(non_existing_path)
     with pytest.raises(IOError):
-        check_if_paths_exist('Z:/Op/Oop/', error=IOError)
+        check_if_paths_exist(non_existing_path, error=IOError)
     with pytest.raises(FileNotFoundError):
-        check_if_paths_exist(['Q:/Op/Oop/'] + os.listdir('.'))
-    assert check_if_paths_exist(os.listdir('.')) is None
-    assert check_if_paths_exist(os.listdir('.'), execution_mode='return')
+        check_if_paths_exist([non_existing_path] + os.listdir('.'))
+
+    failed_check = check_if_paths_exist(non_existing_path,
+                                        execution_mode='return')
+    assert failed_check[1] == 'Z:/Op/Oop/'
+    with pytest.raises(FileNotFoundError):
+        raise failed_check[0]
+
+    single_path_to_check = os.listdir('.')[0]
+    list_of_paths_to_check = os.listdir('.')
+    assert check_if_paths_exist(single_path_to_check) is None
+    assert check_if_paths_exist(single_path_to_check,
+                                execution_mode='return')
+
+    assert check_if_paths_exist(list_of_paths_to_check) is None
+    assert check_if_paths_exist(list_of_paths_to_check,
+                                execution_mode='return')
+
+    with pytest.raises(TypeError) as error_msg:
+        check_if_paths_exist({})
+    assert str(error_msg.value) == ('Argument paths must be string,'
+                                    ' tuple of strigs, or list of strings')
 
 
 def test_raise():
@@ -226,6 +257,19 @@ def test_raise():
         _raise(TypeError)
     with pytest.raises(TypeError, match='Incorrect type'):
         _raise(TypeError, 'Incorrect type')
+
+
+def test_check_argument_error():
+    msg = 'check_argument() requires at least one condition to be checked'
+    with pytest.raises(ValueError) as msg_error:
+        check_argument('x', 10)
+    assert str(msg_error.value) == msg
+    with pytest.raises(ValueError) as msg_error:
+        check_argument('x', 10, message='Error!')
+    assert str(msg_error.value) == msg
+    with pytest.raises(ValueError) as msg_error:
+        check_argument('x', 10, error=TypeError)
+    assert str(msg_error.value) == msg
 
 
 def test_check_argument_instance():
@@ -364,6 +408,10 @@ def test_return_from_check_if_paths_exist():
 
 
 def test_check_checkit_arguments():
+    with pytest.raises(TypeError) as msg_error:
+        _check_checkit_arguments(error=20)
+    assert str(msg_error.value) == 'error must be an exception'
+
     assert _check_checkit_arguments(error=LengthError) is None
     with pytest.raises(NameError):
         _check_checkit_arguments(error=NonExistingError)
