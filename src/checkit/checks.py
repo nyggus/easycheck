@@ -960,9 +960,6 @@ def _check_checkit_arguments(error=None,
     
     But
     >>> _check_checkit_arguments(error=ValueError())
-    Traceback (most recent call last):
-        ...
-    TypeError: 'ValueError' object is not callable
     >>> _check_checkit_arguments(error=LengthError, message=False)
     Traceback (most recent call last):
         ...
@@ -971,8 +968,9 @@ def _check_checkit_arguments(error=None,
     """
     if error is not None:
         try:
-            if not isinstance(error(), Exception):
-                raise TypeError('error must be an exception')
+            if not isinstance(error, Exception):
+                if (not isinstance(error(), Exception)):
+                    raise TypeError('error must be an exception')
         except:
             raise TypeError('error must be an exception')
     if message is not None:
@@ -1006,5 +1004,3 @@ def _check_checkit_arguments(error=None,
                 if not isinstance(instance, type):
                     raise TypeError(
                         'all items in expected_instance must be valid types')
-
-
