@@ -956,8 +956,6 @@ def _check_checkit_arguments(error=None,
     
     >>> _check_checkit_arguments(error=LengthError)
     >>> _check_checkit_arguments(error=ValueError)
-    
-    But
     >>> _check_checkit_arguments(error=ValueError())
     >>> _check_checkit_arguments(error=LengthError, message=False)
     Traceback (most recent call last):
