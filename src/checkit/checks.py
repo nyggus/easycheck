@@ -736,7 +736,6 @@ def _make_message(message_provided, message_otherwise):
 
 
 def catch_check(check_function, *args, **kwargs):
-    # TODO: The last test does not work
     """Catch exception raised by checkit functions.
     
     Most checkit functions return None when the check is fine and raise
