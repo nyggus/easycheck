@@ -19,3 +19,12 @@ from checkit.checks import (check_if,
                             LengthError,
                             OperatorError,
                             )
+
+from checkit.testing import (assert_if,
+                             assert_if_not,
+                             assert_length,
+                             assert_instance,
+                             assert_paths,
+                             easy_mock,
+                             mock,
+                             )
