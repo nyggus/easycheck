@@ -889,7 +889,11 @@ def _clean_message(message):
     if isinstance(message, str):
         message = (message)[:-1].replace('"', '')
     elif isinstance(message, (tuple, list)):
+        if not all(isinstance(item, str) for item in message):
+            raise TypeError(r'message must be string or tuple/list of strings')
         message = '('.join(message)[:-1].replace('"', '')
+    else:
+        raise TypeError(r'message must be string or tuple/list of strings')
     if message == '':
         message = None
     return message
