@@ -35,6 +35,30 @@ from checkit.checks import (check_if,
 from collections.abc import Generator
 
 
+def test_check_if_edge_cases():
+    with pytest.raises(TypeError,
+                       match="missing 1 required positional argument"):
+        check_if()
+    with pytest.raises(ValueError,
+                       match='The condition does not give'):
+        check_if('tomato soup is good')
+        check_if(22)
+        check_if(1)
+        check_if(0)
+    assert check_if(True) is None
+    with pytest.raises(AssertionError):
+        check_if(False)
+    with pytest.raises(TypeError,
+                       match='error must be an exception'):
+        check_if(1, 1)
+        check_if(1, 1, 1)
+    with pytest.raises(TypeError,
+                       match='takes from 1 to 3 positional'):
+        check_if(1, 1, 1, 1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        check_if(Condition=12 > 5)
+
+
 def test_check_if():
     assert check_if(2 > 1) is None
     assert check_if(0 == 0) is None
@@ -49,6 +73,27 @@ def test_check_if():
         check_if('a' > 2)
 
 
+def test_check_if_edge_cases():
+    with pytest.raises(TypeError,
+                       match="missing 1 required positional argument"):
+        check_if_not()
+    with pytest.raises(ValueError, match='The condition does not give'):
+        check_if_not('tomato soup is good')
+        check_if_not(22)
+        check_if_not(1)
+        check_if_not(0)
+    assert check_if_not(False) is None
+    with pytest.raises(AssertionError):
+        check_if_not(True)
+    with pytest.raises(TypeError, match='error must be an exception'):
+        check_if_not(1, 1)
+        check_if_not(1, 1, 1)
+    with pytest.raises(TypeError, match='takes from 1 to 3 positional'):
+        check_if_not(1, 1, 1, 1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        check_if_not(Condition=12 > 5)
+
+
 def test_check_if_not():
     assert check_if_not(2 < 1) is None
     with pytest.raises(AssertionError):
@@ -61,6 +106,20 @@ def test_check_if_not():
         check_if_not('a' > 2)
 
 
+def test_check_length_edge_cases():
+    with pytest.raises(TypeError, match='required positional arguments'):
+        check_length()
+        check_length(1)
+        check_length('tomato soup is good')
+    with pytest.raises(OperatorError, match='Unacceptable operator'):
+        check_length(1, 1, 1)
+    with pytest.raises(TypeError, match='BaseException type, not str'):
+        pytest.raises('tomato soup', 'is good')
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        check_length(Item=2)
+        check_length(item=2, length=5)
+
+
 def test_check_length():
     assert check_length(['string'], 1) is None
     assert check_length('string', 6) is None
@@ -70,9 +129,21 @@ def test_check_length():
         check_length(len(i for i in range(3)), 3)
     with pytest.raises(TypeError):
         check_length(None)
-    with pytest.raises(TypeError):
-        check_length(10)
+    with pytest.raises(TypeError,
+                       match="object of type 'int' has"):
+        check_length(10, 1)
     assert check_length(10, 1, assign_length_to_numbers=True) is None
+
+
+def test_check_instance_edge_cases():
+    with pytest.raises(TypeError, match='required positional arguments'):
+        check_instance()
+        check_instance(1)
+        check_instance(True)
+        check_instance('tomato soup is good')
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        check_instance(Item=2)
+        check_instance(item=2, instance=str)
 
 
 def test_check_instance():
@@ -102,6 +173,21 @@ def test_check_instance():
     assert check_instance(None, None) is None
 
 
+def test_compare_edge_cases():
+    with pytest.raises(TypeError, match='required positional arguments'):
+        _compare()
+        _compare(1)
+        _compare(True)
+        _compare('tomato soup is good')
+        _compare(1, 1)
+        _compare(1, 'tomato soup is good')
+        _compare(1 > 2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        _compare(item1=1, operator=gt, item_2=2)
+        _compare(item_1=1, Operator=gt, item_2=2)
+        _compare(item_1=1, operator=gt, item2=2)
+
+
 def test_compare():
     assert _compare(2, equal, 2)
     assert not _compare(2, equal, 2.01)
@@ -127,6 +213,25 @@ def test_compare():
     assert _compare(3, greater_than_or_equal, 2)
     assert not _compare(2.1, gte, 2.11)
     assert not _compare(2.1, greater_than_or_equal, 2.11)
+    with pytest.raises(OperatorError, match='Incorrect operator'):
+        _compare(2, 'greater', 3)
+    with pytest.raises(NameError, match='not defined'):
+        _compare(2, GT, 3)
+
+
+def test_check_comparison_edge_cases():
+    with pytest.raises(TypeError, match='required positional arguments'):
+        check_comparison()
+        check_comparison(1)
+        check_comparison(True)
+        check_comparison('tomato soup is good')
+        check_comparison(1, 1)
+        check_comparison(1, 'tomato soup is good')
+        check_comparison(1 > 2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        check_comparison(item1=1, operator=gt, item_2=2)
+        check_comparison(item_1=1, Operator=gt, item_2=2)
+        check_comparison(item_1=1, operator=gt, item2=2)
 
 
 def test_check_comparison():
@@ -170,6 +275,22 @@ def test_check_comparison():
     with pytest.raises(AssertionError):
         check_comparison('one text', less_than, 'another text',
                          error=AssertionError)
+    with pytest.raises(NameError, match='not defined'):
+        check_comparison(2, GT, 3)
+
+
+def test_clean_message_edge_cases():
+    with pytest.raises(TypeError, match='required positional argument'):
+        _clean_message()
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        _clean_message(Message='tomato soup is good')
+    with pytest.raises(TypeError, match='string or tuple/list'):
+        _clean_message(1)
+        _clean_message((1, 1))
+        _clean_message(('tomato soup is good', 1))
+        _clean_message([1, 1])
+        _clean_message(['tomato soup is good', 1])
+        _clean_message({'1': 'tomato soup', '2': 'is good'})
 
 
 def test_clean_message():
@@ -177,12 +298,24 @@ def test_clean_message():
     assert _clean_message(
         '"Incorrect argument (change it).")'
     ) == 'Incorrect argument (change it).'
+    assert _clean_message(r'D://') == r'D:/'
+
+
+def test_parse_error_and_message_from_edge_cases():
+    with pytest.raises(TypeError, match='required positional argument'):
+        _parse_error_and_message_from()
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        _parse_error_and_message_from(message='tomato soup is good')
+    with pytest.raises(AttributeError, match="no attribute 'split'"):
+        _parse_error_and_message_from(True)
+        _parse_error_and_message_from(25)
+        _parse_error_and_message_from([1, 1])
+        _parse_error_and_message_from((1, 1))
+        _parse_error_and_message_from(['TypeError'])
 
 
 def test_parse_error_and_message_from():
-    error_and_message = (
-        'TypeError("Incorrect argument")'
-    )
+    error_and_message = ('TypeError("Incorrect argument")')
     error, message = _parse_error_and_message_from(error_and_message)
     assert error == 'TypeError'
     assert message == 'Incorrect argument'
@@ -193,6 +326,19 @@ def test_parse_error_and_message_from():
 
     this_item_is_None = None
     assert _parse_error_and_message_from(this_item_is_None) is None
+
+
+def test_check_all_ifs_edge_cases():
+    with pytest.raises(ValueError, match='at least one condition'):
+        check_all_ifs()
+    with pytest.raises(TypeError, match='Provide all function calls as'):
+        check_all_ifs(1)
+        check_all_ifs(True)
+        check_all_ifs(1, 1)
+        check_all_ifs(1 > 1, 2 > 1)
+        check_all_ifs((20 > 10))
+        check_all_ifs(check_if(20 > 10)),
+        check_all_ifs((check_if, 20 > 10), (check_if(20 > 10)))
 
 
 def test_check_all_ifs():
@@ -215,6 +361,16 @@ def test_check_all_ifs():
     )
     assert any(type(value) == ValueError
                for key, value in multiple_check_3.items())
+
+
+def test_check_if_paths_exist_edge_cases():
+    with pytest.raises(TypeError, match='required positional argument'):
+        check_if_paths_exist()
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        check_if_paths_exist(path='tomato soup is good')
+    with pytest.raises(TypeError, match='Argument paths must be string'):
+        check_if_paths_exist(20)
+        check_if_paths_exist({})
 
 
 def test_check_if_paths_exist():
@@ -244,10 +400,21 @@ def test_check_if_paths_exist():
     assert check_if_paths_exist(list_of_paths_to_check,
                                 execution_mode='return')
 
-    with pytest.raises(TypeError) as error_msg:
-        check_if_paths_exist({})
-    assert str(error_msg.value) == ('Argument paths must be string,'
-                                    ' tuple of strigs, or list of strings')
+
+def test_raise_edge_cases():
+    with pytest.raises(TypeError, match='required positional argument'):
+        _raise()
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        _raise(Error=TypeError)
+        _raise(error=TypeError, MEssage='This was an error')
+    with pytest.raises(TypeError, match='exceptions must derive from BaseException'):
+        _raise(20)
+        _raise('TypeError')
+        _raise((TypeError))
+        _raise([TypeError])
+    with pytest.raises(TypeError, match='message must be string'):
+        _raise(error=TypeError, message=20)
+        _raise(TypeError, ('This was an error'))
 
 
 def test_raise():
@@ -259,22 +426,30 @@ def test_raise():
         _raise(TypeError, 'Incorrect type')
 
 
-def test_check_argument_error():
+def test_check_argument_edge_cases():
+    with pytest.raises(TypeError, match='required positional argument'):
+        check_argument()
+        check_argument(Argument='x')
+
     msg = 'check_argument() requires at least one condition to be checked'
     with pytest.raises(ValueError) as msg_error:
-        check_argument('x', 10)
+        check_argument(10)
     assert str(msg_error.value) == msg
     with pytest.raises(ValueError) as msg_error:
-        check_argument('x', 10, message='Error!')
+        check_argument(10, message='Error!')
     assert str(msg_error.value) == msg
     with pytest.raises(ValueError) as msg_error:
         check_argument('x', 10, error=TypeError)
     assert str(msg_error.value) == msg
 
+    x = 5
+    with pytest.raises(TypeError, match='must be string'):
+        check_argument(x, x, expected_condition=x % 2 == 0)
+
 
 def test_check_argument_instance():
     def foo(x):
-        check_argument('x', x, expected_instance=str)
+        check_argument(x, 'x', expected_instance=str)
         pass
     assert foo('one') is None
     assert foo(('one')) is None
@@ -282,21 +457,25 @@ def test_check_argument_instance():
         foo(4)
         foo(('one', 'two'))
 
-    assert check_argument('my_arg', 50, expected_instance=int) is None
-    with pytest.raises(ArgumentValueError):
-        check_argument('my_arg', 50, expected_instance=str)
-        check_argument('my_arg', 'one', expected_instance=int)
+    assert check_argument(50, 'my_arg', expected_instance=int) is None
+    assert check_argument(50, expected_instance=int) is None
     assert check_argument('my_arg', 'one', expected_instance=str) is None
+    assert check_argument('my_arg', expected_instance=str) is None
+
+    with pytest.raises(ArgumentValueError, match='my_arg'):
+        check_argument(50, 'my_arg', expected_instance=str)
+        check_argument('one', 'my_arg', expected_instance=int)
+    with pytest.raises(ArgumentValueError, match='argument'):
+        check_argument(50, expected_instance=str)
+        check_argument('one', expected_instance=int)
 
 
 def test_check_argument_choices():
-    assert check_argument('my_arg',
-                          5,
-                          expected_choices=range(10),
-                          ) is None
+    assert check_argument(5, 'my_arg', expected_choices=range(10),) is None
+    assert check_argument(5, expected_choices=range(10)) is None
 
     def foo(x):
-        check_argument('x', x, expected_choices=('first choice', 'second choice'))
+        check_argument(x, expected_choices=('first choice', 'second choice'))
         pass
     assert foo('first choice') is None
     assert foo('second choice') is None
@@ -304,43 +483,78 @@ def test_check_argument_choices():
         foo('no choice')
 
     def foo(x):
-        check_argument('x', x, expected_choices=('one', 'two'))
+        check_argument(x, 'x', expected_choices=('one', 'two'))
         pass
     assert foo('one') is None
-    with pytest.raises(ArgumentValueError, match="x's value, three, is not among valid values"):
+    with pytest.raises(ArgumentValueError,
+                       match="x's value, three, is not among valid values"):
+        foo('three')
+
+    def foo(x):
+        check_argument(x, expected_choices=('one', 'two'))
+        pass
+    assert foo('one') is None
+    with pytest.raises(
+            ArgumentValueError,
+            match="argument's value, three, is not among valid values"):
         foo('three')
 
 
 def test_check_argument_length():
-    assert check_argument('my_arg',
-                          5,
+    assert check_argument(5, 'my_arg',
+                          expected_length=1,
+                          assign_length_to_numbers=True) is None
+    assert check_argument(5,
                           expected_length=1,
                           assign_length_to_numbers=True) is None
 
     def foo(x):
-        check_argument('x', x, expected_length=3, assign_length_to_numbers=True)
+        check_argument(x, 'x', expected_length=3, assign_length_to_numbers=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError):
         foo(1)
 
     def foo(x):
-        check_argument('x', x, expected_length=3, assign_length_to_numbers=True)
+        check_argument(x, expected_length=3, assign_length_to_numbers=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError):
+        foo(1)
+
+    def foo(big_x):
+        check_argument(big_x, 'big_x',
+                       expected_length=3,
+                       assign_length_to_numbers=True)
+        pass
+    assert foo([1, 2, 3]) is None
+    with pytest.raises(ArgumentValueError, match='big_x'):
+        foo(1)
+
+    def foo(big_x):
+        check_argument(big_x, expected_length=3, assign_length_to_numbers=True)
+        pass
+    assert foo([1, 2, 3]) is None
+    with pytest.raises(ArgumentValueError, match='argument'):
         foo(1)
 
 
 def test_check_argument_condition():
     x = 5
-    assert check_argument('my_argument',
-                          x,
-                          expected_condition=x in range(0, 10)
-                          ) is None
+    assert check_argument(x, 'x', expected_condition=x in range(0, 10)) is None
+    assert check_argument(x, expected_condition=x in range(0, 10)) is None
+    assert check_argument('x', expected_condition=x in range(0, 10)) is None
+    assert check_argument(x, expected_condition=x in range(0, 10)) is None
 
     def foo(x):
-        check_argument('x', x, expected_condition=x % 2 == 0)
+        check_argument(x, 'x', expected_condition=x % 2 == 0)
+        pass
+    with pytest.raises(ArgumentValueError):
+        foo(3)
+    assert foo(2) is None
+
+    def foo(x):
+        check_argument(x, expected_condition=x % 2 == 0)
         pass
     with pytest.raises(ArgumentValueError):
         foo(3)
@@ -349,15 +563,12 @@ def test_check_argument_condition():
 
 def test_check_argument_mix():
     def foo(x):
-        check_argument('x',
-                       x,
-                       expected_instance=int,
-                       condition=x % 2 == 0)
+        check_argument(x, 'x', expected_instance=int, condition=x % 2 == 0)
         pass
     with pytest.raises(TypeError):
         x = 'one'
-        check_argument(argument_name='x',
-                       argument=x,
+        check_argument(argument=x,
+                       argument_name='x',
                        expected_instance=int,
                        condition=x % 2 == 0)
     with pytest.raises(TypeError):
@@ -389,6 +600,33 @@ def test_check_argument_mix():
             expected_condition=check_glm_args(glm_args))
 
 
+def test_return_from_check_if_paths_exist_edge_cases():
+    with pytest.raises(TypeError, match='required positional argument'):
+        _return_from_check_if_paths_exist()
+        _return_from_check_if_paths_exist(
+            error=FileNotFoundError)
+        _return_from_check_if_paths_exist(
+            error=FileNotFoundError,
+            message=None)
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        _return_from_check_if_paths_exist(
+            Error=FileNotFoundError,
+            message=None,
+            paths=[])
+        _return_from_check_if_paths_exist(
+            Error=FileNotFoundError,
+            Message=None,
+            paths=[])
+        _return_from_check_if_paths_exist(
+            Error=FileNotFoundError,
+            message=None,
+            Paths=[])
+
+    with pytest.raises(TypeError, match='must be an exception'):
+        _return_from_check_if_paths_exist(20, None, [])
+        _return_from_check_if_paths_exist('TypeError', None, [])
+
+
 def test_return_from_check_if_paths_exist():
     # I don't know how to test the error returned because you cannot simply
     # compare ...[0] == FileNotFoundError().
@@ -407,10 +645,27 @@ def test_return_from_check_if_paths_exist():
     assert my_return_2[1] == 'D:/this_dir/this_path.csv'
 
 
+def test_check_checkit_arguments_edge_cases():
+	with pytest.raises(ValueError, match='Provide at least one argument'):
+		_check_checkit_arguments()
+
+	with pytest.raises(TypeError, match='unexpected keyword'):
+		_check_checkit_arguments(Error=1)
+		_check_checkit_arguments(Message=1)
+		_check_checkit_arguments(Condition=1)
+		_check_checkit_arguments(Operator=1)
+		_check_checkit_arguments(Assign_length_to_numbers=1)
+		_check_checkit_arguments(Execution_mode=1)
+		_check_checkit_arguments(Expected_instance=1)
+		_check_checkit_arguments(Expected_length=1)
+		_check_checkit_arguments(Error=ValueError, Message=1)
+
+	with pytest.raises(TypeError) as msg_error:
+		_check_checkit_arguments(error=20)
+		assert str(msg_error.value) == 'error must be an exception'
+
+
 def test_check_checkit_arguments():
-    with pytest.raises(TypeError) as msg_error:
-        _check_checkit_arguments(error=20)
-    assert str(msg_error.value) == 'error must be an exception'
 
     assert _check_checkit_arguments(error=LengthError) is None
     with pytest.raises(NameError):
