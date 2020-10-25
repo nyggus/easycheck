@@ -548,9 +548,11 @@ def check_all_ifs(*args):
         is, presenting all the independent conditions in a separate line,
         unless the call is short if presented in one line.
     """
+    if len(args) == 0:
+        raise ValueError('Provide at least one condition.')
     tuple_error_message = (
         'Provide all function calls as tuples in the form of '
-        '(check_function, *args).'
+        '(check_function, *args)'
     )
     for arg in args:
         check_instance(arg,
