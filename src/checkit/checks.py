@@ -442,6 +442,8 @@ def _return_from_check_if_paths_exist(error, message, paths):
     ...    paths='D:/this_dir/this_path.csv') # doctest: +ELLIPSIS
     (FileNotFoundError('No such file'...
     """
+    _check_checkit_arguments(error=error)
+
     if message:
         return error(str(message)), paths
     else:
@@ -573,8 +575,8 @@ def check_all_ifs(*args):
     return results_of_checks
 
 
-def check_argument(argument_name,
-                   argument,
+def check_argument(argument,
+                   argument_name=None,
                    expected_instance=None,
                    expected_choices=None,
                    expected_length=None,
@@ -588,8 +590,11 @@ def check_argument(argument_name,
     of choices; a common situation is to check if an argument the user provided
     to the function is correct. If yes, nothing happens; if not, the function
     raises error with a default message that depends on what is happening. 
+    
     The argument_name param is the actual name of the argument in function,
     which normally will be just a string of the argument (see below examples).
+    You can skip it, in which case the error messages will not include the
+    name of the argument but will inform about 'argument'.
 
     The function performs lazy checking, meaning that it first checks the
     instance (if provided), then choices (if provided), then expected length
@@ -600,7 +605,7 @@ def check_argument(argument_name,
 
     >>> x = 'one'
     >>> check_argument(
-    ...    'x', x,
+    ...    x, 'x',
     ...    expected_instance=int,
     ...    expected_condition=int(x) % 2 == 0)
     Traceback (most recent call last):
@@ -610,26 +615,27 @@ def check_argument(argument_name,
     The expected_condition, however, must actually include also the argument
     itself, like below:
     >>> x = 5
-    >>> check_argument('x', x, expected_condition=x in range(0, 10))
+    >>> check_argument(x, 'x', expected_condition=x in range(0, 10))
     >>> def foo(x):
-    ...    check_argument('x', x, expected_choices=('first choice',
+    ...    check_argument(x, 'x', expected_choices=('first choice',
     ...                                             'second_choice'))
     ...    # whatever foo is doing...
     >>> foo('first choice')
     >>> foo('no choice')
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: x's value, no choice, is not among valid values: ('first choice', 'second_choice').
+    checks.ArgumentValueError: x's value, no choice, is not among valid \
+values: ('first choice', 'second_choice').
 
-    >>> x = 2; check_argument('x', x, expected_condition=x % 2 == 0)
-    >>> x = 3; check_argument('x', x, expected_condition=x % 2 == 0)
+    >>> x = 2; check_argument(x, 'x', expected_condition=x % 2 == 0)
+    >>> x = 3; check_argument(x, 'x', expected_condition=x % 2 == 0)
     Traceback (most recent call last):
         ...
     checks.ArgumentValueError: Provided condition violated for x
 
     You can provide your own message, though:
     >>> check_argument(
-    ...    'x', x,
+    ...    x, 'x',
     ...    expected_condition=x % 2 == 0,
     ...    message='Wrong, my friend!')
     Traceback (most recent call last):
@@ -637,21 +643,31 @@ def check_argument(argument_name,
     checks.ArgumentValueError: Wrong, my friend!
     
     >>> x = 2.0
-    >>> check_argument('x', x, expected_instance=int, expected_condition=int(x) % 2 == 0)
+    >>> check_argument(
+    ...    x, 'x',
+    ...    expected_instance=int,
+    ...    expected_condition=int(x) % 2 == 0)
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: Incorrect instance of x; valid instance(s): <class 'int'>
+    checks.ArgumentValueError: Incorrect instance of x;\
+ valid instance(s): <class 'int'>
 
     >>> x = 3
-    >>> check_argument('x',
-    ...    x,
+    >>> check_argument(
+    ...    x, 'x',
     ...    expected_instance=int,
     ...    expected_condition=int(x) % 2 == 0)
     Traceback (most recent call last):
         ...
     checks.ArgumentValueError: Provided condition violated for x
     
-    >>> assert check_argument('error', TypeError, expected_instance=type) is None
+    This is how you can check Exceptions and errors provided as arguments:
+    >>> assert check_argument(
+    ...    TypeError, 'error_arg',
+    ...    expected_instance=type) is None
+    >>> assert check_argument(
+    ...    TypeError(), 'error_arg',
+    ...    expected_instance=Exception) is None
 
     You can also define quite complex checks:
     >>> def check_glm_args(glm_args):
@@ -687,6 +703,10 @@ def check_argument(argument_name,
                         expected_condition)):
         raise ValueError('check_argument() requires at least one condition'
                          ' to be checked')
+
+    if argument_name is None:
+        argument_name = 'argument'
+    check_instance(argument_name, str, message='argument_name must be string')
 
     if expected_instance is not None:
         instance_message = _make_message(
@@ -752,11 +772,13 @@ def catch_check(check_function, *args, **kwargs):
     >>> my_check = catch_check(check_if, 2>2, ValueError)
     >>> print(my_check)
     ValueError()
-    >>> print(catch_check(check_if, kwargs={'condition': 2>2, 'error': ValueError}))
+    >>> print(catch_check(check_if,
+    ...    kwargs={'condition': 2>2, 'error': ValueError}))
     ValueError()
     >>> print(catch_check(check_length, [2, 2], 3))
     LengthError()
-    >>> print(catch_check(check_instance, 25, float, ValueError, 'This is no float!'))
+    >>> print(catch_check(
+    ...    check_instance, 25, float, ValueError, 'This is no float!'))
     ValueError('This is no float!')
     >>> my_check = catch_check(check_instance('a', int))
     >>> raise my_check()
@@ -817,7 +839,8 @@ def catch_check(check_function, *args, **kwargs):
     ValueError()
     >>> catch_check(check_length, [2, 2], 3)
     LengthError()
-    >>> my_check = catch_check(check_instance, 25, float, ValueError, 'This is no float!')
+    >>> my_check = catch_check(
+    ...    check_instance, 25, float, ValueError, 'This is no float!')
     >>> my_check # doctest: +ELLIPSIS
     ValueError('This is no float!'...
     >>> print(str(my_check))
@@ -942,6 +965,7 @@ def _raise(error, message=None):
     if message is None:
         raise error
     else:
+        check_instance(message, str, message='message must be string')
         raise error(message)
 
 
@@ -969,6 +993,17 @@ def _check_checkit_arguments(error=None,
     TypeError: message must be either None or string
     >>> _check_checkit_arguments(error=ValueError, condition=2<1)
     """
+    if all(argument is None
+           for argument
+           in (error,
+               message,
+               condition,
+               operator,
+               assign_length_to_numbers,
+               execution_mode,
+               expected_length,
+               expected_instance)):
+        raise ValueError('Provide at least one argument')
     if error is not None:
         try:
             if not isinstance(error, Exception):
