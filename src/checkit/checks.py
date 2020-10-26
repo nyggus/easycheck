@@ -219,7 +219,7 @@ def check_if(condition, error=AssertionError, message=None):
     ...    (a < 50 and b > 100) or
     ...    isinstance(c, str)
     ...    )
-    
+
     This function does not use checkit checks for its arguments, since it would
     lead to infinite recursion.
     """
@@ -469,7 +469,7 @@ def check_comparison(item_1, operator, item_2,
     Traceback (most recent call last):
         ...
     ValueError
-    
+
     You can use a dedicated ComparisonError (from this module):
     >>> check_comparison('one text', less_than, 'another text',
     ...                  error=ComparisonError,
@@ -477,7 +477,7 @@ def check_comparison(item_1, operator, item_2,
     Traceback (most recent call last):
         ...
     checks.ComparisonError: Not less!
-    
+
     Style suggestion:
         Surely, use coding style you prefer, but in our opinion you can
         increase the readability of your code using the following style
@@ -589,8 +589,8 @@ def check_argument(argument,
     Use this function to check if the value the user provided is in the list
     of choices; a common situation is to check if an argument the user provided
     to the function is correct. If yes, nothing happens; if not, the function
-    raises error with a default message that depends on what is happening. 
-    
+    raises error with a default message that depends on what is happening.
+
     The argument_name param is the actual name of the argument in function,
     which normally will be just a string of the argument (see below examples).
     You can skip it, in which case the error messages will not include the
@@ -641,7 +641,7 @@ values: ('first choice', 'second_choice').
     Traceback (most recent call last):
         ...
     checks.ArgumentValueError: Wrong, my friend!
-    
+
     >>> x = 2.0
     >>> check_argument(
     ...    x, 'x',
@@ -660,7 +660,7 @@ values: ('first choice', 'second_choice').
     Traceback (most recent call last):
         ...
     checks.ArgumentValueError: Provided condition violated for x
-    
+
     This is how you can check Exceptions and errors provided as arguments:
     >>> assert check_argument(
     ...    TypeError, 'error_arg',
@@ -759,67 +759,14 @@ def _make_message(message_provided, message_otherwise):
 
 def catch_check(check_function, *args, **kwargs):
     """Catch exception raised by checkit functions.
-    
-    Most checkit functions return None when the check is fine and raise
-    an exception otherwise. You can use this function to change this behavior:
-    It still returns None when everything is fine, but instead of raising
-    the exception in case of problems, it returns this exception formatted
-    as string.
-    
-    >>> catch_check(check_if, 2==2)
-    >>> catch_check(check_if, 2>2)
-    'AssertionError()'
-    >>> my_check = catch_check(check_if, 2>2, ValueError)
-    >>> print(my_check)
-    ValueError()
-    >>> print(catch_check(check_if,
-    ...    kwargs={'condition': 2>2, 'error': ValueError}))
-    ValueError()
-    >>> print(catch_check(check_length, [2, 2], 3))
-    LengthError()
-    >>> print(catch_check(
-    ...    check_instance, 25, float, ValueError, 'This is no float!'))
-    ValueError('This is no float!')
-    >>> my_check = catch_check(check_instance('a', int))
-    >>> raise my_check()
-    """
-    check_if(hasattr(check_function, '__call__'),
-             error=TypeError,
-             message='check_function does not seem to be a checkit function')
-    check_if_not(check_function == check_all_ifs,
-                 error=ValueError,
-                 message=('Do not use catch_check for check_all_ifs because'
-                          ' it returns its checks.'))
-    check_argument(
-        argument_name=check_function.__name__,
-        argument=check_function,
-        expected_choices=(
-            check_if,
-            check_if_not,
-            check_argument,
-            check_comparison,
-            check_if_paths_exist,
-            check_instance,
-            check_length,
-        )
-    )
-    try:
-        check_function(*args, **kwargs)
-        return None
-    except Exception as e:
-        return repr(e)
 
-
-def catch_check(check_function, *args, **kwargs):
-    """Catch exception raised by checkit functions.
-    
     Most checkit functions return None when the check is fine and raise
     an exception otherwise. You can use this function to change this behavior:
     It still returns None when everything is fine, but instead of raising
     the exception in case of problems, it returns this exception.
-    
-    Note the particular behavior. Since the function returns 
-    
+
+    Note the particular behavior. Since the function returns
+
     >>> catch_check(check_if, 2==2)
     >>> catch_check(check_if, 2>2)
     AssertionError()
@@ -848,17 +795,34 @@ def catch_check(check_function, *args, **kwargs):
     >>> my_check = catch_check(check_instance, 'a', int)
     >>> my_check
     TypeError()
+    >>> raise(my_check)
+    Traceback (most recent call last):
+        ...
+    TypeError
     """
     check_if(hasattr(check_function, '__call__'),
              error=TypeError,
-             message='{check_function} does not seem to be a checkit function')
+             message=(f'{check_function} does not '
+                      'seem to be a checkit function')
+             )
     check_if_not(check_function == check_all_ifs,
                  error=ValueError,
-                 message=('Do not use catch_check for check_all_ifs because'
-                          ' it returns its checks.'))
+                 message=('Do not use catch_check for check_all_ifs() '
+                          'because it returns its checks.')
+                 )
+    paths_condition = (
+        check_function == check_if_paths_exist and
+        ('return' in args or 'execution_mode' in kwargs.keys())
+    )
+    check_if_not(paths_condition,
+                 error=ValueError,
+                 message=('Do not use catch_check for check_if_paths_exist() '
+                          'with execution_mode="return" because it returns '
+                          'its checks.')
+                 )
     check_argument(
-        argument_name=check_function.__name__,
         argument=check_function,
+        argument_name=check_function.__name__,
         expected_choices=(
             check_if,
             check_if_not,
@@ -867,7 +831,9 @@ def catch_check(check_function, *args, **kwargs):
             check_if_paths_exist,
             check_instance,
             check_length,
-        )
+        ),
+        message=(f'{check_function.__name__} is not'
+                 ' among acceptable valid checkit functions')
     )
     try:
         check_function(*args, **kwargs)
@@ -905,7 +871,7 @@ def _compare(item_1, operator, item_2):
 
 def _clean_message(message):
     """Clear message returned along with error.
-    
+
     >>> _clean_message('"Incorrect argument")')
     'Incorrect argument'
     >>> _clean_message('"This is testing message (because why not).")')
@@ -926,7 +892,7 @@ def _clean_message(message):
 
 def _parse_error_and_message_from(error_and_message):
     """Get error and message from one string.
-    
+
     >>> error_and_message = (
     ...    'TypeError("Incorrect argument")'
     ...    )
@@ -946,7 +912,7 @@ def _parse_error_and_message_from(error_and_message):
 
 def _raise(error, message=None):
     """Raise error with or without message.
-    
+
     >>> _raise(ValueError)
     Traceback (most recent call last):
        ....
@@ -978,12 +944,12 @@ def _check_checkit_arguments(error=None,
                              expected_length=None,
                              expected_instance=None):
     """Check common arguments in checkit functions.
-    
+
     The check does use use checkit functions but standard if-conditions
     (for instance, to avoid recursions, but also to ensure that the checks
     are done using a standard-library-based approach).
     Other arguments should be checked using in other ways.
-    
+
     >>> _check_checkit_arguments(error=LengthError)
     >>> _check_checkit_arguments(error=ValueError)
     >>> _check_checkit_arguments(error=ValueError())
