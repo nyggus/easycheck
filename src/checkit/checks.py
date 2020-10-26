@@ -751,8 +751,6 @@ def _make_message(message_provided, message_otherwise):
     'Otherwise'
     >>> _make_message('Provided', 'Otherwise')
     'Provided'
-    >>> _make_message('Provided', 'Otherwise')
-    'Provided'
     """
     return message_provided if message_provided else message_otherwise
 
