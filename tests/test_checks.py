@@ -756,8 +756,6 @@ def test_return_from_check_if_paths_exist_edge_cases():
 
 
 def test_return_from_check_if_paths_exist():
-    # I don't know how to test the error returned because you cannot simply
-    # compare ...[0] == FileNotFoundError().
     my_return = _return_from_check_if_paths_exist(
         error=FileNotFoundError,
         message=None,
@@ -880,6 +878,18 @@ def test_check_checkit_arguments():
             execution_mode='raise',
             assign_length_to_numbers='yes'
         )
+
+
+def test_make_message_edge_cases():
+    with pytest.raises(TypeError,
+                       match="required positional argument"):
+        _make_message()
+        _make_message(None)
+        _make_message('Provided')
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        _make_message(message='Provided')
+        _make_message(message_provided='Provided',
+                      Message_otherwise='Otherwise')
 
 
 def test_make_message():
