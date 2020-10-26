@@ -19,6 +19,7 @@ from checkit.checks import (check_if,
                             check_all_ifs,
                             check_argument,
                             check_comparison,
+                            catch_check,
                             ComparisonError,
                             ArgumentValueError,
                             LengthError,
@@ -161,16 +162,124 @@ def test_check_instance():
             (tuple, list),
             message='Neither tuple nor list'
         )
+    assert check_instance(None, None) is None
+    assert check_instance(None, (int, None)) is None
+    assert check_instance(20, (int, None)) is None
+
+    with pytest.raises(TypeError):
+        check_instance(20.1, (int, None))
+
     with pytest.raises(TypeError):
         check_instance((i for i in range(3)), tuple)
     with pytest.raises(TypeError):
-        check_instance((i for i in range(3)), tuple, message='This is not tuple.')
+        check_instance((i for i in range(3)),
+                       tuple,
+                       message='This is not tuple.')
     with pytest.raises(TypeError):
         check_instance(10, None)
         check_instance('string', None)
         check_instance((10, 20), None)
         check_instance([10, 20], None)
-    assert check_instance(None, None) is None
+
+
+def test_catch_check_edge_cases():
+    with pytest.raises(TypeError, match='required positional argument'):
+        catch_check()
+        catch_check(check=check_instance)
+    with pytest.raises(TypeError, match='checkit function'):
+        catch_check(1)
+    with pytest.raises(ArgumentValueError,
+                       match='acceptable valid checkit functions'):
+        catch_check(sum)
+
+
+def test_catch_check_if():
+    my_check = catch_check(check_if, 2 == 2)
+    assert my_check is None
+
+    my_check_not = catch_check(check_if, 2 > 2)
+    with pytest.raises(AssertionError):
+        raise my_check_not
+
+    my_check_not = catch_check(check_if, 2 > 2, ValueError)
+    assert isinstance(my_check_not, ValueError)
+    with pytest.raises(ValueError):
+        raise my_check_not
+
+
+def test_catch_check_if_not():
+    my_check = catch_check(check_if_not, 2 > 2)
+    assert my_check is None
+
+    my_check_not = catch_check(check_if_not, 2 == 2)
+    assert isinstance(my_check_not, AssertionError)
+    with pytest.raises(AssertionError):
+        raise my_check_not
+
+
+def test_catch_check_length():
+    my_check = catch_check(check_length, [2, 2], 2)
+    assert my_check is None
+
+    my_check_not = catch_check(check_length, [2, 2], 3)
+    assert isinstance(my_check_not, LengthError)
+    with pytest.raises(LengthError):
+        raise my_check_not
+
+
+def test_catch_check_instance():
+    my_check = catch_check(check_instance, 25, int)
+    assert my_check is None
+
+    my_check_not = catch_check(check_instance,
+                               25,
+                               float,
+                               ValueError,
+                               'This is no float!')
+    assert isinstance(my_check_not, ValueError)
+    with pytest.raises(ValueError, match='This is no float!'):
+        raise my_check_not
+
+    my_check = catch_check(check_instance, 'a', int)
+    assert isinstance(my_check, TypeError)
+    with pytest.raises(TypeError):
+        raise my_check
+
+
+def test_catch_check_paths_with_return():
+    existing_path = os.listdir('.')[0]
+    with pytest.raises(ValueError, match='execution_mode="return"'):
+        my_check_not = catch_check(check_if_paths_exist,
+                                   paths=existing_path,
+                                   execution_mode='return')
+    with pytest.raises(ValueError, match='execution_mode="return"'):
+        my_check_not = catch_check(check_if_paths_exist,
+                                   existing_path,
+                                   'return')
+
+
+def test_catch_check_paths_one_path():
+    existing_path = os.listdir('.')[0]
+    my_check = catch_check(check_if_paths_exist, paths=existing_path)
+    assert my_check is None
+
+    non_existing_path = 'W:/Op/No_no'
+    my_check_not = catch_check(check_if_paths_exist, paths=non_existing_path)
+    assert isinstance(my_check_not, FileNotFoundError)
+    with pytest.raises(FileNotFoundError):
+        raise my_check_not
+
+
+def test_catch_check_paths_many_paths():
+    existing_paths = os.listdir('.')
+    my_check = catch_check(check_if_paths_exist, paths=existing_paths)
+    assert my_check is None
+
+    non_existing_paths = ['W:/Op/No_no'] + os.listdir('.')
+    my_check_not = catch_check(check_if_paths_exist, paths=non_existing_paths)
+    assert isinstance(my_check_not, FileNotFoundError)
+    with pytest.raises(FileNotFoundError):
+        raise my_check_not
 
 
 def test_compare_edge_cases():
@@ -291,6 +400,7 @@ def test_clean_message_edge_cases():
         _clean_message([1, 1])
         _clean_message(['tomato soup is good', 1])
         _clean_message({'1': 'tomato soup', '2': 'is good'})
+        _clean_message((1, 1))
 
 
 def test_clean_message():
@@ -386,9 +496,15 @@ def test_check_if_paths_exist():
 
     failed_check = check_if_paths_exist(non_existing_path,
                                         execution_mode='return')
-    assert failed_check[1] == 'Z:/Op/Oop/'
+    assert failed_check[1] == non_existing_path
     with pytest.raises(FileNotFoundError):
         raise failed_check[0]
+
+    failed_check = check_if_paths_exist([non_existing_path] + os.listdir('.'),
+                                        execution_mode='return')
+    with pytest.raises(FileNotFoundError):
+        raise failed_check[0]
+    assert failed_check[1] == [non_existing_path]
 
     single_path_to_check = os.listdir('.')[0]
     list_of_paths_to_check = os.listdir('.')
@@ -583,7 +699,7 @@ def test_check_argument_mix():
                 isinstance(glm_args[2], str) and
                 glm_args[1] in ('poisson', 'quasi-poisson') and
                 glm_args[2] in ('log', 'identity')
-             )
+            )
 
         glm_args = 1, 'quasi-poisson', 'log'
         check_argument(
@@ -646,23 +762,23 @@ def test_return_from_check_if_paths_exist():
 
 
 def test_check_checkit_arguments_edge_cases():
-	with pytest.raises(ValueError, match='Provide at least one argument'):
-		_check_checkit_arguments()
+    with pytest.raises(ValueError, match='Provide at least one argument'):
+        _check_checkit_arguments()
 
-	with pytest.raises(TypeError, match='unexpected keyword'):
-		_check_checkit_arguments(Error=1)
-		_check_checkit_arguments(Message=1)
-		_check_checkit_arguments(Condition=1)
-		_check_checkit_arguments(Operator=1)
-		_check_checkit_arguments(Assign_length_to_numbers=1)
-		_check_checkit_arguments(Execution_mode=1)
-		_check_checkit_arguments(Expected_instance=1)
-		_check_checkit_arguments(Expected_length=1)
-		_check_checkit_arguments(Error=ValueError, Message=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
+        _check_checkit_arguments(Error=1)
+        _check_checkit_arguments(Message=1)
+        _check_checkit_arguments(Condition=1)
+        _check_checkit_arguments(Operator=1)
+        _check_checkit_arguments(Assign_length_to_numbers=1)
+        _check_checkit_arguments(Execution_mode=1)
+        _check_checkit_arguments(Expected_instance=1)
+        _check_checkit_arguments(Expected_length=1)
+        _check_checkit_arguments(Error=ValueError, Message=1)
 
-	with pytest.raises(TypeError) as msg_error:
-		_check_checkit_arguments(error=20)
-		assert str(msg_error.value) == 'error must be an exception'
+    with pytest.raises(TypeError) as msg_error:
+        _check_checkit_arguments(error=20)
+        assert str(msg_error.value) == 'error must be an exception'
 
 
 def test_check_checkit_arguments():
@@ -674,6 +790,9 @@ def test_check_checkit_arguments():
     with pytest.raises(TypeError):
         _check_checkit_arguments(error='NonExistingError')
         _check_checkit_arguments(error=NameError())
+
+    with pytest.raises(TypeError, match='must be an exception'):
+        _check_checkit_arguments(error=sum)
 
     with pytest.raises(TypeError):
         _check_checkit_arguments(error=LengthError, message=False)
