@@ -19,13 +19,9 @@ from checkit.checks import (check_if,
                             ArgumentValueError,
                             LengthError,
                             OperatorError,
+                            assert_if,
+                            assert_if_not,
+                            assert_length,
+                            assert_instance,
+                            assert_paths
                             )
-
-from checkit.testing import (assert_if,
-                             assert_if_not,
-                             assert_length,
-                             assert_instance,
-                             assert_paths,
-                             easy_mock,
-                             mock,
-                             )
