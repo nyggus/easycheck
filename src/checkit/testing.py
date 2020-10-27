@@ -140,6 +140,8 @@ def easy_mock(item, returns):
     
     So, you should define mocks in the global environment.
     """
+    if item is None:
+        mock_item = returns
     if callable(item):
         def mock_item(*args, **kwargs):
             return returns
