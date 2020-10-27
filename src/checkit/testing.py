@@ -41,8 +41,8 @@ def easy_mock(item, returns):
     get_data() function that gets data from a database, a memory-inefficient
     process. You can write a docktest for this function, and it will take time
     to run it. But you will unlikely want to run this function for every other
-    doctest in which you do need these data. So, you can create a mock for this,
-    like here:
+    doctest in which you do need these data. So, you can create a mock for
+    this, like here:
     
     >>> def read_from_data_base():
     ...    # the original function, which takes about 5 sec to run
