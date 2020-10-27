@@ -110,6 +110,11 @@ for numbers), again using the operator parameter:
 When you're using Python 3.8 or newer, you can use the walrus operator with
 the checkit functions.
 
+The module also offers assert-like functions, which are simply aliases of the
+corresponding checkit functions: assert_if(), assert_if_not(),
+assert_instance(), assert_length() and assert_paths().
+
+
 Additional comments about our intentions:
 We thought of adding functions like check_if_equal(item_1, item_2, message=None),
 but we think that check_if_equal(item_1, item_2) is less readable than
@@ -1006,3 +1011,10 @@ def _check_checkit_arguments(error=None,
                 if not isinstance(instance, type):
                     raise TypeError(
                         'all items in expected_instance must be valid types')
+
+
+assert_if = check_if
+assert_if_not = check_if_not
+assert_length = check_length
+assert_instance = check_instance
+assert_paths = check_if_paths_exist
