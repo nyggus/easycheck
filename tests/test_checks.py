@@ -896,3 +896,40 @@ def test_make_message():
     assert _make_message(None, 'Otherwise') == 'Otherwise'
     assert _make_message('Provided', 'Otherwise') == 'Provided'
     assert _make_message('Provided', 'Otherwise') == 'Provided'
+
+
+def test_assert_functions():
+    assert assert_if(10 > 5) == check_if(10 > 5)
+    with pytest.raises(AssertionError):
+        assert_if(10 < 5)
+        check_if(10 < 5)
+
+    assert assert_if_not(10 < 5) == check_if_not(10 < 5)
+    with pytest.raises(AssertionError):
+        assert_if_not(10 > 5)
+        check_if_not(10 > 5)
+
+    assert assert_instance((10, 10), tuple) == check_instance((10, 10), tuple)
+    with pytest.raises(TypeError):
+        assert_instance(10, tuple)
+        check_instance(10, tuple)
+
+    assert assert_length('str', 3) == check_length('str', 3)
+    assert (
+        assert_length(5, 1, assign_length_to_numbers=True) ==
+        check_length(5, 1, assign_length_to_numbers=True))
+    with pytest.raises(TypeError):
+        assert_length(5, 3)
+        check_length(5, 3)
+    with pytest.raises(LengthError):
+        assert_length(5, 3, assign_length_to_numbers=True)
+        check_length(5, 3, assign_length_to_numbers=True)
+
+    existing_file = os.listdir('.')[0]
+    assert (check_if_paths_exist(existing_file, execution_mode='return') ==
+            assert_paths(existing_file, execution_mode='return'))
+    assert (check_if_paths_exist('Q:/E/', execution_mode='return')[1] ==
+            assert_paths('Q:/E/', execution_mode='return')[1])
+    with pytest.raises(FileNotFoundError):
+        assert_paths('Q:/E/')
+        check_if_paths_exist('Q:/E/')
