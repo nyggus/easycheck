@@ -952,7 +952,7 @@ def _check_checkit_arguments(error=None,
     The check does use use checkit functions but standard if-conditions
     (for instance, to avoid recursions, but also to ensure that the checks
     are done using a standard-library-based approach).
-    Other arguments should be checked using in other ways.
+    Other arguments should be checked using other ways.
 
     >>> _check_checkit_arguments(error=LengthError)
     >>> _check_checkit_arguments(error=ValueError)
