@@ -555,8 +555,9 @@ def check_all_ifs(*args):
         is, presenting all the independent conditions in a separate line,
         unless the call is short if presented in one line.
     """
-    if len(args) == 0:
-        raise ValueError('Provide at least one condition.')
+    check_length(args, 0, greater_than,
+                 ValueError,
+                 'Provide at least one condition.')
     tuple_error_message = (
         'Provide all function calls as tuples in the form of '
         '(check_function, *args)'
@@ -603,7 +604,7 @@ def check_argument(argument,
 
     The function performs lazy checking, meaning that it first checks the
     instance (if provided), then choices (if provided), then expected length
-    (if provided), and finally condition (if provided). But the must not raise
+    (if provided), and finally condition (if provided). But they must not raise
     a built-in error, because it will be raised before the check is performed.
     For example, the below will not work because of the ValueError, resulting
     from an attempt to apply the `int()` function to a string:
