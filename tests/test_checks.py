@@ -401,11 +401,17 @@ def test_clean_message_edge_cases():
         _clean_message(Message='tomato soup is good')
     with pytest.raises(TypeError, match='string or tuple/list'):
         _clean_message(1)
+    with pytest.raises(TypeError, match='string or tuple/list'):
         _clean_message((1, 1))
+    with pytest.raises(TypeError, match='string or tuple/list'):
         _clean_message(('tomato soup is good', 1))
+    with pytest.raises(TypeError, match='string or tuple/list'):
         _clean_message([1, 1])
+    with pytest.raises(TypeError, match='string or tuple/list'):
         _clean_message(['tomato soup is good', 1])
+    with pytest.raises(TypeError, match='string or tuple/list'):
         _clean_message({'1': 'tomato soup', '2': 'is good'})
+    with pytest.raises(TypeError, match='string or tuple/list'):
         _clean_message((1, 1))
 
 
@@ -788,6 +794,12 @@ def test_check_checkit_arguments_edge_cases():
 
     with pytest.raises(TypeError) as msg_error:
         _check_checkit_arguments(error=20)
+        assert str(msg_error.value) == 'error must be an exception'
+
+    with pytest.raises(TypeError) as msg_error:
+        class NonExceptionClass:
+            pass
+        _check_checkit_arguments(error=NonExceptionClass)
         assert str(msg_error.value) == 'error must be an exception'
 
 
