@@ -14,10 +14,13 @@ from checkit.comparisons import (equal,
 def test_equal_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         equal()
+    with pytest.raises(TypeError, match='required positional argument'):
         equal(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         equal(True)
     with pytest.raises(TypeError, match='unexpected keyword'):
         equal(item1=0, item_2=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         equal(item_1=0, item2=2)
 
 
@@ -32,10 +35,13 @@ def test_equal():
 def test_less_than_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         less_than()
+    with pytest.raises(TypeError, match='required positional argument'):
         less_than(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         less_than(True)
     with pytest.raises(TypeError, match='unexpected keyword'):
         less_than(item1=0, item_2=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         less_than(item_1=0, item2=2)
 
 
@@ -53,10 +59,13 @@ def test_less_than():
 def test_less_than_or_equal_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         less_than_or_equal()
+    with pytest.raises(TypeError, match='required positional argument'):
         less_than_or_equal(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         less_than_or_equal(True)
     with pytest.raises(TypeError, match='unexpected keyword'):
         less_than_or_equal(item1=0, item_2=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         less_than_or_equal(item_1=0, item2=2)
 
 
@@ -72,10 +81,13 @@ def test_less_than_or_equal():
 def test_greater_than_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         greater_than()
+    with pytest.raises(TypeError, match='required positional argument'):
         greater_than(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         greater_than(True)
     with pytest.raises(TypeError, match='unexpected keyword'):
         greater_than(item1=0, item_2=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         greater_than(item_1=0, item2=2)
 
 
@@ -93,10 +105,13 @@ def test_greater_than():
 def test_greater_than_or_equal_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         greater_than_or_equal()
+    with pytest.raises(TypeError, match='required positional argument'):
         greater_than_or_equal(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         greater_than_or_equal(True)
     with pytest.raises(TypeError, match='unexpected keyword'):
         greater_than_or_equal(item1=0, item_2=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         greater_than_or_equal(item_1=0, item2=2)
 
 
@@ -114,6 +129,7 @@ def test_greater_than_or_equal():
 def test_get_possible_operators_edge_cases():
     with pytest.raises(TypeError, match='takes 0 positional arguments'):
         get_possible_operators(20)
+    with pytest.raises(TypeError, match='takes 0 positional arguments'):
         get_possible_operators(None)
 
 
@@ -133,21 +149,35 @@ def test_get_possible_operators():
 def test_short_versions_of_operators_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         lt()
+    with pytest.raises(TypeError, match='required positional argument'):
         lt(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         lte()
+    with pytest.raises(TypeError, match='required positional argument'):
         lte(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         gt()
+    with pytest.raises(TypeError, match='required positional argument'):
         gt(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         gte()
+    with pytest.raises(TypeError, match='required positional argument'):
         gte(1)
     with pytest.raises(TypeError, match='unexpected keyword'):
         lt(item1=1, item_2=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         lt(item_1=1, item2=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         lte(item1=1, item_2=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         lte(item_1=1, item2=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         gt(item1=1, item_2=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         gt(item_1=1, item2=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         gte(item1=1, item_2=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         gte(item_1=1, item2=1)
 
 
@@ -172,4 +202,3 @@ def test_short_versions_of_operators():
     assert gte(3, 2)
     assert not gte(2, 3)
     assert not gte(2.1, 2.11)
-

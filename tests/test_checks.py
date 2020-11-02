@@ -37,24 +37,25 @@ from collections.abc import Generator
 
 
 def test_check_if_edge_cases():
+    assert check_if(True) is None
     with pytest.raises(TypeError,
                        match="missing 1 required positional argument"):
         check_if()
-    with pytest.raises(ValueError,
-                       match='The condition does not give'):
+    with pytest.raises(ValueError, match='The condition does not give'):
         check_if('tomato soup is good')
+    with pytest.raises(ValueError, match='The condition does not give'):
         check_if(22)
+    with pytest.raises(ValueError, match='The condition does not give'):
         check_if(1)
+    with pytest.raises(ValueError, match='The condition does not give'):
         check_if(0)
-    assert check_if(True) is None
     with pytest.raises(AssertionError):
         check_if(False)
-    with pytest.raises(TypeError,
-                       match='error must be an exception'):
+    with pytest.raises(TypeError, match='error must be an exception'):
         check_if(1, 1)
+    with pytest.raises(TypeError, match='error must be an exception'):
         check_if(1, 1, 1)
-    with pytest.raises(TypeError,
-                       match='takes from 1 to 3 positional'):
+    with pytest.raises(TypeError, match='takes from 1 to 3 positional'):
         check_if(1, 1, 1, 1)
     with pytest.raises(TypeError, match='unexpected keyword'):
         check_if(Condition=12 > 5)
@@ -83,14 +84,18 @@ def test_check_if_not_edge_cases():
         check_if_not()
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if_not('tomato soup is good')
+    with pytest.raises(ValueError, match='The condition does not give'):
         check_if_not(22)
+    with pytest.raises(ValueError, match='The condition does not give'):
         check_if_not(1)
+    with pytest.raises(ValueError, match='The condition does not give'):
         check_if_not(0)
     assert check_if_not(False) is None
     with pytest.raises(AssertionError):
         check_if_not(True)
     with pytest.raises(TypeError, match='error must be an exception'):
         check_if_not(1, 1)
+    with pytest.raises(TypeError, match='error must be an exception'):
         check_if_not(1, 1, 1)
     with pytest.raises(TypeError, match='takes from 1 to 3 positional'):
         check_if_not(1, 1, 1, 1)
@@ -115,9 +120,11 @@ def test_check_if_not_negative():
 
 
 def test_check_length_edge_cases():
-    with pytest.raises(TypeError, match='required positional arguments'):
+    with pytest.raises(TypeError, match='required positional argument'):
         check_length()
+    with pytest.raises(TypeError, match='required positional argument'):
         check_length(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         check_length('tomato soup is good')
     with pytest.raises(OperatorError, match='Unacceptable operator'):
         check_length(1, 1, 1)
@@ -125,6 +132,7 @@ def test_check_length_edge_cases():
         pytest.raises('tomato soup', 'is good')
     with pytest.raises(TypeError, match='unexpected keyword'):
         check_length(Item=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         check_length(item=2, length=5)
 
 
@@ -140,20 +148,23 @@ def test_check_length_negative():
         check_length(len(i for i in range(3)), 3)
     with pytest.raises(TypeError):
         check_length(None)
-    with pytest.raises(TypeError,
-                       match="object of type 'int' has"):
+    with pytest.raises(TypeError, match="object of type 'int' has"):
         check_length(10, 1)
     assert check_length(10, 1, assign_length_to_numbers=True) is None
 
 
 def test_check_instance_edge_cases():
-    with pytest.raises(TypeError, match='required positional arguments'):
+    with pytest.raises(TypeError, match='required positional argument'):
         check_instance()
+    with pytest.raises(TypeError, match='required positional argument'):
         check_instance(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         check_instance(True)
+    with pytest.raises(TypeError, match='required positional argument'):
         check_instance('tomato soup is good')
     with pytest.raises(TypeError, match='unexpected keyword'):
         check_instance(Item=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         check_instance(item=2, instance=str)
 
 
@@ -188,14 +199,18 @@ def test_check_instance_negative():
                        message='This is not tuple.')
     with pytest.raises(TypeError):
         check_instance(10, None)
+    with pytest.raises(TypeError):
         check_instance('string', None)
+    with pytest.raises(TypeError):
         check_instance((10, 20), None)
+    with pytest.raises(TypeError):
         check_instance([10, 20], None)
 
 
 def test_catch_check_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         catch_check()
+    with pytest.raises(TypeError, match='required positional argument'):
         catch_check(check=check_instance)
     with pytest.raises(TypeError, match='checkit function'):
         catch_check(1)
@@ -294,22 +309,28 @@ def test_catch_check_paths_many_paths():
 
 
 def test_compare_edge_cases():
-    with pytest.raises(TypeError, match='required positional arguments'):
+    with pytest.raises(TypeError, match='required positional argument'):
         _compare()
+    with pytest.raises(TypeError, match='required positional argument'):
         _compare(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         _compare(True)
+    with pytest.raises(TypeError, match='required positional argument'):
         _compare('tomato soup is good')
+    with pytest.raises(TypeError, match='required positional argument'):
         _compare(1, 1)
+    with pytest.raises(TypeError, match='required positional argument'):
         _compare(1, 'tomato soup is good')
+    with pytest.raises(TypeError, match='required positional argument'):
         _compare(1 > 2)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _compare(item1=1, operator=gt, item_2=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _compare(item_1=1, Operator=gt, item_2=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _compare(item_1=1, operator=gt, item2=2)
     with pytest.raises(OperatorError, match='Incorrect operator'):
         _compare(2, 'greater', 3)
-    with pytest.raises(NameError, match='not defined'):
-        _compare(2, GT, 3)
 
 
 def test_compare_positive():
@@ -343,17 +364,25 @@ def test_compare_negative():
 
 
 def test_check_comparison_edge_cases():
-    with pytest.raises(TypeError, match='required positional arguments'):
+    with pytest.raises(TypeError, match='required positional argument'):
         check_comparison()
+    with pytest.raises(TypeError, match='required positional argument'):
         check_comparison(1)
+    with pytest.raises(TypeError, match='required positional argument'):
         check_comparison(True)
+    with pytest.raises(TypeError, match='required positional argument'):
         check_comparison('tomato soup is good')
+    with pytest.raises(TypeError, match='required positional argument'):
         check_comparison(1, 1)
+    with pytest.raises(TypeError, match='required positional argument'):
         check_comparison(1, 'tomato soup is good')
+    with pytest.raises(TypeError, match='required positional argument'):
         check_comparison(1 > 2)
     with pytest.raises(TypeError, match='unexpected keyword'):
         check_comparison(item1=1, operator=gt, item_2=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         check_comparison(item_1=1, Operator=gt, item_2=2)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         check_comparison(item_1=1, operator=gt, item2=2)
 
 
@@ -374,14 +403,23 @@ def test_check_comparison_positive():
 def test_check_comparison_negative():
     with pytest.raises(ValueError):
         check_comparison(2, less_than, 2)
+    with pytest.raises(ValueError):
         check_comparison(2, lt, 2)
+    with pytest.raises(ValueError):
         check_comparison(2, greater_than, 2)
+    with pytest.raises(ValueError):
         check_comparison(2, gt, 2)
+    with pytest.raises(ValueError):
         check_comparison(3, equal, 2)
+    with pytest.raises(ValueError):
         check_comparison(3, less_than, 2)
+    with pytest.raises(ValueError):
         check_comparison(3, lt, 2)
+    with pytest.raises(ValueError):
         check_comparison(3, less_than_or_equal, 2)
+    with pytest.raises(ValueError):
         check_comparison(3, lte, 2)
+    with pytest.raises(ValueError):
         check_comparison('one text', less_than, 'another text')
 
     with pytest.raises(ComparisonError):
@@ -430,9 +468,13 @@ def test_parse_error_and_message_from_edge_cases():
         _parse_error_and_message_from(message='tomato soup is good')
     with pytest.raises(AttributeError, match="no attribute 'split'"):
         _parse_error_and_message_from(True)
+    with pytest.raises(AttributeError, match="no attribute 'split'"):
         _parse_error_and_message_from(25)
+    with pytest.raises(AttributeError, match="no attribute 'split'"):
         _parse_error_and_message_from([1, 1])
+    with pytest.raises(AttributeError, match="no attribute 'split'"):
         _parse_error_and_message_from((1, 1))
+    with pytest.raises(AttributeError, match="no attribute 'split'"):
         _parse_error_and_message_from(['TypeError'])
 
 
@@ -455,11 +497,17 @@ def test_check_all_ifs_edge_cases():
         check_all_ifs()
     with pytest.raises(TypeError, match='Provide all function calls as'):
         check_all_ifs(1)
+    with pytest.raises(TypeError, match='Provide all function calls as'):
         check_all_ifs(True)
+    with pytest.raises(TypeError, match='Provide all function calls as'):
         check_all_ifs(1, 1)
+    with pytest.raises(TypeError, match='Provide all function calls as'):
         check_all_ifs(1 > 1, 2 > 1)
+    with pytest.raises(TypeError, match='Provide all function calls as'):
         check_all_ifs((20 > 10))
+    with pytest.raises(TypeError, match='Provide all function calls as'):
         check_all_ifs(check_if(20 > 10)),
+    with pytest.raises(TypeError, match='Provide all function calls as'):
         check_all_ifs((check_if, 20 > 10), (check_if(20 > 10)))
 
 
@@ -492,6 +540,7 @@ def test_check_if_paths_exist_edge_cases():
         check_if_paths_exist(path='tomato soup is good')
     with pytest.raises(TypeError, match='Argument paths must be string'):
         check_if_paths_exist(20)
+    with pytest.raises(TypeError, match='Argument paths must be string'):
         check_if_paths_exist({})
     with pytest.raises(ValueError):
         check_if_paths_exist(os.listdir('.')[0], execution_mode='buuu')
@@ -515,6 +564,7 @@ def test_check_if_paths_exist_negative():
         check_if_paths_exist(non_existing_path, execution_mode='buuu')
     with pytest.raises(FileNotFoundError):
         check_if_paths_exist(non_existing_path)
+    with pytest.raises(FileNotFoundError):
         check_if_paths_exist([non_existing_path] + os.listdir('.'))
     with pytest.raises(IOError):
         check_if_paths_exist(non_existing_path, error=IOError)
@@ -537,16 +587,24 @@ def test_raise_edge_cases():
         _raise()
     with pytest.raises(TypeError, match='unexpected keyword'):
         _raise(Error=TypeError)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _raise(error=TypeError, MEssage='This was an error')
     with pytest.raises(TypeError,
                        match='exceptions must derive from BaseException'):
         _raise(20)
+    with pytest.raises(TypeError,
+                       match='exceptions must derive from BaseException'):
         _raise('TypeError')
-        _raise((TypeError))
+    with pytest.raises(TypeError,
+                       match='exceptions must derive from BaseException'):
+        _raise(('TypeError'))
+    with pytest.raises(TypeError,
+                       match='exceptions must derive from BaseException'):
         _raise([TypeError])
     with pytest.raises(TypeError, match='message must be string'):
         _raise(error=TypeError, message=20)
-        _raise(TypeError, ('This was an error'))
+    with pytest.raises(TypeError, match='message must be string'):
+        _raise(TypeError, ('This was an error', ''))
 
 
 def test_raise():
@@ -561,6 +619,7 @@ def test_raise():
 def test_check_argument_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         check_argument()
+    with pytest.raises(TypeError, match='required positional argument'):
         check_argument(Argument='x')
 
     msg = 'check_argument() requires at least one condition to be checked'
@@ -587,6 +646,7 @@ def test_check_argument_instance():
     assert foo(('one')) is None
     with pytest.raises(ArgumentValueError):
         foo(4)
+    with pytest.raises(ArgumentValueError):
         foo(('one', 'two'))
 
     assert check_argument(50, 'my_arg', expected_instance=int) is None
@@ -596,9 +656,11 @@ def test_check_argument_instance():
 
     with pytest.raises(ArgumentValueError, match='my_arg'):
         check_argument(50, 'my_arg', expected_instance=str)
+    with pytest.raises(ArgumentValueError, match='my_arg'):
         check_argument('one', 'my_arg', expected_instance=int)
     with pytest.raises(ArgumentValueError, match='argument'):
         check_argument(50, expected_instance=str)
+    with pytest.raises(ArgumentValueError, match='argument'):
         check_argument('one', expected_instance=int)
 
 
@@ -708,25 +770,27 @@ def test_check_argument_mix():
     with pytest.raises(TypeError):
         foo('one')
 
-        def check_glm_args(glm_args):
-            return (
-                isinstance(glm_args[0], (int, float)) and
-                glm_args[0] > 0 and
-                glm_args[0] <= 1 and
-                isinstance(glm_args[1], str) and
-                isinstance(glm_args[2], str) and
-                glm_args[1] in ('poisson', 'quasi-poisson') and
-                glm_args[2] in ('log', 'identity')
-            )
+    def check_glm_args(glm_args):
+        return (
+            isinstance(glm_args[0], (int, float)) and
+            glm_args[0] > 0 and
+            glm_args[0] <= 1 and
+            isinstance(glm_args[1], str) and
+            isinstance(glm_args[2], str) and
+            glm_args[1] in ('poisson', 'quasi-poisson') and
+            glm_args[2] in ('log', 'identity')
+        )
 
-        glm_args = 1, 'quasi-poisson', 'log'
-        check_argument(
-            argument_name='glm_args',
-            argument=glm_args,
-            expected_instance=tuple,
-            expected_condition=check_glm_args(glm_args))
+    glm_args = 1, 'quasi-poisson', 'log'
+    assert check_argument(
+        argument_name='glm_args',
+        argument=glm_args,
+        expected_instance=tuple,
+        expected_condition=check_glm_args(glm_args)) is None
 
-        glm_args = 1., 'quasi-poisson', 'logit'
+    glm_args = 1., 'quasi-poisson', 'logit'
+    with pytest.raises(ArgumentValueError,
+                       match='condition violated for glm_args'):
         check_argument(
             argument_name='glm_args',
             argument=glm_args,
@@ -737,8 +801,10 @@ def test_check_argument_mix():
 def test_return_from_check_if_paths_exist_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         _return_from_check_if_paths_exist()
+    with pytest.raises(TypeError, match='required positional argument'):
         _return_from_check_if_paths_exist(
             error=FileNotFoundError)
+    with pytest.raises(TypeError, match='required positional argument'):
         _return_from_check_if_paths_exist(
             error=FileNotFoundError,
             message=None)
@@ -747,10 +813,12 @@ def test_return_from_check_if_paths_exist_edge_cases():
             Error=FileNotFoundError,
             message=None,
             paths=[])
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _return_from_check_if_paths_exist(
             Error=FileNotFoundError,
             Message=None,
             paths=[])
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _return_from_check_if_paths_exist(
             Error=FileNotFoundError,
             message=None,
@@ -758,6 +826,7 @@ def test_return_from_check_if_paths_exist_edge_cases():
 
     with pytest.raises(TypeError, match='must be an exception'):
         _return_from_check_if_paths_exist(20, None, [])
+    with pytest.raises(TypeError, match='must be an exception'):
         _return_from_check_if_paths_exist('TypeError', None, [])
 
 
@@ -783,24 +852,32 @@ def test_check_checkit_arguments_edge_cases():
 
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Error=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Message=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Condition=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Operator=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Assign_length_to_numbers=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Execution_mode=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Expected_instance=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Expected_length=1)
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Error=ValueError, Message=1)
 
-    with pytest.raises(TypeError) as msg_error:
+    with pytest.raises(TypeError,
+                       match='error must be an exception') as msg_error:
         _check_checkit_arguments(error=20)
-        assert str(msg_error.value) == 'error must be an exception'
 
-    with pytest.raises(TypeError) as msg_error:
+    with pytest.raises(TypeError,
+                       match='error must be an exception') as msg_error:
         class NonExceptionClass:
             pass
         _check_checkit_arguments(error=NonExceptionClass)
-        assert str(msg_error.value) == 'error must be an exception'
 
 
 def test_check_checkit_arguments():
@@ -808,10 +885,10 @@ def test_check_checkit_arguments():
     assert _check_checkit_arguments(error=LengthError) is None
     with pytest.raises(NameError):
         _check_checkit_arguments(error=NonExistingError)
+    with pytest.raises(NameError):
         _check_checkit_arguments(error=NonExistingError())
     with pytest.raises(TypeError):
         _check_checkit_arguments(error='NonExistingError')
-        _check_checkit_arguments(error=NameError())
 
     with pytest.raises(TypeError, match='must be an exception'):
         _check_checkit_arguments(error=sum)
@@ -834,6 +911,7 @@ def test_check_checkit_arguments():
     with pytest.raises(ValueError):
         _check_checkit_arguments(error=ValueError,
                                  condition='not a comparison')
+    with pytest.raises(ValueError):
         _check_checkit_arguments(condition='not a comparison')
 
     for this_operator in get_possible_operators():
@@ -893,13 +971,15 @@ def test_check_checkit_arguments():
 
 
 def test_make_message_edge_cases():
-    with pytest.raises(TypeError,
-                       match="required positional argument"):
+    with pytest.raises(TypeError, match="required positional argument"):
         _make_message()
+    with pytest.raises(TypeError, match="required positional argument"):
         _make_message(None)
+    with pytest.raises(TypeError, match="required positional argument"):
         _make_message('Provided')
     with pytest.raises(TypeError, match='unexpected keyword'):
         _make_message(message='Provided')
+    with pytest.raises(TypeError, match='unexpected keyword'):
         _make_message(message_provided='Provided',
                       Message_otherwise='Otherwise')
 
@@ -913,29 +993,25 @@ def test_make_message():
 def test_assert_functions():
     assert assert_if(10 > 5) == check_if(10 > 5)
     with pytest.raises(AssertionError):
-        assert_if(10 < 5)
-        check_if(10 < 5)
+        assert_if(10 < 5) and check_if(10 < 5) is None
 
     assert assert_if_not(10 < 5) == check_if_not(10 < 5)
     with pytest.raises(AssertionError):
-        assert_if_not(10 > 5)
-        check_if_not(10 > 5)
+        assert_if_not(10 > 5) and check_if_not(10 > 5) is None
 
     assert assert_instance((10, 10), tuple) == check_instance((10, 10), tuple)
     with pytest.raises(TypeError):
-        assert_instance(10, tuple)
-        check_instance(10, tuple)
+        assert_instance(10, tuple) and check_instance(10, tuple) is None
 
     assert assert_length('str', 3) == check_length('str', 3)
     assert (
         assert_length(5, 1, assign_length_to_numbers=True) ==
         check_length(5, 1, assign_length_to_numbers=True))
     with pytest.raises(TypeError):
-        assert_length(5, 3)
-        check_length(5, 3)
+        assert_length(5, 3) and check_length(5, 3) is None
     with pytest.raises(LengthError):
-        assert_length(5, 3, assign_length_to_numbers=True)
-        check_length(5, 3, assign_length_to_numbers=True)
+        (assert_length(5, 3, assign_length_to_numbers=True)
+         and check_length(5, 3, assign_length_to_numbers=True) is None)
 
     existing_file = os.listdir('.')[0]
     assert (check_if_paths_exist(existing_file, execution_mode='return') ==
@@ -943,5 +1019,4 @@ def test_assert_functions():
     assert (check_if_paths_exist('Q:/E/', execution_mode='return')[1] ==
             assert_paths('Q:/E/', execution_mode='return')[1])
     with pytest.raises(FileNotFoundError):
-        assert_paths('Q:/E/')
-        check_if_paths_exist('Q:/E/')
+        assert_paths('Q:/E/') and check_if_paths_exist('Q:/E/') is None
