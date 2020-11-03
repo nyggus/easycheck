@@ -3,14 +3,6 @@ import pytest
 import sys
 import checkit
 
-from checkit.comparisons import (equal,
-                                 less_than, lt,
-                                 less_than_or_equal, lte,
-                                 greater_than, gt,
-                                 greater_than_or_equal, gte,
-                                 get_possible_operators,
-                                 )
-
 from checkit.checks import (check_if, assert_if,
                             check_if_not, assert_if_not,
                             check_instance, assert_instance,
@@ -24,6 +16,7 @@ from checkit.checks import (check_if, assert_if,
                             ArgumentValueError,
                             LengthError,
                             OperatorError,
+                            get_possible_operators,
                             _compare,
                             _parse_error_and_message_from,
                             _clean_message,
@@ -34,6 +27,8 @@ from checkit.checks import (check_if, assert_if,
                             )
 
 from collections.abc import Generator
+
+from operator import eq, le, lt, gt, ge, ne, is_, is_not
 
 
 def test_check_if_edge_cases():
@@ -334,33 +329,26 @@ def test_compare_edge_cases():
 
 
 def test_compare_positive():
-    assert _compare(2, equal, 2)
+    assert _compare(2, eq, 2)
     assert _compare(2, lt, 3)
-    assert _compare(2, less_than, 3)
-    assert _compare(2, lte, 2)
-    assert _compare(2, less_than_or_equal, 2)
-    assert _compare(2, lte, 3)
-    assert _compare(2, less_than_or_equal, 3)
+    assert _compare(2, le, 2)
+    assert _compare(2, le, 2)
+    assert _compare(2, le, 3)
     assert _compare(3, gt, 2)
-    assert _compare(3, greater_than, 2)
-    assert _compare(2, gte, 2)
-    assert _compare(2, greater_than_or_equal, 2)
-    assert _compare(3, gte, 2)
-    assert _compare(3, greater_than_or_equal, 2)
+    assert _compare(2, ge, 2)
+    assert _compare(3, ge, 2)
 
 
 def test_compare_negative():
-    assert not _compare(2, equal, 2.01)
-    assert not _compare(3, less_than, 3)
+    assert not _compare(2, eq, 2.01)
+    assert not _compare(3, lt, 3)
     assert not _compare(3, lt, 2)
-    assert not _compare(2.11, lte, 2.100001)
-    assert not _compare(2.11, less_than_or_equal, 2.100001)
+    assert not _compare(2.11, le, 2.100001)
+    assert not _compare(2.11, le, 2.100001)
     assert not _compare(3, gt, 3)
-    assert not _compare(3, greater_than, 3)
     assert not _compare(2.11, gt, 2.12)
-    assert not _compare(2.11, greater_than, 2.12)
-    assert not _compare(2.1, gte, 2.11)
-    assert not _compare(2.1, greater_than_or_equal, 2.11)
+    assert not _compare(2.11, ge, 2.12)
+    assert not _compare(2.1, ge, 2.11)
 
 
 def test_check_comparison_edge_cases():
@@ -387,49 +375,35 @@ def test_check_comparison_edge_cases():
 
 
 def test_check_comparison_positive():
-    assert check_comparison(2, equal, 2) is None
-    assert check_comparison(2, less_than_or_equal, 2) is None
-    assert check_comparison(2, lte, 2) is None
-    assert check_comparison(2, greater_than_or_equal, 2) is None
-    assert check_comparison(2, gte, 2) is None
-    assert check_comparison(3, greater_than, 2) is None
+    assert check_comparison(2, eq, 2) is None
+    assert check_comparison(2, le, 2) is None
+    assert check_comparison(2, ge, 2) is None
     assert check_comparison(3, gt, 2) is None
-    assert check_comparison(3, greater_than_or_equal, 2) is None
-    assert check_comparison(3, gte, 2) is None
+    assert check_comparison(3, ge, 2) is None
     assert check_comparison('One text', lt, 'one text') is None
-    assert check_comparison('One text', less_than, 'another text') is None
+    assert check_comparison('One text', lt, 'another text') is None
 
 
 def test_check_comparison_negative():
     with pytest.raises(ValueError):
-        check_comparison(2, less_than, 2)
-    with pytest.raises(ValueError):
         check_comparison(2, lt, 2)
-    with pytest.raises(ValueError):
-        check_comparison(2, greater_than, 2)
     with pytest.raises(ValueError):
         check_comparison(2, gt, 2)
     with pytest.raises(ValueError):
-        check_comparison(3, equal, 2)
-    with pytest.raises(ValueError):
-        check_comparison(3, less_than, 2)
+        check_comparison(3, eq, 2)
     with pytest.raises(ValueError):
         check_comparison(3, lt, 2)
     with pytest.raises(ValueError):
-        check_comparison(3, less_than_or_equal, 2)
+        check_comparison(3, le, 2)
     with pytest.raises(ValueError):
-        check_comparison(3, lte, 2)
-    with pytest.raises(ValueError):
-        check_comparison('one text', less_than, 'another text')
+        check_comparison('one text', lt, 'another text')
 
     with pytest.raises(ComparisonError):
-        check_comparison('one text', less_than, 'another text',
+        check_comparison('one text', lt, 'another text',
                          error=ComparisonError)
     with pytest.raises(AssertionError):
-        check_comparison('one text', less_than, 'another text',
+        check_comparison('one text', lt, 'another text',
                          error=AssertionError)
-    with pytest.raises(NameError, match='not defined'):
-        check_comparison(2, GT, 3)
 
 
 def test_clean_message_edge_cases():

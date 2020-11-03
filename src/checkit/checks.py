@@ -59,7 +59,7 @@ Other checkit functions use this function to check a particular condition,
 like length:
 >>> my_list = [1, 12, 1]
 >>> check_length(my_list, 3)
->>> check_length(my_list, 10, operator=less_than_or_equal)
+>>> check_length(my_list, 10, operator=le)
 >>> check_length('the SimpleAssert module', 23)
 
 You can override a Pythonic approach to treating numbers (and boolean values)
@@ -67,9 +67,10 @@ as not having length:
 >>> check_length(True, 1, assign_length_to_numbers=True)
 
 Note that above we used the parameter `operator`. You can use it in several
-functions, and it can take such values as `equal`, `less_than`, `lt`, etc. (use
-`get_possible_operators()` too see their list). These operators are actually
-functions, so you simple provide them as function names, as we did above.
+functions, and it can take nine operators from the operator module (use
+`get_possible_operators()` too see their list: eq, le, lt, gt, ge, ne, is_,
+is_not). These operators are actually functions, so you simple provide them as
+function names, as we did above.
 
 Now we want to check the instance of the following string:
 >>> my_string = '_'.join(str(item) for item in [1, 2, 3])
@@ -101,11 +102,9 @@ FileNotFoundError
 The module also offers two-item comparisons (for the moment working only
 for numbers), again using the operator parameter:
 >>> a, b, c = 2, 4, 2
->>> check_comparison(a, less_than_or_equal, b)
->>> check_comparison(a, lte, b)
->>> check_comparison(b, greater_than_or_equal, a)
->>> check_comparison(b, gte, a)
->>> check_comparison(a, equal, c)
+>>> check_comparison(a, lt, b)
+>>> check_comparison(b, gt, a)
+>>> check_comparison(a, eq, c)
 
 When you're using Python 3.8 or newer, you can use the walrus operator with
 the checkit functions.
@@ -147,14 +146,7 @@ must follow all of the following conditions:
 import os
 import sys
 
-from checkit.comparisons import (equal,
-                                 less_than, lt,
-                                 less_than_or_equal, lte,
-                                 greater_than, gt,
-                                 greater_than_or_equal, gte,
-                                 get_possible_operators,
-                                 )
-
+from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from collections.abc import Generator
 from itertools import zip_longest
 from pathlib import Path
@@ -267,7 +259,7 @@ def check_if_not(condition, error=AssertionError, message=None):
 
 def check_length(item,
                  expected_length,
-                 operator=equal,
+                 operator=eq,
                  error=LengthError,
                  message=None,
                  assign_length_to_numbers=False,
@@ -462,21 +454,21 @@ def check_comparison(item_1, operator, item_2,
 
     The operator should be from get_possible_operators().
 
-    >>> check_comparison(2, less_than, 2)
+    >>> check_comparison(2, lt, 2)
     Traceback (most recent call last):
         ...
     ValueError
-    >>> check_comparison(2, equal, 2)
-    >>> check_comparison(2, greater_than_or_equal, 1.1)
+    >>> check_comparison(2, eq, 2)
+    >>> check_comparison(2, ge, 1.1)
     >>> check_comparison('One text', lt, 'one text')
-    >>> check_comparison('One text', less_than, 'another text')
-    >>> check_comparison('one text', less_than, 'another text')
+    >>> check_comparison('One text', lt, 'another text')
+    >>> check_comparison('one text', lt, 'another text')
     Traceback (most recent call last):
         ...
     ValueError
 
     You can use a dedicated ComparisonError (from this module):
-    >>> check_comparison('one text', less_than, 'another text',
+    >>> check_comparison('one text', lt, 'another text',
     ...                  error=ComparisonError,
     ...                  message='Not less!')
     Traceback (most recent call last):
@@ -489,7 +481,7 @@ def check_comparison(item_1, operator, item_2,
         (in case you need to split the function call into more lines,
         which is when you need to change the last two parameters):
         >>> check_comparison(
-        ...    'one text', less_than, 'another text',
+        ...    'one text', lt, 'another text',
         ...    error = ComparisonError,
         ...    message='Comparison condition violated'
         ...    )
@@ -555,7 +547,7 @@ def check_all_ifs(*args):
         is, presenting all the independent conditions in a separate line,
         unless the call is short if presented in one line.
     """
-    check_length(args, 0, greater_than,
+    check_length(args, 0, gt,
                  ValueError,
                  'Provide at least one condition.')
     tuple_error_message = (
@@ -852,17 +844,17 @@ def _compare(item_1, operator, item_2):
     The operator should be from get_possible_operators().
     Returns True if the comparison is valid and False otherwise.
 
-    >>> _compare(2, equal, 2)
+    >>> _compare(2, eq, 2)
     True
-    >>> _compare(2, equal, 2.01)
+    >>> _compare(2, eq, 2.01)
     False
-    >>> _compare(2.11, lte, 2.100001)
+    >>> _compare(2.11, le, 2.100001)
     False
-    >>> _compare(2.11, less_than_or_equal, 2.100001)
+    >>> _compare(2.11, le, 2.100001)
     False
-    >>> _compare(2, gte, 2)
+    >>> _compare(2, ge, 2)
     True
-    >>> _compare(2.1, greater_than_or_equal, 2.11)
+    >>> _compare(2.1, ge, 2.11)
     False
     """
     check_if(
@@ -1019,3 +1011,14 @@ assert_if_not = check_if_not
 assert_length = check_length
 assert_instance = check_instance
 assert_paths = check_if_paths_exist
+
+
+def get_possible_operators():
+    """
+    >>> operators = get_possible_operators()
+    >>> type(operators[0])
+    <class 'builtin_function_or_method'>
+    >>> len(operators)
+    8
+    """
+    return eq, le, lt, gt, ge, ne, is_, is_not

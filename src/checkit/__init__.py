@@ -1,11 +1,3 @@
-from checkit.comparisons import (equal,
-                                 less_than, lt,
-                                 less_than_or_equal, lte,
-                                 greater_than, gt,
-                                 greater_than_or_equal, gte,
-                                 get_possible_operators,
-                                 )
-
 from checkit.checks import (check_if,
                             check_if_not,
                             check_instance,
@@ -25,3 +17,5 @@ from checkit.checks import (check_if,
                             assert_instance,
                             assert_paths
                             )
+
+from operator import eq, le, lt, gt, ge, ne, is_, is_not
