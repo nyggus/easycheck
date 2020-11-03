@@ -1,7 +1,7 @@
 """Module to be used for comparisons using a string operator.
 
 The operators is used by the check_it.checks functions. The module is
-covered by both pytests doctests.
+covered by both pytests and doctests.
 """
 
 
