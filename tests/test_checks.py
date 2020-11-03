@@ -145,7 +145,7 @@ def test_check_length_negative():
         check_length(None)
     with pytest.raises(TypeError, match="object of type 'int' has"):
         check_length(10, 1)
-    assert check_length(10, 1, assign_length_to_numbers=True) is None
+    assert check_length(10, 1, assign_length_to_others=True) is None
 
 
 def test_check_instance_edge_cases():
@@ -671,22 +671,22 @@ def test_check_argument_choices():
 def test_check_argument_length():
     assert check_argument(5, 'my_arg',
                           expected_length=1,
-                          assign_length_to_numbers=True) is None
+                          assign_length_to_others=True) is None
     assert check_argument(5,
                           expected_length=1,
-                          assign_length_to_numbers=True) is None
+                          assign_length_to_others=True) is None
 
     def foo(x):
         check_argument(x, 'x',
                        expected_length=3,
-                       assign_length_to_numbers=True)
+                       assign_length_to_others=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError):
         foo(1)
 
     def foo(x):
-        check_argument(x, expected_length=3, assign_length_to_numbers=True)
+        check_argument(x, expected_length=3, assign_length_to_others=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError):
@@ -695,14 +695,14 @@ def test_check_argument_length():
     def foo(big_x):
         check_argument(big_x, 'big_x',
                        expected_length=3,
-                       assign_length_to_numbers=True)
+                       assign_length_to_others=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError, match='big_x'):
         foo(1)
 
     def foo(big_x):
-        check_argument(big_x, expected_length=3, assign_length_to_numbers=True)
+        check_argument(big_x, expected_length=3, assign_length_to_others=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError, match='argument'):
@@ -833,7 +833,7 @@ def test_check_checkit_arguments_edge_cases():
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Operator=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Assign_length_to_numbers=1)
+        _check_checkit_arguments(Assign_length_to_others=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Execution_mode=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
@@ -893,11 +893,11 @@ def test_check_checkit_arguments():
         with pytest.raises(OperatorError):
             _check_checkit_arguments(operator=this_operator.__name__)
 
-    assert _check_checkit_arguments(assign_length_to_numbers=True) is None
-    assert _check_checkit_arguments(assign_length_to_numbers=False) is None
+    assert _check_checkit_arguments(assign_length_to_others=True) is None
+    assert _check_checkit_arguments(assign_length_to_others=False) is None
     for this_assignment in ('nothing', 22, [1]):
         with pytest.raises(TypeError):
-            _check_checkit_arguments(assign_length_to_numbers=this_assignment)
+            _check_checkit_arguments(assign_length_to_others=this_assignment)
 
     assert _check_checkit_arguments(execution_mode='return') is None
     assert _check_checkit_arguments(execution_mode='raise') is None
@@ -931,7 +931,7 @@ def test_check_checkit_arguments():
         condition=2 < 2,
         expected_length=3,
         execution_mode='raise',
-        assign_length_to_numbers=True
+        assign_length_to_others=True
     ) is None
 
     with pytest.raises(TypeError):
@@ -940,7 +940,7 @@ def test_check_checkit_arguments():
             condition=2 < 2,
             expected_length=3,
             execution_mode='raise',
-            assign_length_to_numbers='yes'
+            assign_length_to_others='yes'
         )
 
 
@@ -979,13 +979,13 @@ def test_assert_functions():
 
     assert assert_length('str', 3) == check_length('str', 3)
     assert (
-        assert_length(5, 1, assign_length_to_numbers=True) ==
-        check_length(5, 1, assign_length_to_numbers=True))
+        assert_length(5, 1, assign_length_to_others=True) ==
+        check_length(5, 1, assign_length_to_others=True))
     with pytest.raises(TypeError):
         assert_length(5, 3) and check_length(5, 3) is None
     with pytest.raises(LengthError):
-        (assert_length(5, 3, assign_length_to_numbers=True)
-         and check_length(5, 3, assign_length_to_numbers=True) is None)
+        (assert_length(5, 3, assign_length_to_others=True)
+         and check_length(5, 3, assign_length_to_others=True) is None)
 
     existing_file = os.listdir('.')[0]
     assert (check_if_paths_exist(existing_file, execution_mode='return') ==

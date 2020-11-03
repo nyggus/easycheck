@@ -1,25 +1,31 @@
-"""A module for simple checks to be used outside of testing.
+"""A module for simple checks to be used within code, but also in doctesting.
 
 The module offers simple functions to check various conditions. These
 functions are to be used when you would like to use assertions in code,
 something you should not do in Python. In such cases, this module comes as
 handy, offering simple and readable functions to check various conditions.
 But this actually does not mean that you cannot use these functions in
-testing: You can do so, like in pytest testing.
+testing: You can do so, like in pytest testing, and the module offers aliases
+of its functions specifically devoted to testing (e.g., assert_if,
+assert_instance, assert_length).
 
 What the package offers is simplicity and code readability. Instead of
 raising exceptions in if-blocks, you can use devoted functions that are
-easy to use and understand. These functions are simple and easy-to-follow
-wrappers for checking conditions and raising the corresponding exceptions.
-The idea is to keep the resulting code clean and readable.
+easy to use, at the same time being easy to understand. These functions are
+simple and easy-to-follow wrappers for checking conditions and raising the
+corresponding exceptions. The idea is to keep the resulting code as clean and
+readable as possible.
 
 The main function is `check_if()`. The other functions are actually wrappers
 built around it, customized to particular situations and conditions.
 
-The `check_if()` function is general and checks a condition; if it
-is not met, it raises an exception (which is one of the Exception classes,
-either built-in ones into Python or the checkit module, or created by you);
-you can optionally send a message along with the exception.
+The `check_if()` function is general and checks a condition provided as its
+argument; if it is not met, the function raises an exception (which is one of
+the Exception classes, either built-in ones, or from the checkit module, or
+created by you); you can optionally send a message along with the exception.
+What's more, when you're using the assert expression, you're left with
+AssertionError, but when using the checkit functions, you can use any exception
+you want.
 
 Consider the following example:
 >>> if 1 > 0:
@@ -34,9 +40,10 @@ Traceback (most recent call last):
     ...
 ValueError: One is bigger than zero
 
-Of course, it's not the brevity that we mainly aim for, but the readability
-of code. You come up with one line instead of two, but this line makes it
-simpler to immediate see what you are comparing.
+Of course, it's not only the brevity that we aim for, but the readability
+of code. Of course, as usually, whether this approach is more readdable or not
+is subjenctive, but you will see many examples that in our opinion do make
+ the checkit approach more readable than the corresponding if-blocks.
 
 If you are fine with AssertionError (actually, the only exception class
 for regular asserts in Python), you can use this code:
@@ -45,12 +52,11 @@ Traceback (most recent call last):
     ...
 AssertionError
 
-This might be the most efficient way for debugging through quick-to-add assertions.
+This might be the most efficient way for debugging through quick-to-add
+assertions.
 
 You can use a check_if_not() wrapper for negative conditions:
->>> check_if_not(2 > 1,
-...    error=ValueError,
-...    message='The condition is true')
+>>> check_if_not(2 > 1, error=ValueError, message='The condition is true')
 Traceback (most recent call last):
     ...
 ValueError: The condition is true
@@ -64,13 +70,13 @@ like length:
 
 You can override a Pythonic approach to treating numbers (and boolean values)
 as not having length:
->>> check_length(True, 1, assign_length_to_numbers=True)
+>>> check_length(True, 1, assign_length_to_others=True)
 
 Note that above we used the parameter `operator`. You can use it in several
 functions, and it can take nine operators from the operator module (use
-`get_possible_operators()` too see their list: eq, le, lt, gt, ge, ne, is_,
-is_not). These operators are actually functions, so you simple provide them as
-function names, as we did above.
+`get_possible_operators()` too see their list, which is eq, le, lt, gt, ge, ne,
+is_, is_not). These operators are actually functions, so you simple provide
+them as function names, as we did above.
 
 Now we want to check the instance of the following string:
 >>> my_string = '_'.join(str(item) for item in [1, 2, 3])
@@ -94,6 +100,7 @@ Traceback (most recent call last):
     ...
 FileNotFoundError
 
+or that many paths exist:
 >>> check_if_paths_exist(('my_file.txt', 'my_other_file.csv'))
 Traceback (most recent call last):
     ...
@@ -110,17 +117,17 @@ When you're using Python 3.8 or newer, you can use the walrus operator with
 the checkit functions.
 
 The module also offers assert-like functions, which are simply aliases of the
-corresponding checkit functions: assert_if(), assert_if_not(),
-assert_instance(), assert_length() and assert_paths().
+corresponding checkit functions: `assert_if()`, `assert_if_not()`,
+`assert_instance()`, `assert_length()` and `assert_paths()`.
 
-
-Additional comments about our intentions:
-We thought of adding functions like check_if_equal(item_1, item_2, message=None),
-but we think that check_if_equal(item_1, item_2) is less readable than
-check_if(item_1 == item_2) or check_if(item_1 is item_2) (depending on
-what is being checked). The same way we did not write functions check_if_unequal,
-check_if_greater_than and the like. The generic function check_if(condition)
-is in our opinion more readable.
+Comments:
+We thought of adding some more functions, like
+`check_if_equal(item_1, item_2, message=None)`, but we think that
+`check_if_equal(item_1, item_2)` is less readable than
+`check_if(item_1 == item_2)` or `check_if(item_1 is item_2)` (depending on what
+is being checked). The same way we did not write functions
+`check_if_unequal()`, `check_if_greater_than()` and the like. The generic
+function `check_if(condition)` is in our opinion enough.
 
 The list of functions is open and we are open to ideas, but such a new function
 must follow all of the following conditions:
@@ -166,8 +173,8 @@ class ComparisonError(Exception):
     """Optional exception class for check_comparison() functions.
 
     The default exception class for check_comparison is ValueError,
-    but this class is ready for you to use in case you want to
-    catch a customized error for comparisons.
+    but this class is ready for you to use in case you want to catch a
+    customized error for comparisons.
     """
     pass
 
@@ -262,7 +269,7 @@ def check_length(item,
                  operator=eq,
                  error=LengthError,
                  message=None,
-                 assign_length_to_numbers=False,
+                 assign_length_to_others=False,
                  execution_mode='raise'):
     """Compare the length of item with expected_length, using condition.
 
@@ -271,7 +278,7 @@ def check_length(item,
     If the condition is met, the function returns nothing. If not, it throws
     LengthError with an optional message. The function takes a Pythonic approach,
     treating numbers as not having length (and throwing TypeError then).
-    Param assign_length_to_numbers lets you change this behavior, in which case
+    Param assign_length_to_others lets you change this behavior, in which case
     integers, doubles floats, complex values, and bool values take length as 1.
 
     >>> check_length(['string'], 1)
@@ -281,17 +288,17 @@ def check_length(item,
     Traceback (most recent call last):
         ...
     TypeError: object of type 'generator' has no len()
-    >>> check_length(2, 1, assign_length_to_numbers=True)
-    >>> check_length(2, 0, operator=gt, assign_length_to_numbers=True)
+    >>> check_length(2, 1, assign_length_to_others=True)
+    >>> check_length(2, 0, operator=gt, assign_length_to_others=True)
     """
     _check_checkit_arguments(error=error,
                              message=message,
                              operator=operator,
                              expected_length=expected_length,
-                             assign_length_to_numbers=assign_length_to_numbers,
+                             assign_length_to_others=assign_length_to_others,
                              execution_mode=execution_mode)
 
-    if assign_length_to_numbers:
+    if assign_length_to_others:
         if isinstance(item, (int, float, complex, bool)):
             item = [item]
 
@@ -935,7 +942,7 @@ def _check_checkit_arguments(error=None,
                              message=None,
                              condition=None,
                              operator=None,
-                             assign_length_to_numbers=None,
+                             assign_length_to_others=None,
                              execution_mode=None,
                              expected_length=None,
                              expected_instance=None):
@@ -961,7 +968,7 @@ def _check_checkit_arguments(error=None,
                message,
                condition,
                operator,
-               assign_length_to_numbers,
+               assign_length_to_others,
                execution_mode,
                expected_length,
                expected_instance)):
@@ -987,9 +994,9 @@ def _check_checkit_arguments(error=None,
         if not isinstance(expected_length, (int, float)):
             raise TypeError(
                 'expected_length should be an integer (or a float)')
-    if assign_length_to_numbers is not None:
-        if not isinstance(assign_length_to_numbers, bool):
-            raise TypeError('assign_length_to_numbers should be a bool')
+    if assign_length_to_others is not None:
+        if not isinstance(assign_length_to_others, bool):
+            raise TypeError('assign_length_to_others should be a bool')
     if execution_mode is not None:
         if not execution_mode in ('raise', 'return'):
             raise ValueError(
