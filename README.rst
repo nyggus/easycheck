@@ -1,12 +1,12 @@
 checkit
 ======
 
-checkit is a lightweight tool for running functionized assertion-like checks within Python code (so outside of testing). The idea is to use the checkit functions in a similar way as assertions, but with more functionalities and with a slightly different aim: when a condition you check is met, nothing happens (in fact, the function return None); if it's violated, an exception is raised. Nonetheless, while you should not use assertions in your Python code, the checkit module is designed in a ways so its function can be used in code. You can also use them in testing (whether in pytests or in doctests).
+checkit is a lightweight tool for running functionized assertion-like checks within Python code (in both code and doctests). The idea is to use the checkit functions in a similar way as assertions, but with more functionalities and with a slightly different aim: when a condition you check is met, nothing happens (in fact, the function returns None); if it's violated, an exception is raised. Nonetheless, while you should not use assertions in your Python code, the checkit module is designed in a way so its function can be used in code. You can also use them in testing (whether in pytests or in doctests).
 
 The main checkit functions (starting off with check_) are designed so that they can be used as easy-to-understand one-liners. They can be used instead of if-blocks, which you normally use to check conditions and raise exceptions if they are not met. The checkit approach has two main advantages over this classical approach:
 
-(i) it saves a little space; not much, since most of the time you'll end up with one line of code instead of two, and not always, particularly when you provide an exception type to be raised and a long message; 
-can (ii) but mainly it increases code simplicity and readability, since both the names of checkit functions and their arguments are designed in such a way that the reader immediately see what is being checked.
+* it saves a little space; not much, since most of the time you'll end up with one line of code instead of two, and not always, particularly when you provide an exception type to be raised and a long message; but mainly 
+* it increases code simplicity and readability, since both the names of checkit functions and their arguments are designed in such a way that the reader immediately sees what is being checked.
 
 NOTE: the checkit package should be used to check conditions in assertion-like situations. Use checkit when you want to ensure that everything is right so that you can follow, or that something is wrong; if something is wrong indeed, you can easily handle the exception raised. So, checkit is not designed to be used to check conditions in your code (like in if-elif blocks that do not raise exceptions).
 
@@ -39,13 +39,13 @@ The package is covered with both doctests and pytests. You can run them using th
 .. code-block:: text
 
     python -m pytest
-    python -m doctest src/checkit/*.py
+    python -m doctest src/checkit.py
 
 
 Example 1: Use checkit in code
 ------------------------------
 
-The basic aim of checkit is to provide you with quick-to-use, simple and readable assertion-like functions to make sure that particular conditions you are interested in are met. They are assert-like because what you do is indeed similar to what assert expressions do, since the functions: (i) check a condition, (ii) do nothing when it's met, but (iii) raise an exception when it is not. However, checkit differs from assertions in one significant functionality: Unlike when using the :code:`assert` expression, you can raise any error you want. What is perhaps more important, you are not supposed to use the assert expression in code outside of testing, but you can do so with checkit assert-like functions (starting off with check_).
+The basic aim of checkit is to provide you with quick-to-use, simple and readable assertion-like functions to make sure that particular conditions you are interested in are met. They are assert-like because what you do is indeed similar to what the assert expression does, since the functions (i) check a condition, (ii) do nothing when it's met, but (iii) raise an exception when it is not. However, checkit differs from assertions in one significant functionality: Unlike when using the :code:`assert` expression, you can raise any error you want. What is perhaps more important, you are not supposed to use the assert expression in code outside of testing, but you can do so with the checkit assert-like functions (starting off with check_).
 
 Of course, checkit is to help you when Python does not handle a particular situation. For example, it does so when you're trying to divide a number by zero, so you need not use checkit then. But there is a plethora of various situations which you want to handle.
 
@@ -318,13 +318,13 @@ If you do not want to raise exceptions but to catch them, you can do so using th
 Example 5: Testing
 --------------------
 
-Although we stress that checkit functions are dedicated to be used in code (unlike classical assertions), it does not mean that they cannot be used in testing. In fact, they can be quite helpful, in both doctests and pytests. The checkit package offers several aliases of its main checkit functions, aliases they makme the functions resemble assert expressions. These aliases are
+Although we stress that checkit functions are dedicated to be used in code (unlike classical assertions), it does not mean that they cannot be used in testing. In fact, they can be quite helpful, particularly in doctests, but also in pytests. The checkit package offers several aliases of its main checkit functions, aliases they make the functions resemble the assert expression. These aliases are
 
-* assert_if (for check_if)
-* assert_if_not (for check_if_not)
-* assert_length (for check_length)
-* assert_instance (for check_instance)
-* assert_paths (for check_if_paths_exist)
+* :code:`assert_if` (for :code:`check_if`)
+* :code:`assert_if_not` (for :code:`check_if_not`)
+* :code:`assert_length` (for :code:`check_length`)
+* :code:`assert_instance` (for :code:`check_instance`)
+* :code:`assert_paths` (for :code:`check_if_paths_exist`)
 
 Since they are aliases, they use the very same syntax and arguments as their checkit counterparts. See:
 
