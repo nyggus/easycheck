@@ -193,8 +193,10 @@ class ArgumentValueError(Exception):
 def check_if(condition, error=AssertionError, message=None):
     """Check if a condition is true.
 
-    If yes, returns nothing. If not, throws an error with optional message.
+    If yes, returns nothing. If not, throws an error with an optional message.
     This is a generic function, used by other functions of the module.
+    
+    It works as follows:
     >>> check_if(2 > 1)
     >>> check_if(2 < 1)
     Traceback (most recent call last):
@@ -209,8 +211,8 @@ def check_if(condition, error=AssertionError, message=None):
     >>> args = 33, 275, 'fifty-four'
     >>> check_if(args[0] < 50 and args[1] > 100 and isinstance(args[2], str))
 
-    which would be better using unpacking (particularly if each element of
-    the tuple has meaning):
+    which might be more readable using unpacking (particularly if each element
+    of the tuple has meaning):
     >>> a, b, c = args
     >>> check_if(a < 50 and b > 100 and isinstance(c, str))
 
@@ -223,9 +225,6 @@ def check_if(condition, error=AssertionError, message=None):
     ...    (a < 50 and b > 100) or
     ...    isinstance(c, str)
     ...    )
-
-    This function does not use checkit checks for its arguments, since it would
-    lead to infinite recursion.
     """
     _check_checkit_arguments(error=error,
                              message=message,
@@ -237,15 +236,17 @@ def check_if(condition, error=AssertionError, message=None):
 def check_if_not(condition, error=AssertionError, message=None):
     """Check if a condition is not true.
 
-    Use this function to check if something did not happen.
-    If it did not happen indeed, the function returns nothing. If it did, it throws
-    an error with an optional message.
+    Use this function to check if something did not happen. If it did not
+    happen indeed, the function returns nothing. If it did, it throws an error
+    with an optional message.
     >>> check_if_not(2 == 1)
     >>> check_if_not(2 > 1)
     Traceback (most recent call last):
         ...
     AssertionError
-    >>> check_if_not(2 > 1, error=ValueError, message='2 is not smaller than 1')
+    >>> check_if_not(2 > 1,
+    ...    error=ValueError,
+    ...    message='2 is not smaller than 1')
     Traceback (most recent call last):
         ...
     ValueError: 2 is not smaller than 1
@@ -276,10 +277,11 @@ def check_length(item,
     The operator can be from among get_possible_operators().
 
     If the condition is met, the function returns nothing. If not, it throws
-    LengthError with an optional message. The function takes a Pythonic approach,
-    treating numbers as not having length (and throwing TypeError then).
-    Param assign_length_to_others lets you change this behavior, in which case
-    integers, doubles floats, complex values, and bool values take length as 1.
+    LengthError with an optional message. As a default, the function takes
+    a Pythonic approach, treating numbers as not having length (and throwing
+    TypeError then). Param assign_length_to_others lets you change this
+    behavior, in which case integers, doubles, floats, complex values, and
+    boolean values take length as 1.
 
     >>> check_length(['string'], 1)
     >>> check_length('string', 6)
@@ -290,6 +292,7 @@ def check_length(item,
     TypeError: object of type 'generator' has no len()
     >>> check_length(2, 1, assign_length_to_others=True)
     >>> check_length(2, 0, operator=gt, assign_length_to_others=True)
+    >>> check_length(True, 1, assign_length_to_others=True)
     """
     _check_checkit_arguments(error=error,
                              message=message,
@@ -327,11 +330,10 @@ def check_instance(item, expected_instance, error=TypeError, message=None):
     >>> check_instance(['string'], list)
     >>> check_instance('string', str)
     >>> check_instance((1, 2), tuple)
-    >>> check_instance([1, 2], (tuple, list),
-    ...                           message='Neither tuple nor list')
+    >>> check_instance([1, 2], (tuple, list), message='Neither tuple nor list')
     >>> check_instance('souvenir',
-    ...                   (tuple, list),
-    ...                   message='Neither tuple nor list')
+    ...    (tuple, list),
+    ...    message='Neither tuple nor list')
     Traceback (most recent call last):
         ...
     TypeError: Neither tuple nor list
@@ -339,7 +341,8 @@ def check_instance(item, expected_instance, error=TypeError, message=None):
     Traceback (most recent call last):
         ...
     TypeError
-    >>> check_instance((i for i in range(3)), tuple, message='This is not tuple.')
+    >>> check_instance(
+    ...    (i for i in range(3)), tuple, message='This is not tuple.')
     Traceback (most recent call last):
         ...
     TypeError: This is not tuple.
@@ -378,14 +381,14 @@ def check_if_paths_exist(paths,
                          error=FileNotFoundError,
                          message=None,
                          execution_mode='raise'):
-    """Check if paths exists, and if not even raise error or return.
+    """Check if paths exists, and if not either raise or return an error.
 
     Param paths is either a string or a list/tuple.
 
-    The function's behavior depends on execution_mode. If you want to learn which
-    paths do not exist, choose execution_mode='return', in which case you will get
-    True if all the files exist, and a tuple of False, error(message),
-    paths (the last item being non-existing paths).
+    The function's behavior depends on param execution_mode. If you want to
+    learn which paths do not exist, choose execution_mode='return', in which
+    case you will get True if all the files exist, and a tuple of (False,
+    error(message), paths) (the last item being non-existing paths).
 
     >>> check_if_paths_exist('Q:/Op/Oop/')
     Traceback (most recent call last):
@@ -434,7 +437,9 @@ def check_if_paths_exist(paths,
 
 
 def _return_from_check_if_paths_exist(error, message, paths):
-    """
+    """Create a tuple to return from check_if_paths_exist, message-dependent.
+    
+    
     >>> _return_from_check_if_paths_exist(
     ...    error=FileNotFoundError,
     ...    message=None,
@@ -512,10 +517,9 @@ def check_all_ifs(*args):
     """Check all multiple conditions and return all checks.
 
     If you want to check several conditions, you can simply check them
-    line by line. Use this function if you want to check each condition
-    and catch all the errors (and messages) - it does not behave like
-    the other functions of the module, since it returns the results
-    of the checks.
+    line by line. Use this function if you want to check each condition and
+    catch all the errors (and messages) - it does not behave like the other
+    functions of the module, since it returns the results of the checks.
 
     The args are to be a list of tuples of the form
     (check_function, *args, **kwargs), where args and kwargs are
@@ -526,11 +530,13 @@ def check_all_ifs(*args):
     Returns: A dict with the results, of the following (example) structure:
              {'1: check_if': True, '2: check_if': True}
              This means that two checks were run, both using check_if, and
-             both were returned confirmation (so no exception was raised).
+             both returned confirmation (so no exception was raised).
              In case of an exception raised, the resulting dict gets the
              following structure:
              {'1: check_if': True, '2: check_if_not': AssertionError()}
-             when you did not provide the message, and ...???
+             when you did not provide the message, and
+             {'1: check_if': True, '2: check_if_not': AssertionError('Wrong')}
+             otherwise ('Wrong" being the message provided as the argument).
 
     >>> check_all_ifs(
     ...    (check_if, 2 > 1),
@@ -638,7 +644,7 @@ values: ('first choice', 'second_choice').
         ...
     checkit.ArgumentValueError: Provided condition violated for x
 
-    You can provide your own message, though:
+    You can also provide your own message:
     >>> check_argument(
     ...    x, 'x',
     ...    expected_condition=x % 2 == 0,
@@ -666,7 +672,7 @@ values: ('first choice', 'second_choice').
         ...
     checkit.ArgumentValueError: Provided condition violated for x
 
-    This is how you can check Exceptions and errors provided as arguments:
+    This is how you can check exceptions and errors provided as arguments:
     >>> assert check_argument(
     ...    TypeError, 'error_arg',
     ...    expected_instance=type) is None
@@ -767,8 +773,6 @@ def catch_check(check_function, *args, **kwargs):
     an exception otherwise. You can use this function to change this behavior:
     It still returns None when everything is fine, but instead of raising
     the exception in case of problems, it returns this exception.
-
-    Note the particular behavior. Since the function returns
 
     >>> catch_check(check_if, 2==2)
     >>> catch_check(check_if, 2>2)
@@ -873,7 +877,7 @@ def _compare(item_1, operator, item_2):
 
 
 def _clean_message(message):
-    """Clear message returned along with error.
+    """Clean message returned along with error.
 
     >>> _clean_message('"Incorrect argument")')
     'Incorrect argument'
@@ -894,7 +898,7 @@ def _clean_message(message):
 
 
 def _parse_error_and_message_from(error_and_message):
-    """Get error and message from one string.
+    """Get error and message presented as one string.
 
     >>> error_and_message = (
     ...    'TypeError("Incorrect argument")'
