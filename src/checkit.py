@@ -473,7 +473,7 @@ def check_comparison(item_1, operator, item_2,
     ...                  message='Not less!')
     Traceback (most recent call last):
         ...
-    checks.ComparisonError: Not less!
+    checkit.ComparisonError: Not less!
 
     Style suggestion:
         Surely, use coding style you prefer, but in our opinion you can
@@ -487,7 +487,7 @@ def check_comparison(item_1, operator, item_2,
         ...    )
         Traceback (most recent call last):
             ...
-        checks.ComparisonError: Comparison condition violated
+        checkit.ComparisonError: Comparison condition violated
 
         The idea is to keep the first three arguments in one line, so that
         the comparison can be read like text: 2, greater_than, 0; or
@@ -622,14 +622,14 @@ def check_argument(argument,
     >>> foo('no choice')
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: x's value, no choice, is not among valid \
+    checkit.ArgumentValueError: x's value, no choice, is not among valid \
 values: ('first choice', 'second_choice').
 
     >>> x = 2; check_argument(x, 'x', expected_condition=x % 2 == 0)
     >>> x = 3; check_argument(x, 'x', expected_condition=x % 2 == 0)
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: Provided condition violated for x
+    checkit.ArgumentValueError: Provided condition violated for x
 
     You can provide your own message, though:
     >>> check_argument(
@@ -638,7 +638,7 @@ values: ('first choice', 'second_choice').
     ...    message='Wrong, my friend!')
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: Wrong, my friend!
+    checkit.ArgumentValueError: Wrong, my friend!
 
     >>> x = 2.0
     >>> check_argument(
@@ -647,7 +647,7 @@ values: ('first choice', 'second_choice').
     ...    expected_condition=int(x) % 2 == 0)
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: Incorrect instance of x;\
+    checkit.ArgumentValueError: Incorrect instance of x;\
  valid instance(s): <class 'int'>
 
     >>> x = 3
@@ -657,7 +657,7 @@ values: ('first choice', 'second_choice').
     ...    expected_condition=int(x) % 2 == 0)
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: Provided condition violated for x
+    checkit.ArgumentValueError: Provided condition violated for x
 
     This is how you can check Exceptions and errors provided as arguments:
     >>> assert check_argument(
@@ -692,7 +692,7 @@ values: ('first choice', 'second_choice').
     ...    expected_condition=check_glm_args(glm_args))
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: Provided condition violated for glm_args
+    checkit.ArgumentValueError: Provided condition violated for glm_args
     """
     if all(item is None
            for item in (expected_instance,
