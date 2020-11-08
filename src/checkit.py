@@ -41,8 +41,8 @@ Traceback (most recent call last):
 ValueError: One is bigger than zero
 
 Of course, it's not only the brevity that we aim for, but the readability
-of code. Of course, as usually, whether this approach is more readdable or not
-is subjenctive, but you will see many examples that in our opinion do make
+of code. Of course, as usually, whether this approach is more readable or not
+is subjective, but you will see many examples that in our opinion do make
  the checkit approach more readable than the corresponding if-blocks.
 
 If you are fine with AssertionError (actually, the only exception class
@@ -73,9 +73,9 @@ as not having length:
 >>> check_length(True, 1, assign_length_to_others=True)
 
 Note that above we used the parameter `operator`. You can use it in several
-functions, and it can take nine operators from the operator module (use
+functions, and it can take eight operators from the operator module (use
 `get_possible_operators()` too see their list, which is eq, le, lt, gt, ge, ne,
-is_, is_not). These operators are actually functions, so you simple provide
+is_, is_not). These operators are actually functions, so you simply provide
 them as function names, as we did above.
 
 Now we want to check the instance of the following string:
@@ -151,11 +151,8 @@ must follow all of the following conditions:
 """
 
 import os
-import sys
-
-from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from collections.abc import Generator
-from itertools import zip_longest
+from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
 
 
@@ -195,7 +192,7 @@ def check_if(condition, error=AssertionError, message=None):
 
     If yes, returns nothing. If not, throws an error with an optional message.
     This is a generic function, used by other functions of the module.
-    
+
     It works as follows:
     >>> check_if(2 > 1)
     >>> check_if(2 < 1)
@@ -438,8 +435,8 @@ def check_if_paths_exist(paths,
 
 def _return_from_check_if_paths_exist(error, message, paths):
     """Create a tuple to return from check_if_paths_exist, message-dependent.
-    
-    
+
+
     >>> _return_from_check_if_paths_exist(
     ...    error=FileNotFoundError,
     ...    message=None,
@@ -1002,7 +999,7 @@ def _check_checkit_arguments(error=None,
         if not isinstance(assign_length_to_others, bool):
             raise TypeError('assign_length_to_others should be a bool')
     if execution_mode is not None:
-        if not execution_mode in ('raise', 'return'):
+        if execution_mode not in ('raise', 'return'):
             raise ValueError(
                 'execution_mode should be either "raise" or "return"')
     if expected_instance is not None:

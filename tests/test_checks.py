@@ -1,8 +1,7 @@
 import os
 import pytest
-import sys
-import checkit
-
+from collections.abc import Generator
+from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from checkit import (check_if, assert_if,
                      check_if_not, assert_if_not,
                      check_instance, assert_instance,
@@ -26,34 +25,28 @@ from checkit import (check_if, assert_if,
                      _make_message,
                      )
 
-from collections.abc import Generator
-
-from operator import eq, le, lt, gt, ge, ne, is_, is_not
-
 
 def test_check_if_edge_cases():
-    assert check_if(True) is None
     with pytest.raises(TypeError,
                        match="missing 1 required positional argument"):
         check_if()
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if('tomato soup is good')
     with pytest.raises(ValueError, match='The condition does not give'):
-        check_if(22)
+        check_if('')
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if(1)
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if(0)
+    assert check_if(True) is None
     with pytest.raises(AssertionError):
         check_if(False)
     with pytest.raises(TypeError, match='error must be an exception'):
         check_if(1, 1)
-    with pytest.raises(TypeError, match='error must be an exception'):
-        check_if(1, 1, 1)
+    with pytest.raises(TypeError, match='message must be either None or string'):
+        check_if(1, ValueError, 1)
     with pytest.raises(TypeError, match='takes from 1 to 3 positional'):
         check_if(1, 1, 1, 1)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_if(Condition=12 > 5)
 
 
 def test_check_if_positive():
@@ -67,10 +60,8 @@ def test_check_if_negative():
         check_if(2 < 1)
     with pytest.raises(ValueError):
         check_if(2 < 1, error=ValueError)
-    with pytest.raises(ValueError):
-        check_if(2 < 1, error=ValueError)
-    with pytest.raises(TypeError):
-        check_if('a' > 2)
+    with pytest.raises(ValueError, match='incorrect value'):
+        check_if(2 < 1, error=ValueError, message='incorrect value')
 
 
 def test_check_if_not_edge_cases():
@@ -80,7 +71,7 @@ def test_check_if_not_edge_cases():
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if_not('tomato soup is good')
     with pytest.raises(ValueError, match='The condition does not give'):
-        check_if_not(22)
+        check_if_not('')
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if_not(1)
     with pytest.raises(ValueError, match='The condition does not give'):
@@ -90,12 +81,10 @@ def test_check_if_not_edge_cases():
         check_if_not(True)
     with pytest.raises(TypeError, match='error must be an exception'):
         check_if_not(1, 1)
-    with pytest.raises(TypeError, match='error must be an exception'):
-        check_if_not(1, 1, 1)
+    with pytest.raises(TypeError, match='message must be either None or string'):
+        check_if_not(1, ValueError, 1)
     with pytest.raises(TypeError, match='takes from 1 to 3 positional'):
         check_if_not(1, 1, 1, 1)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_if_not(Condition=12 > 5)
 
 
 def test_check_if_not_positive():
@@ -108,10 +97,8 @@ def test_check_if_not_negative():
         check_if_not(2 > 1)
     with pytest.raises(ValueError):
         check_if_not(2 > 1, error=ValueError)
-    with pytest.raises(ValueError):
-        check_if_not(2 > 1, error=ValueError)
-    with pytest.raises(TypeError):
-        check_if_not('a' > 2)
+    with pytest.raises(ValueError, match='incorrect value'):
+        check_if_not(2 > 1, error=ValueError, message='incorrect value')
 
 
 def test_check_length_edge_cases():
@@ -125,10 +112,6 @@ def test_check_length_edge_cases():
         check_length(1, 1, 1)
     with pytest.raises(TypeError, match='BaseException type, not str'):
         pytest.raises('tomato soup', 'is good')
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_length(Item=2)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_length(item=2, length=5)
 
 
 def test_check_length_positive():
@@ -136,6 +119,7 @@ def test_check_length_positive():
     assert check_length('string', 6) is None
     assert check_length([1, 2], 2) is None
     assert check_length(range(0, 3), 3) is None
+    assert check_length(10, 1, assign_length_to_others=True) is None
 
 
 def test_check_length_negative():
@@ -145,7 +129,6 @@ def test_check_length_negative():
         check_length(None)
     with pytest.raises(TypeError, match="object of type 'int' has"):
         check_length(10, 1)
-    assert check_length(10, 1, assign_length_to_others=True) is None
 
 
 def test_check_instance_edge_cases():
