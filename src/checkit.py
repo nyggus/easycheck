@@ -588,7 +588,6 @@ def check_argument(argument,
                    expected_instance=None,
                    expected_choices=None,
                    expected_length=None,
-                   expected_condition=None,
                    error=ArgumentValueError,
                    message=None,
                    **kwargs):
@@ -611,19 +610,18 @@ def check_argument(argument,
     For example, the below will not work because of the ValueError, resulting
     from an attempt to apply the `int()` function to a string:
 
-    >>> x = 'one'
     >>> check_argument(
-    ...    x, 'x',
-    ...    expected_instance=int,
-    ...    expected_condition=int(x) % 2 == 0)
+    ...    [1, 2, 3], 'x',
+    ...    expected_instance=tuple,
+    ...    expected_length=3
+    ...    )
     Traceback (most recent call last):
         ...
-    ValueError: invalid literal for int() with base 10: 'one'
+    checkit.ArgumentValueError: Incorrect instance of x; valid instance(s): \
+<class 'tuple'>
 
-    The expected_condition, however, must actually include also the argument
-    itself, like below:
-    >>> x = 5
-    >>> check_argument(x, 'x', expected_condition=x in range(0, 10))
+    The expected_choices argument helps you check whether the user has provided
+    a valid value of the argument:
     >>> def foo(x):
     ...    check_argument(x, 'x', expected_choices=('first choice',
     ...                                             'second_choice'))
@@ -635,80 +633,28 @@ def check_argument(argument,
     checkit.ArgumentValueError: x's value, no choice, is not among valid \
 values: ('first choice', 'second_choice').
 
-    >>> x = 2; check_argument(x, 'x', expected_condition=x % 2 == 0)
-    >>> x = 3; check_argument(x, 'x', expected_condition=x % 2 == 0)
-    Traceback (most recent call last):
-        ...
-    checkit.ArgumentValueError: Provided condition violated for x
-
-    You can also provide your own message:
-    >>> check_argument(
-    ...    x, 'x',
-    ...    expected_condition=x % 2 == 0,
-    ...    message='Wrong, my friend!')
-    Traceback (most recent call last):
-        ...
-    checkit.ArgumentValueError: Wrong, my friend!
-
     >>> x = 2.0
     >>> check_argument(
     ...    x, 'x',
-    ...    expected_instance=int,
-    ...    expected_condition=int(x) % 2 == 0)
+    ...    expected_instance=int)
     Traceback (most recent call last):
         ...
     checkit.ArgumentValueError: Incorrect instance of x;\
  valid instance(s): <class 'int'>
 
-    >>> x = 3
-    >>> check_argument(
-    ...    x, 'x',
-    ...    expected_instance=int,
-    ...    expected_condition=int(x) % 2 == 0)
-    Traceback (most recent call last):
-        ...
-    checkit.ArgumentValueError: Provided condition violated for x
-
     This is how you can check exceptions and errors provided as arguments:
-    >>> assert check_argument(
+    >>> check_argument(
     ...    TypeError, 'error_arg',
-    ...    expected_instance=type) is None
-    >>> assert check_argument(
+    ...    expected_instance=type)
+    >>> check_argument(
     ...    TypeError(), 'error_arg',
-    ...    expected_instance=Exception) is None
-
-    You can also define quite complex checks:
-    >>> def check_glm_args(glm_args):
-    ...    return (
-    ...        isinstance(glm_args[0], (int, float)) and
-    ...        glm_args[0] > 0 and
-    ...        glm_args[0] <= 1 and
-    ...        isinstance(glm_args[1], str) and
-    ...        isinstance(glm_args[2], str) and
-    ...        glm_args[1] in ('poisson', 'quasi-poisson') and
-    ...        glm_args[2] in ('log', 'identity')
-    ...     )
-    >>> glm_args = 1, 'quasi-poisson', 'log'
-    >>> check_argument(
-    ...    argument_name='glm_args',
-    ...    argument=glm_args,
-    ...    expected_instance=tuple,
-    ...    expected_condition=check_glm_args(glm_args))
-    >>> glm_args = 1., 'quasi-poisson', 'logit'
-    >>> check_argument(
-    ...    argument_name='glm_args',
-    ...    argument=glm_args,
-    ...    expected_instance=tuple,
-    ...    expected_condition=check_glm_args(glm_args))
-    Traceback (most recent call last):
-        ...
-    checkit.ArgumentValueError: Provided condition violated for glm_args
+    ...    expected_instance=Exception)
     """
     if all(item is None
            for item in (expected_instance,
                         expected_choices,
-                        expected_length,
-                        expected_condition)):
+                        expected_length
+                        )):
         raise ValueError('check_argument() requires at least one condition'
                          ' to be checked')
 
@@ -744,13 +690,6 @@ values: ('first choice', 'second_choice').
                      message=length_message,
                      **kwargs
                      )
-    if expected_condition is not None:
-        condition_message = _make_message(
-            message,
-            f'Provided condition violated for {argument_name}')
-        check_if(expected_condition,
-                 error=error,
-                 message=condition_message)
 
 
 def _make_message(message_provided, message_otherwise):
