@@ -1,7 +1,7 @@
 Example: Testing
 --------------------
 
-Although we stress that checkit functions are dedicated to be used in code (unlike classical assertions), it does not mean that they cannot be used in testing. In fact, they can be quite helpful, particularly in doctests, but also in pytests. The checkit package offers several aliases of its main checkit functions, aliases they make the functions resemble the assert expression. These aliases are
+Although we stress that checkit functions are dedicated to be used in code (unlike classical assertions), it does not mean that they cannot be used in testing. In fact, they can be quite helpful, particularly in doctests, but also in pytests. The checkit package offers several aliases of its main checkit functions, aliases that make the functions resemble the :code:`assert` expression. These aliases are
 
 * :code:`assert_if` (for :code:`check_if`)
 * :code:`assert_if_not` (for :code:`check_if_not`)
@@ -29,6 +29,7 @@ Since they are aliases, they use the very same syntax and arguments as their che
 When you run doctests, everything will go fine, as in the below simulation of the doctests from the above docstring:
 
 .. code-block:: python
+
 	>>> single_string = 'aka'
 	>>> string_multiplied = multiply_string(single_string, 3)
 	>>> assert_instance(string_multiplied, list)

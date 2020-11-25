@@ -1,7 +1,11 @@
 Example 1: Use checkit in code
 ------------------------------
 
-The basic aim of checkit is to provide you with quick-to-use, simple and readeable assertion-like functions to make sure that particular conditions you are interested in are met. They are assert-like because what you do is indeed similar to what the assert expression does, since the functions (i) check a condition, (ii) do nothing when it's met, but (iii) raise an exception when it is not. However, checkit differs from assertions in one significant functionality: Unlike when using the :code:`assert` expression, you can raise any error you want. What is perhaps more important, you are not supposed to use the assert expression in code outside of testing, but you can do so with the checkit assert-like functions - in fact, they are designed to be used that way.
+The basic aim of checkit is to provide you with quick-to-use, simple and readable assertion-like functions to make sure that particular conditions you are interested in are met. They are assert-like because what you do is indeed similar to what the assert expression does, since the functions
+
+* check a condition
+* do nothing when it's met, but
+* raise an exception when it is not
 
 Of course, checkit is to help you when Python does not handle a particular situation. For example, it does so when you're trying to divide a number by zero, so you need not use checkit then. But there is a plethora of various situations which you want to handle.
 
@@ -51,14 +55,14 @@ Without checkit, this function might have the following form:
 	...            ' impossible to split first and second name')
 	...    return full_name.split(' ')[1]
     
-Above, we use specified errors and messages, but we can make it shorter, using default exceptions and messages. Consider the following:
+Above, we used specified errors and messages, but we can make the call shorter by using default exceptions and messages. Consider the following:
     
 .. code-block:: python
 
 	>>> def get_family_name(full_name):
-	...    check_if_not(full_name is None)
+	...    check_if_not(full_name is None, ValueError)
 	...    check_instance(full_name, str)
-	...    check_if(' ' in full_name.strip())
+	...    check_if(' ' in full_name.strip(), ValueError)
 	...    return full_name.split(' ')[1]
 
 	>>> get_family_name('John Smith')
@@ -66,7 +70,7 @@ Above, we use specified errors and messages, but we can make it shorter, using d
 	>>> get_family_name('John_Smith')
 	Traceback (most recent call last):
 		...
-	AssertionError
+	ValueError
 
 	>>> get_family_name(57)
 	Traceback (most recent call last):
@@ -76,7 +80,7 @@ Above, we use specified errors and messages, but we can make it shorter, using d
 	>>> get_family_name(None)
 	Traceback (most recent call last):
 		...
-	AssertionError
+	ValueError
 
 The non-checkit counterpart is rather less readable:
 
