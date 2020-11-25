@@ -1,7 +1,7 @@
 Example 4: Complex checks using a self-defined function
 -------------------------------------------------------
 
-You can also define complex checks using a function that collects calls to checkit functions. That way, you can simplify the function, in which the check will take one like instead of a couple of them (8 in the example below).
+You can also define complex checks using a function that collects calls to checkit functions. That way, you can simplify the function in which you want to make the check, by using just one line instead of several (8 in the example below).
 
 .. code-block::python
 
