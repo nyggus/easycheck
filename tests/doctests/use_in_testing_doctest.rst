@@ -1,5 +1,5 @@
-Example: Testing
---------------------
+Use in testing
+--------------
 
 Although we stress that checkit functions are dedicated to be used in code (unlike classical assertions), it does not mean that they cannot be used in testing. In fact, they can be quite helpful, particularly in doctests, but also in pytests. The checkit package offers several aliases of its main checkit functions, aliases that make the functions resemble the :code:`assert` expression. These aliases are
 

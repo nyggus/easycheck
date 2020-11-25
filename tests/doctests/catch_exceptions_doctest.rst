@@ -1,5 +1,5 @@
-Example 2: Catching exceptions instead of raising them
-------------------------------------------------------
+Catching exceptions instead of raising them
+-------------------------------------------
 
 If you do not want to raise exceptions but to catch them, you can do so using the :code:`catch_check()` function:
 

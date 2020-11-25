@@ -1,5 +1,5 @@
-Example 1: Use checkit in code
-------------------------------
+Use checkit in code
+-------------------
 
 The basic aim of checkit is to provide you with quick-to-use, simple and readable assertion-like functions to make sure that particular conditions you are interested in are met. They are assert-like because what you do is indeed similar to what the assert expression does, since the functions
 
