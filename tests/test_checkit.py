@@ -161,7 +161,7 @@ def test_check_instance_positive():
 
 
 def test_check_instance_negative():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match='Neither tuple nor list'):
         check_instance(
             'souvenir',
             (tuple, list),
@@ -171,10 +171,10 @@ def test_check_instance_negative():
         check_instance(20.1, (int, None))
     with pytest.raises(TypeError):
         check_instance((i for i in range(3)), tuple)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match='This is not tuple'):
         check_instance((i for i in range(3)),
                        tuple,
-                       message='This is not tuple.')
+                       message='This is not tuple')
     with pytest.raises(TypeError):
         check_instance(10, None)
     with pytest.raises(TypeError):
@@ -591,8 +591,6 @@ def test_check_argument_edge_cases():
     assert str(msg_error.value) == msg
 
     x = 5
-    with pytest.raises(TypeError, match='must be string'):
-        check_argument(x, x, expected_condition=x % 2 == 0)
 
 
 def test_check_argument_instance():
@@ -692,28 +690,6 @@ def test_check_argument_length():
         foo(1)
 
 
-def test_check_argument_condition():
-    x = 5
-    assert check_argument(x, 'x', expected_condition=x in range(0, 10)) is None
-    assert check_argument(x, expected_condition=x in range(0, 10)) is None
-    assert check_argument('x', expected_condition=x in range(0, 10)) is None
-    assert check_argument(x, expected_condition=x in range(0, 10)) is None
-
-    def foo(x):
-        check_argument(x, 'x', expected_condition=x % 2 == 0)
-        pass
-    with pytest.raises(ArgumentValueError):
-        foo(3)
-    assert foo(2) is None
-
-    def foo(x):
-        check_argument(x, expected_condition=x % 2 == 0)
-        pass
-    with pytest.raises(ArgumentValueError):
-        foo(3)
-    assert foo(2) is None
-
-
 def test_check_argument_mix():
     def foo(x):
         check_argument(x, 'x', expected_instance=int, condition=x % 2 == 0)
@@ -742,17 +718,10 @@ def test_check_argument_mix():
     assert check_argument(
         argument_name='glm_args',
         argument=glm_args,
-        expected_instance=tuple,
-        expected_condition=check_glm_args(glm_args)) is None
+        expected_instance=tuple
+    ) is None
 
     glm_args = 1., 'quasi-poisson', 'logit'
-    with pytest.raises(ArgumentValueError,
-                       match='condition violated for glm_args'):
-        check_argument(
-            argument_name='glm_args',
-            argument=glm_args,
-            expected_instance=tuple,
-            expected_condition=check_glm_args(glm_args))
 
 
 def test_return_from_check_if_paths_exist_edge_cases():
