@@ -1,25 +1,37 @@
-"""A module for simple checks to be used outside of testing.
+"""A module for simple checks to be used within code and testing.
 
 The module offers simple functions to check various conditions. These
-functions are to be used when you would like to use assertions in code,
-something you should not do in Python. In such cases, this module comes as
-handy, offering simple and readable functions to check various conditions.
-But this actually does not mean that you cannot use these functions in
-testing: You can do so, like in pytest testing.
+functions are to be used when you feel like using assertions in code, but you
+have to give up the idea, since you should not use assertion in Python code.
+In such cases, this module comes as handy, offering simple and readable
+functions to check various conditions. The idea behind checkit functions is as
+follows: If the condition if met, nothing happens (the function returns None);
+when the condition is violated, an exception is raised. You either can go for
+default exceptions and messages (sometimes no message) or you can customize
+them.
+
+The module also offers aliases to be used in testing, all of which have the
+word "assert" in their names (e.g., assert_if, assert_instance, assert_length).
 
 What the package offers is simplicity and code readability. Instead of
 raising exceptions in if-blocks, you can use devoted functions that are
-easy to use and understand. These functions are simple and easy-to-follow
-wrappers for checking conditions and raising the corresponding exceptions.
-The idea is to keep the resulting code clean and readable.
+easy to use, while at the same time being easy to understand. These functions
+are simple and easy-to-follow wrappers for checking conditions and raising the
+corresponding exceptions. The idea is to keep the resulting code as clean and
+readable as possible. The testing functions also aim to add readability, to
+both tests and their output - thanks to customized exceptions and messages.
 
-The main function is `check_if()`. The other functions are actually wrappers
-built around it, customized to particular situations and conditions.
+The main function is `check_if()`, with its negative friend `check_if_not()`.
+The other functions are actually wrappers built around `check_if()`, customized
+to particular situations and conditions.
 
-The `check_if()` function is general and checks a condition; if it
-is not met, it raises an exception (which is one of the Exception classes,
-either built-in ones into Python or the checkit module, or created by you);
-you can optionally send a message along with the exception.
+A general function, `check_if()` checks a condition provided as its argument;
+if it is not met, the function raises an exception (which is one of
+the Exception classes, either built-in ones, or from the checkit module, or
+created by you); you can (optionally) send a message along with the exception.
+Note that when you're using the assert expression, you're left with
+AssertionError, but when using the checkit functions, you can use any exception
+you want.
 
 Consider the following example:
 >>> if 1 > 0:
@@ -34,42 +46,62 @@ Traceback (most recent call last):
     ...
 ValueError: One is bigger than zero
 
-Of course, it's not the brevity that we mainly aim for, but the readability
-of code. You come up with one line instead of two, but this line makes it
-simpler to immediate see what you are comparing.
+or even
+>>> check_if(0 > 1, ValueError, 'One is bigger than zero')
+Traceback (most recent call last):
+    ...
+ValueError: One is bigger than zero
 
-If you are fine with AssertionError (actually, the only exception class
-for regular asserts in Python), you can use this code:
+In fact, you could also do the following:
+>>> check_if(0 > 1, ValueError('One is bigger than zero'))
+Traceback (most recent call last):
+    ...
+ValueError: One is bigger than zero
+
+but the two first calls are cleaner.
+
+Of course, it's not only the brevity that we aim for, but mainly code
+readability. Of course, as usually, whether this approach is more readable or
+not is a subjective matter, but you will see many examples that in our opinion
+do make the checkit approach more readable than the corresponding if-blocks.
+
+If you are fine with AssertionError (actually, the only exception class for
+regular asserts in Python), you can use this code:
 >>> check_if(0 > 1)
 Traceback (most recent call last):
     ...
 AssertionError
 
-This might be the most efficient way for debugging through quick-to-add assertions.
+This might be the most efficient way for debugging through quick-to-add
+assertions.
 
-You can use a check_if_not() wrapper for negative conditions:
->>> check_if_not(2 > 1,
-...    error=ValueError,
-...    message='The condition is true')
+You can use a `check_if_not()` wrapper for negative conditions:
+>>> check_if_not(2 > 1, error=ValueError, message='The condition is true')
 Traceback (most recent call last):
     ...
 ValueError: The condition is true
 
-Other checkit functions use this function to check a particular condition,
-like length:
+Other checkit functions `check_if()` to check a particular condition, like
+length:
 >>> my_list = [1, 12, 1]
 >>> check_length(my_list, 3)
->>> check_length(my_list, 10, operator=less_than_or_equal)
+>>> check_length(my_list, 10, operator=le)
 >>> check_length('the SimpleAssert module', 23)
 
-You can override a Pythonic approach to treating numbers (and boolean values)
-as not having length:
->>> check_length(True, 1, assign_length_to_numbers=True)
+You can override a Pythonic approach to treating numbers (integers, doubles,
+floats, complex values) and boolean values as not having length:
+>>> check_length(True, 1, assign_length_to_others=True)
+>>> check_length(1, 1, assign_length_to_others=True)
+>>> check_length(1, 2, assign_length_to_others=True)
+Traceback (most recent call last):
+    ...
+checkit.LengthError
 
 Note that above we used the parameter `operator`. You can use it in several
-functions, and it can take such values as `equal`, `less_than`, `lt`, etc. (use
-`get_possible_operators()` too see their list). These operators are actually
-functions, so you simple provide them as function names, as we did above.
+functions, and it can take eight operators from the operator module (use
+`get_possible_operators()` too see their list, which is eq, le, lt, gt, ge, ne,
+is_, is_not). These operators are actually functions, so you simply provide
+them as function names, as we did above.
 
 Now we want to check the instance of the following string:
 >>> my_string = '_'.join(str(item) for item in [1, 2, 3])
@@ -93,70 +125,82 @@ Traceback (most recent call last):
     ...
 FileNotFoundError
 
+or that many paths exist:
 >>> check_if_paths_exist(('my_file.txt', 'my_other_file.csv'))
 Traceback (most recent call last):
     ...
 FileNotFoundError
 
-The module also offers two-item comparisons (for the moment working only
-for numbers), again using the operator parameter:
+(The function works with both files and directories, but raises in both cases
+raises FileNotFoundError, although of course you can change this default
+behavior using the error parameter.)
+
+The module also offers two-item comparisons, also using the operator parameter:
 >>> a, b, c = 2, 4, 2
->>> check_comparison(a, less_than_or_equal, b)
->>> check_comparison(a, lte, b)
->>> check_comparison(b, greater_than_or_equal, a)
->>> check_comparison(b, gte, a)
->>> check_comparison(a, equal, c)
+>>> check_comparison(a, lt, b)
+>>> check_comparison(b, gt, a)
+>>> check_comparison(a, eq, c)
+>>> check_comparison('a', eq, 'a')
+>>> check_comparison('a', ne, 'b')
+>>> check_comparison(['1', '2'], eq, ['1', '2'])
+>>> check_comparison(['1', '2'], ne, ['1', 2])
 
-When you're using Python 3.8 or newer, you can use the walrus operator with
-the checkit functions.
+Use in testing:
+The module offers assert-like functions, which are simply aliases of the
+corresponding checkit functions: `assert_if()`, `assert_if_not()`,
+`assert_instance()`, `assert_length()` and `assert_paths()`. You can use them
+in doctesting and pytesting, and their main advantage over the classical
+`assertion` expression is that they can use any exception you want, which makes
+testing output more informative. Also, thanks to how they are written, you get
+customized testing functions for particular situations, like here:
+instead of
+>>> string = 'Shout Bamalama'
+>>> assert isinstance(string, str)
+>>> assert string != 'Silence prefered'
+>>> assert len(string) > 10
 
-The module also offers assert-like functions, which are simply aliases of the
-corresponding checkit functions: assert_if(), assert_if_not(),
-assert_instance(), assert_length() and assert_paths().
+you can use the following:
+>>> assert_instance(string, str)
+>>> check_if_not(string == 'Silence prefered')
+>>> assert_length(string, 10, gt)
 
-
-Additional comments about our intentions:
-We thought of adding functions like check_if_equal(item_1, item_2, message=None),
-but we think that check_if_equal(item_1, item_2) is less readable than
-check_if(item_1 == item_2) or check_if(item_1 is item_2) (depending on
-what is being checked). The same way we did not write functions check_if_unequal,
-check_if_greater_than and the like. The generic function check_if(condition)
-is in our opinion more readable.
+Comments:
+We thought of adding some more functions, like
+`check_if_equal(item_1, item_2, message=None)`, but we think that
+`check_if_equal(item_1, item_2)` is less readable than
+`check_if(item_1 == item_2)` or `check_if(item_1 is item_2)` (depending on what
+is being checked). The same way we did not add functions `check_if_unequal()`,
+`check_if_greater_than()` and the like. The generic function `check_if()` is in
+our opinion enough.
 
 The list of functions is open and we are open to ideas, but such a new function
 must follow all of the following conditions:
-* it must be readable, in terms of both its code and using it in code,
-  and it must be more readable than any other function from the module
-  (see the above comparison of `check_if(item_1 == item_2)` and
+* it must be readable, in terms of both its code and using it in code, and it
+  must be more readable than any other function from the module (see the above
+  comparison of `check_if(item_1 == item_2)` and
   `check_if_equal(item_1, item_2)`) being used to check the same condition
 * its name must clearly convey what is being checked; for checks, the name
   should follow the check_ convention
 * it uses a new Exception class only if this is justified
 * it returns nothing when the checked condition is passed, and it raises
-  an exception otherwise (so it mimicks how assertions work, but offering
+  an exception otherwise (so it mimics how assertions work, but offering
   the possibility to raise other exception types than AssertionError)
-* it covers all possible situations that the check can meet
+* it covers all possible situations that the check can meet (at least all those
+  that make sense)
 * if atypical situations are handled, this is done in a reasonable way; for
   instance, if it does something in an atypical way for Python (consider how
   the `check_length()` function handles the length of numbers), it does not so
   with its default behavior
 * it has a well-written docstring that includes doctests
 * its behavior is fully covered by tests (both doctests and pytests)
+
+TODO:
+* add a possibility to use a warning instead of raising an exception?
 """
 
 import os
-import sys
-
-from checkit.comparisons import (equal,
-                                 less_than, lt,
-                                 less_than_or_equal, lte,
-                                 greater_than, gt,
-                                 greater_than_or_equal, gte,
-                                 get_possible_operators,
-                                 )
-
 from collections.abc import Generator
-from itertools import zip_longest
+from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
 
 
@@ -174,8 +218,8 @@ class ComparisonError(Exception):
     """Optional exception class for check_comparison() functions.
 
     The default exception class for check_comparison is ValueError,
-    but this class is ready for you to use in case you want to
-    catch a customized error for comparisons.
+    but this class is ready for you to use in case you want to catch a
+    customized error for comparisons.
     """
     pass
 
@@ -194,8 +238,10 @@ class ArgumentValueError(Exception):
 def check_if(condition, error=AssertionError, message=None):
     """Check if a condition is true.
 
-    If yes, returns nothing. If not, throws an error with optional message.
+    If yes, returns nothing. If not, throws an error with an optional message.
     This is a generic function, used by other functions of the module.
+
+    It works as follows:
     >>> check_if(2 > 1)
     >>> check_if(2 < 1)
     Traceback (most recent call last):
@@ -210,8 +256,8 @@ def check_if(condition, error=AssertionError, message=None):
     >>> args = 33, 275, 'fifty-four'
     >>> check_if(args[0] < 50 and args[1] > 100 and isinstance(args[2], str))
 
-    which would be better using unpacking (particularly if each element of
-    the tuple has meaning):
+    which might be more readable using unpacking (particularly if each element
+    of the tuple has meaning):
     >>> a, b, c = args
     >>> check_if(a < 50 and b > 100 and isinstance(c, str))
 
@@ -224,9 +270,6 @@ def check_if(condition, error=AssertionError, message=None):
     ...    (a < 50 and b > 100) or
     ...    isinstance(c, str)
     ...    )
-
-    This function does not use checkit checks for its arguments, since it would
-    lead to infinite recursion.
     """
     _check_checkit_arguments(error=error,
                              message=message,
@@ -238,15 +281,34 @@ def check_if(condition, error=AssertionError, message=None):
 def check_if_not(condition, error=AssertionError, message=None):
     """Check if a condition is not true.
 
-    Use this function to check if something did not happen.
-    If it did not happen indeed, the function returns nothing. If it did, it throws
+    Use this function to check if something is not true. If it is not true
+    indeed, the function returns nothing. If it is true, the function throws
     an error with an optional message.
+    
+    You would normally use these functions in situations like these: "This is
+    engine speed in the object engine_speed:
+    >>> engine_speed = 5900
+    
+    and if it's higher than 6K, than the situation gets difficult. So, let me
+    check this:
+    >>> check_if_not(engine_speed > 6000, ValueError, 'Danger!')
+    
+    Sure, you can do so using the `check_if()` function, like here:
+    >>> check_if(engine_speed <= 6000, ValueError, 'Danger!')
+    
+    and both are fine. You simply have two functions to choose from in order to
+    make the code as readable as you want. It's all about what kind of language
+    you want to use in this particular situation. 
+    
+    Consider the examples below:
     >>> check_if_not(2 == 1)
     >>> check_if_not(2 > 1)
     Traceback (most recent call last):
         ...
     AssertionError
-    >>> check_if_not(2 > 1, error=ValueError, message='2 is not smaller than 1')
+    >>> check_if_not(2 > 1,
+    ...    error=ValueError,
+    ...    message='2 is not smaller than 1')
     Traceback (most recent call last):
         ...
     ValueError: 2 is not smaller than 1
@@ -267,20 +329,21 @@ def check_if_not(condition, error=AssertionError, message=None):
 
 def check_length(item,
                  expected_length,
-                 operator=equal,
+                 operator=eq,
                  error=LengthError,
                  message=None,
-                 assign_length_to_numbers=False,
+                 assign_length_to_others=False,
                  execution_mode='raise'):
-    """Compare the length of item with expected_length, using condition.
+    """Compare item's length with expected_length, using operator.
 
-    The operator can be from among get_possible_operators().
+    The operator can be from those returned by `get_possible_operators()`.
 
     If the condition is met, the function returns nothing. If not, it throws
-    LengthError with an optional message. The function takes a Pythonic approach,
-    treating numbers as not having length (and throwing TypeError then).
-    Param assign_length_to_numbers lets you change this behavior, in which case
-    integers, doubles floats, complex values, and bool values take length as 1.
+    LengthError with an optional message. As a default, the function takes
+    a Pythonic approach, treating numbers as not having length (and throwing
+    TypeError then). Param assign_length_to_others lets you change this
+    behavior, in which case integers, doubles, floats, complex values, and
+    boolean values take length as 1.
 
     >>> check_length(['string'], 1)
     >>> check_length('string', 6)
@@ -289,17 +352,24 @@ def check_length(item,
     Traceback (most recent call last):
         ...
     TypeError: object of type 'generator' has no len()
-    >>> check_length(2, 1, assign_length_to_numbers=True)
-    >>> check_length(2, 0, operator=gt, assign_length_to_numbers=True)
+    >>> check_length(2, 1, assign_length_to_others=True)
+    >>> check_length(2, 0, operator=gt, assign_length_to_others=True)
+    >>> check_length(True, 1, assign_length_to_others=True)
+    
+    Caution! Note that unlike in most other functions, the third parameter here
+    is not error but operator, hence if you want to change the default
+    exception type from LengthError to other, you need to use the
+    parameter's name, like here:
+    >>> check_length('string', 6, error=ValueError)
     """
     _check_checkit_arguments(error=error,
                              message=message,
                              operator=operator,
                              expected_length=expected_length,
-                             assign_length_to_numbers=assign_length_to_numbers,
+                             assign_length_to_others=assign_length_to_others,
                              execution_mode=execution_mode)
 
-    if assign_length_to_numbers:
+    if assign_length_to_others:
         if isinstance(item, (int, float, complex, bool)):
             item = [item]
 
@@ -308,11 +378,11 @@ def check_length(item,
 
 
 def check_instance(item, expected_instance, error=TypeError, message=None):
-    """Check if item has type of expected_instance.
+    """Check if item has the type of expected_instance.
 
-    The param expected_instance can be a tuple of instances. If the condition
-    is true, the function returns nothing. Otherwise, it throws TypeError,
-    with optional message.
+    The param expected_instance can be a tuple of possible instances. If the
+    condition is true, the function returns nothing. Otherwise, it throws
+    TypeError, with an optional message.
 
     If you want to check if the item is None, you can do so in two ways:
     >>> my_none_object = None
@@ -322,17 +392,16 @@ def check_instance(item, expected_instance, error=TypeError, message=None):
     >>> check_instance(my_none_object, None)
 
     The former approach is Pythonic while the latter less so, but we keep this
-    functionality so that you can use the check_instance function also for
+    functionality so that you can use the `check_instance()` function also for
     None objects.
 
     >>> check_instance(['string'], list)
     >>> check_instance('string', str)
     >>> check_instance((1, 2), tuple)
-    >>> check_instance([1, 2], (tuple, list),
-    ...                           message='Neither tuple nor list')
+    >>> check_instance([1, 2], (tuple, list), message='Neither tuple nor list')
     >>> check_instance('souvenir',
-    ...                   (tuple, list),
-    ...                   message='Neither tuple nor list')
+    ...    (tuple, list),
+    ...    message='Neither tuple nor list')
     Traceback (most recent call last):
         ...
     TypeError: Neither tuple nor list
@@ -340,7 +409,8 @@ def check_instance(item, expected_instance, error=TypeError, message=None):
     Traceback (most recent call last):
         ...
     TypeError
-    >>> check_instance((i for i in range(3)), tuple, message='This is not tuple.')
+    >>> check_instance(
+    ...    (i for i in range(3)), tuple, message='This is not tuple.')
     Traceback (most recent call last):
         ...
     TypeError: This is not tuple.
@@ -379,14 +449,13 @@ def check_if_paths_exist(paths,
                          error=FileNotFoundError,
                          message=None,
                          execution_mode='raise'):
-    """Check if paths exists, and if not even raise error or return.
+    """Check if paths exists, and if not either raise or return an error.
 
     Param paths is either a string or a list/tuple.
 
-    The function's behavior depends on execution_mode. If you want to learn which
-    paths do not exist, choose execution_mode='return', in which case you will get
-    True if all the files exist, and a tuple of False, error(message),
-    paths (the last item being non-existing paths).
+    The function's behavior depends on param execution_mode. If you want to
+    learn which paths do not exist, choose execution_mode='return', in which
+    case the function will not raise an exception but return it (see below).
 
     >>> check_if_paths_exist('Q:/Op/Oop/')
     Traceback (most recent call last):
@@ -426,21 +495,27 @@ def check_if_paths_exist(paths,
             if execution_mode == 'raise':
                 _raise(error, message)
             elif execution_mode == 'return':
-                return _return_from_check_if_paths_exist(error, message, non_existing_paths)
+                return _return_from_check_if_paths_exist(error,
+                                                         message,
+                                                         non_existing_paths)
         else:
             if execution_mode == 'return':
                 return None, []
     else:
-        raise TypeError('Argument paths must be string, tuple of strigs, or list of strings')
+        raise TypeError('Argument paths must be string, tuple of strigs,'
+                        ' or list of strings')
 
 
 def _return_from_check_if_paths_exist(error, message, paths):
-    """
+    """Create a tuple to return from check_if_paths_exist, message-dependent.
+
+
     >>> _return_from_check_if_paths_exist(
     ...    error=FileNotFoundError,
     ...    message=None,
     ...    paths=[])
     (FileNotFoundError(), [])
+    
     >>> _return_from_check_if_paths_exist(
     ...    error=FileNotFoundError,
     ...    message='No such file',
@@ -460,28 +535,28 @@ def check_comparison(item_1, operator, item_2,
                      message=None):
     """Check if a comparison of two items is true.
 
-    The operator should be from get_possible_operators().
+    The operator should be from `get_possible_operators()`.
 
-    >>> check_comparison(2, less_than, 2)
+    >>> check_comparison(2, lt, 2)
     Traceback (most recent call last):
         ...
     ValueError
-    >>> check_comparison(2, equal, 2)
-    >>> check_comparison(2, greater_than_or_equal, 1.1)
+    >>> check_comparison(2, eq, 2)
+    >>> check_comparison(2, ge, 1.1)
     >>> check_comparison('One text', lt, 'one text')
-    >>> check_comparison('One text', less_than, 'another text')
-    >>> check_comparison('one text', less_than, 'another text')
+    >>> check_comparison('One text', lt, 'another text')
+    >>> check_comparison('one text', lt, 'another text')
     Traceback (most recent call last):
         ...
     ValueError
 
     You can use a dedicated ComparisonError (from this module):
-    >>> check_comparison('one text', less_than, 'another text',
+    >>> check_comparison('one text', lt, 'another text',
     ...                  error=ComparisonError,
     ...                  message='Not less!')
     Traceback (most recent call last):
         ...
-    checks.ComparisonError: Not less!
+    checkit.ComparisonError: Not less!
 
     Style suggestion:
         Surely, use coding style you prefer, but in our opinion you can
@@ -489,17 +564,19 @@ def check_comparison(item_1, operator, item_2,
         (in case you need to split the function call into more lines,
         which is when you need to change the last two parameters):
         >>> check_comparison(
-        ...    'one text', less_than, 'another text',
+        ...    'one text', lt, 'another text',
         ...    error = ComparisonError,
         ...    message='Comparison condition violated'
         ...    )
         Traceback (most recent call last):
             ...
-        checks.ComparisonError: Comparison condition violated
+        checkit.ComparisonError: Comparison condition violated
 
         The idea is to keep the first three arguments in one line, so that
-        the comparison can be read like text: 2, greater_than, 0; or
-        this_text, equal, example_text; etc.
+        the comparison can be read like text: 
+        2, ge, 0 - two is greater or equal than zero,
+        this_text, equal, example_text - this_text is equal to example_text,
+        etc.
     """
     check_if(operator in get_possible_operators(),
              error=OperatorError,
@@ -513,10 +590,9 @@ def check_all_ifs(*args):
     """Check all multiple conditions and return all checks.
 
     If you want to check several conditions, you can simply check them
-    line by line. Use this function if you want to check each condition
-    and catch all the errors (and messages) - it does not behave like
-    the other functions of the module, since it returns the results
-    of the checks.
+    line by line. Use this function if you want to check each condition and
+    catch all the errors (and messages) - it does not behave like the other
+    functions of the module, since it returns the results of the checks.
 
     The args are to be a list of tuples of the form
     (check_function, *args, **kwargs), where args and kwargs are
@@ -527,11 +603,13 @@ def check_all_ifs(*args):
     Returns: A dict with the results, of the following (example) structure:
              {'1: check_if': True, '2: check_if': True}
              This means that two checks were run, both using check_if, and
-             both were returned confirmation (so no exception was raised).
+             both returned confirmation (so no exception was raised).
              In case of an exception raised, the resulting dict gets the
              following structure:
              {'1: check_if': True, '2: check_if_not': AssertionError()}
-             when you did not provide the message, and ...???
+             when you did not provide the message, and otherwise
+             {'1: check_if': True, '2: check_if_not': AssertionError('Wrong')}
+              ('Wrong" being the message provided as the argument).
 
     >>> check_all_ifs(
     ...    (check_if, 2 > 1),
@@ -555,7 +633,7 @@ def check_all_ifs(*args):
         is, presenting all the independent conditions in a separate line,
         unless the call is short if presented in one line.
     """
-    check_length(args, 0, greater_than,
+    check_length(args, 0, gt,
                  ValueError,
                  'Provide at least one condition.')
     tuple_error_message = (
@@ -586,42 +664,37 @@ def check_argument(argument,
                    expected_instance=None,
                    expected_choices=None,
                    expected_length=None,
-                   expected_condition=None,
                    error=ArgumentValueError,
                    message=None,
                    **kwargs):
     """Check if the user provided a correct argument value.
 
-    Use this function to check if the value the user provided is in the list
-    of choices; a common situation is to check if an argument the user provided
-    to the function is correct. If yes, nothing happens; if not, the function
-    raises error with a default message that depends on what is happening.
-
+    You can use this function to check whether an argument's value meets
+    various conditions. (Of course, you can check all those conditions using
+    seperate checkit functions, or you can use this function.)
+    
     The argument_name param is the actual name of the argument in function,
     which normally will be just a string of the argument (see below examples).
     You can skip it, in which case the error messages will not include the
     name of the argument but will inform about 'argument'.
 
     The function performs lazy checking, meaning that it first checks the
-    instance (if provided), then choices (if provided), then expected length
-    (if provided), and finally condition (if provided). But they must not raise
-    a built-in error, because it will be raised before the check is performed.
-    For example, the below will not work because of the ValueError, resulting
-    from an attempt to apply the `int()` function to a string:
+    instance (if provided), then choices (if provided), and then expected
+    length (if provided). But they must not raise a built-in error, because it
+    will be raised before the check is performed.
 
-    >>> x = 'one'
     >>> check_argument(
-    ...    x, 'x',
-    ...    expected_instance=int,
-    ...    expected_condition=int(x) % 2 == 0)
+    ...    [1, 2, 3], 'x',
+    ...    expected_instance=tuple,
+    ...    expected_length=3
+    ...    )
     Traceback (most recent call last):
         ...
-    ValueError: invalid literal for int() with base 10: 'one'
+    checkit.ArgumentValueError: Incorrect instance of x; valid instance(s): \
+<class 'tuple'>
 
-    The expected_condition, however, must actually include also the argument
-    itself, like below:
-    >>> x = 5
-    >>> check_argument(x, 'x', expected_condition=x in range(0, 10))
+    The expected_choices argument helps you check whether the user has provided
+    a valid value of the argument:
     >>> def foo(x):
     ...    check_argument(x, 'x', expected_choices=('first choice',
     ...                                             'second_choice'))
@@ -630,83 +703,31 @@ def check_argument(argument,
     >>> foo('no choice')
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: x's value, no choice, is not among valid \
+    checkit.ArgumentValueError: x's value, no choice, is not among valid \
 values: ('first choice', 'second_choice').
-
-    >>> x = 2; check_argument(x, 'x', expected_condition=x % 2 == 0)
-    >>> x = 3; check_argument(x, 'x', expected_condition=x % 2 == 0)
-    Traceback (most recent call last):
-        ...
-    checks.ArgumentValueError: Provided condition violated for x
-
-    You can provide your own message, though:
-    >>> check_argument(
-    ...    x, 'x',
-    ...    expected_condition=x % 2 == 0,
-    ...    message='Wrong, my friend!')
-    Traceback (most recent call last):
-        ...
-    checks.ArgumentValueError: Wrong, my friend!
 
     >>> x = 2.0
     >>> check_argument(
     ...    x, 'x',
-    ...    expected_instance=int,
-    ...    expected_condition=int(x) % 2 == 0)
+    ...    expected_instance=int)
     Traceback (most recent call last):
         ...
-    checks.ArgumentValueError: Incorrect instance of x;\
+    checkit.ArgumentValueError: Incorrect instance of x;\
  valid instance(s): <class 'int'>
 
-    >>> x = 3
+    This is how you can check exceptions and errors provided as arguments:
     >>> check_argument(
-    ...    x, 'x',
-    ...    expected_instance=int,
-    ...    expected_condition=int(x) % 2 == 0)
-    Traceback (most recent call last):
-        ...
-    checks.ArgumentValueError: Provided condition violated for x
-
-    This is how you can check Exceptions and errors provided as arguments:
-    >>> assert check_argument(
     ...    TypeError, 'error_arg',
-    ...    expected_instance=type) is None
-    >>> assert check_argument(
+    ...    expected_instance=type)
+    >>> check_argument(
     ...    TypeError(), 'error_arg',
-    ...    expected_instance=Exception) is None
-
-    You can also define quite complex checks:
-    >>> def check_glm_args(glm_args):
-    ...    return (
-    ...        isinstance(glm_args[0], (int, float)) and
-    ...        glm_args[0] > 0 and
-    ...        glm_args[0] <= 1 and
-    ...        isinstance(glm_args[1], str) and
-    ...        isinstance(glm_args[2], str) and
-    ...        glm_args[1] in ('poisson', 'quasi-poisson') and
-    ...        glm_args[2] in ('log', 'identity')
-    ...     )
-    >>> glm_args = 1, 'quasi-poisson', 'log'
-    >>> check_argument(
-    ...    argument_name='glm_args',
-    ...    argument=glm_args,
-    ...    expected_instance=tuple,
-    ...    expected_condition=check_glm_args(glm_args))
-    >>> glm_args = 1., 'quasi-poisson', 'logit'
-    >>> check_argument(
-    ...    argument_name='glm_args',
-    ...    argument=glm_args,
-    ...    expected_instance=tuple,
-    ...    expected_condition=check_glm_args(glm_args))
-    Traceback (most recent call last):
-        ...
-    checks.ArgumentValueError: Provided condition violated for glm_args
+    ...    expected_instance=Exception)
     """
     if all(item is None
            for item in (expected_instance,
                         expected_choices,
-                        expected_length,
-                        expected_condition)):
+                        expected_length
+                        )):
         raise ValueError('check_argument() requires at least one condition'
                          ' to be checked')
 
@@ -742,13 +763,6 @@ values: ('first choice', 'second_choice').
                      message=length_message,
                      **kwargs
                      )
-    if expected_condition is not None:
-        condition_message = _make_message(
-            message,
-            f'Provided condition violated for {argument_name}')
-        check_if(expected_condition,
-                 error=error,
-                 message=condition_message)
 
 
 def _make_message(message_provided, message_otherwise):
@@ -768,8 +782,6 @@ def catch_check(check_function, *args, **kwargs):
     an exception otherwise. You can use this function to change this behavior:
     It still returns None when everything is fine, but instead of raising
     the exception in case of problems, it returns this exception.
-
-    Note the particular behavior. Since the function returns
 
     >>> catch_check(check_if, 2==2)
     >>> catch_check(check_if, 2>2)
@@ -852,17 +864,17 @@ def _compare(item_1, operator, item_2):
     The operator should be from get_possible_operators().
     Returns True if the comparison is valid and False otherwise.
 
-    >>> _compare(2, equal, 2)
+    >>> _compare(2, eq, 2)
     True
-    >>> _compare(2, equal, 2.01)
+    >>> _compare(2, eq, 2.01)
     False
-    >>> _compare(2.11, lte, 2.100001)
+    >>> _compare(2.11, le, 2.100001)
     False
-    >>> _compare(2.11, less_than_or_equal, 2.100001)
+    >>> _compare(2.11, le, 2.100001)
     False
-    >>> _compare(2, gte, 2)
+    >>> _compare(2, ge, 2)
     True
-    >>> _compare(2.1, greater_than_or_equal, 2.11)
+    >>> _compare(2.1, ge, 2.11)
     False
     """
     check_if(
@@ -874,7 +886,7 @@ def _compare(item_1, operator, item_2):
 
 
 def _clean_message(message):
-    """Clear message returned along with error.
+    """Clean message returned along with error.
 
     >>> _clean_message('"Incorrect argument")')
     'Incorrect argument'
@@ -895,11 +907,9 @@ def _clean_message(message):
 
 
 def _parse_error_and_message_from(error_and_message):
-    """Get error and message from one string.
+    """Get error and message presented as one string.
 
-    >>> error_and_message = (
-    ...    'TypeError("Incorrect argument")'
-    ...    )
+    >>> error_and_message = ('TypeError("Incorrect argument")')
     >>> _parse_error_and_message_from(error_and_message)
     ('TypeError', 'Incorrect argument')
     >>> error_and_message = 'ValueError'
@@ -943,7 +953,7 @@ def _check_checkit_arguments(error=None,
                              message=None,
                              condition=None,
                              operator=None,
-                             assign_length_to_numbers=None,
+                             assign_length_to_others=None,
                              execution_mode=None,
                              expected_length=None,
                              expected_instance=None):
@@ -969,7 +979,7 @@ def _check_checkit_arguments(error=None,
                message,
                condition,
                operator,
-               assign_length_to_numbers,
+               assign_length_to_others,
                execution_mode,
                expected_length,
                expected_instance)):
@@ -995,11 +1005,11 @@ def _check_checkit_arguments(error=None,
         if not isinstance(expected_length, (int, float)):
             raise TypeError(
                 'expected_length should be an integer (or a float)')
-    if assign_length_to_numbers is not None:
-        if not isinstance(assign_length_to_numbers, bool):
-            raise TypeError('assign_length_to_numbers should be a bool')
+    if assign_length_to_others is not None:
+        if not isinstance(assign_length_to_others, bool):
+            raise TypeError('assign_length_to_others should be a bool')
     if execution_mode is not None:
-        if not execution_mode in ('raise', 'return'):
+        if execution_mode not in ('raise', 'return'):
             raise ValueError(
                 'execution_mode should be either "raise" or "return"')
     if expected_instance is not None:
@@ -1019,3 +1029,15 @@ assert_if_not = check_if_not
 assert_length = check_length
 assert_instance = check_instance
 assert_paths = check_if_paths_exist
+
+
+def get_possible_operators():
+    """Provide a list of possible operators to be used in checkit functions.
+    
+    >>> operators = get_possible_operators()
+    >>> type(operators[0])
+    <class 'builtin_function_or_method'>
+    >>> len(operators)
+    8
+    """
+    return eq, le, lt, gt, ge, ne, is_, is_not

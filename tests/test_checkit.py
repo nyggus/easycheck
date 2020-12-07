@@ -1,64 +1,52 @@
 import os
 import pytest
-import sys
-import checkit
-
-from checkit.comparisons import (equal,
-                                 less_than, lt,
-                                 less_than_or_equal, lte,
-                                 greater_than, gt,
-                                 greater_than_or_equal, gte,
-                                 get_possible_operators,
-                                 )
-
-from checkit.checks import (check_if, assert_if,
-                            check_if_not, assert_if_not,
-                            check_instance, assert_instance,
-                            check_if_paths_exist, assert_paths,
-                            check_length, assert_length,
-                            check_all_ifs,
-                            check_argument,
-                            check_comparison,
-                            catch_check,
-                            ComparisonError,
-                            ArgumentValueError,
-                            LengthError,
-                            OperatorError,
-                            _compare,
-                            _parse_error_and_message_from,
-                            _clean_message,
-                            _raise,
-                            _return_from_check_if_paths_exist,
-                            _check_checkit_arguments,
-                            _make_message,
-                            )
-
 from collections.abc import Generator
+from operator import eq, le, lt, gt, ge, ne, is_, is_not
+from checkit import (check_if, assert_if,
+                     check_if_not, assert_if_not,
+                     check_instance, assert_instance,
+                     check_if_paths_exist, assert_paths,
+                     check_length, assert_length,
+                     check_all_ifs,
+                     check_argument,
+                     check_comparison,
+                     catch_check,
+                     ComparisonError,
+                     ArgumentValueError,
+                     LengthError,
+                     OperatorError,
+                     get_possible_operators,
+                     _compare,
+                     _parse_error_and_message_from,
+                     _clean_message,
+                     _raise,
+                     _return_from_check_if_paths_exist,
+                     _check_checkit_arguments,
+                     _make_message,
+                     )
 
 
 def test_check_if_edge_cases():
-    assert check_if(True) is None
     with pytest.raises(TypeError,
                        match="missing 1 required positional argument"):
         check_if()
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if('tomato soup is good')
     with pytest.raises(ValueError, match='The condition does not give'):
-        check_if(22)
+        check_if('')
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if(1)
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if(0)
+    assert check_if(True) is None
     with pytest.raises(AssertionError):
         check_if(False)
     with pytest.raises(TypeError, match='error must be an exception'):
         check_if(1, 1)
-    with pytest.raises(TypeError, match='error must be an exception'):
-        check_if(1, 1, 1)
+    with pytest.raises(TypeError, match='message must be either None or string'):
+        check_if(1, ValueError, 1)
     with pytest.raises(TypeError, match='takes from 1 to 3 positional'):
         check_if(1, 1, 1, 1)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_if(Condition=12 > 5)
 
 
 def test_check_if_positive():
@@ -72,10 +60,8 @@ def test_check_if_negative():
         check_if(2 < 1)
     with pytest.raises(ValueError):
         check_if(2 < 1, error=ValueError)
-    with pytest.raises(ValueError):
-        check_if(2 < 1, error=ValueError)
-    with pytest.raises(TypeError):
-        check_if('a' > 2)
+    with pytest.raises(ValueError, match='incorrect value'):
+        check_if(2 < 1, error=ValueError, message='incorrect value')
 
 
 def test_check_if_not_edge_cases():
@@ -85,7 +71,7 @@ def test_check_if_not_edge_cases():
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if_not('tomato soup is good')
     with pytest.raises(ValueError, match='The condition does not give'):
-        check_if_not(22)
+        check_if_not('')
     with pytest.raises(ValueError, match='The condition does not give'):
         check_if_not(1)
     with pytest.raises(ValueError, match='The condition does not give'):
@@ -95,12 +81,10 @@ def test_check_if_not_edge_cases():
         check_if_not(True)
     with pytest.raises(TypeError, match='error must be an exception'):
         check_if_not(1, 1)
-    with pytest.raises(TypeError, match='error must be an exception'):
-        check_if_not(1, 1, 1)
+    with pytest.raises(TypeError, match='message must be either None or string'):
+        check_if_not(1, ValueError, 1)
     with pytest.raises(TypeError, match='takes from 1 to 3 positional'):
         check_if_not(1, 1, 1, 1)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_if_not(Condition=12 > 5)
 
 
 def test_check_if_not_positive():
@@ -113,10 +97,8 @@ def test_check_if_not_negative():
         check_if_not(2 > 1)
     with pytest.raises(ValueError):
         check_if_not(2 > 1, error=ValueError)
-    with pytest.raises(ValueError):
-        check_if_not(2 > 1, error=ValueError)
-    with pytest.raises(TypeError):
-        check_if_not('a' > 2)
+    with pytest.raises(ValueError, match='incorrect value'):
+        check_if_not(2 > 1, error=ValueError, message='incorrect value')
 
 
 def test_check_length_edge_cases():
@@ -130,10 +112,6 @@ def test_check_length_edge_cases():
         check_length(1, 1, 1)
     with pytest.raises(TypeError, match='BaseException type, not str'):
         pytest.raises('tomato soup', 'is good')
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_length(Item=2)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_length(item=2, length=5)
 
 
 def test_check_length_positive():
@@ -141,6 +119,7 @@ def test_check_length_positive():
     assert check_length('string', 6) is None
     assert check_length([1, 2], 2) is None
     assert check_length(range(0, 3), 3) is None
+    assert check_length(10, 1, assign_length_to_others=True) is None
 
 
 def test_check_length_negative():
@@ -150,7 +129,6 @@ def test_check_length_negative():
         check_length(None)
     with pytest.raises(TypeError, match="object of type 'int' has"):
         check_length(10, 1)
-    assert check_length(10, 1, assign_length_to_numbers=True) is None
 
 
 def test_check_instance_edge_cases():
@@ -183,7 +161,7 @@ def test_check_instance_positive():
 
 
 def test_check_instance_negative():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match='Neither tuple nor list'):
         check_instance(
             'souvenir',
             (tuple, list),
@@ -193,10 +171,10 @@ def test_check_instance_negative():
         check_instance(20.1, (int, None))
     with pytest.raises(TypeError):
         check_instance((i for i in range(3)), tuple)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match='This is not tuple'):
         check_instance((i for i in range(3)),
                        tuple,
-                       message='This is not tuple.')
+                       message='This is not tuple')
     with pytest.raises(TypeError):
         check_instance(10, None)
     with pytest.raises(TypeError):
@@ -334,33 +312,26 @@ def test_compare_edge_cases():
 
 
 def test_compare_positive():
-    assert _compare(2, equal, 2)
+    assert _compare(2, eq, 2)
     assert _compare(2, lt, 3)
-    assert _compare(2, less_than, 3)
-    assert _compare(2, lte, 2)
-    assert _compare(2, less_than_or_equal, 2)
-    assert _compare(2, lte, 3)
-    assert _compare(2, less_than_or_equal, 3)
+    assert _compare(2, le, 2)
+    assert _compare(2, le, 2)
+    assert _compare(2, le, 3)
     assert _compare(3, gt, 2)
-    assert _compare(3, greater_than, 2)
-    assert _compare(2, gte, 2)
-    assert _compare(2, greater_than_or_equal, 2)
-    assert _compare(3, gte, 2)
-    assert _compare(3, greater_than_or_equal, 2)
+    assert _compare(2, ge, 2)
+    assert _compare(3, ge, 2)
 
 
 def test_compare_negative():
-    assert not _compare(2, equal, 2.01)
-    assert not _compare(3, less_than, 3)
+    assert not _compare(2, eq, 2.01)
+    assert not _compare(3, lt, 3)
     assert not _compare(3, lt, 2)
-    assert not _compare(2.11, lte, 2.100001)
-    assert not _compare(2.11, less_than_or_equal, 2.100001)
+    assert not _compare(2.11, le, 2.100001)
+    assert not _compare(2.11, le, 2.100001)
     assert not _compare(3, gt, 3)
-    assert not _compare(3, greater_than, 3)
     assert not _compare(2.11, gt, 2.12)
-    assert not _compare(2.11, greater_than, 2.12)
-    assert not _compare(2.1, gte, 2.11)
-    assert not _compare(2.1, greater_than_or_equal, 2.11)
+    assert not _compare(2.11, ge, 2.12)
+    assert not _compare(2.1, ge, 2.11)
 
 
 def test_check_comparison_edge_cases():
@@ -387,49 +358,35 @@ def test_check_comparison_edge_cases():
 
 
 def test_check_comparison_positive():
-    assert check_comparison(2, equal, 2) is None
-    assert check_comparison(2, less_than_or_equal, 2) is None
-    assert check_comparison(2, lte, 2) is None
-    assert check_comparison(2, greater_than_or_equal, 2) is None
-    assert check_comparison(2, gte, 2) is None
-    assert check_comparison(3, greater_than, 2) is None
+    assert check_comparison(2, eq, 2) is None
+    assert check_comparison(2, le, 2) is None
+    assert check_comparison(2, ge, 2) is None
     assert check_comparison(3, gt, 2) is None
-    assert check_comparison(3, greater_than_or_equal, 2) is None
-    assert check_comparison(3, gte, 2) is None
+    assert check_comparison(3, ge, 2) is None
     assert check_comparison('One text', lt, 'one text') is None
-    assert check_comparison('One text', less_than, 'another text') is None
+    assert check_comparison('One text', lt, 'another text') is None
 
 
 def test_check_comparison_negative():
     with pytest.raises(ValueError):
-        check_comparison(2, less_than, 2)
-    with pytest.raises(ValueError):
         check_comparison(2, lt, 2)
-    with pytest.raises(ValueError):
-        check_comparison(2, greater_than, 2)
     with pytest.raises(ValueError):
         check_comparison(2, gt, 2)
     with pytest.raises(ValueError):
-        check_comparison(3, equal, 2)
-    with pytest.raises(ValueError):
-        check_comparison(3, less_than, 2)
+        check_comparison(3, eq, 2)
     with pytest.raises(ValueError):
         check_comparison(3, lt, 2)
     with pytest.raises(ValueError):
-        check_comparison(3, less_than_or_equal, 2)
+        check_comparison(3, le, 2)
     with pytest.raises(ValueError):
-        check_comparison(3, lte, 2)
-    with pytest.raises(ValueError):
-        check_comparison('one text', less_than, 'another text')
+        check_comparison('one text', lt, 'another text')
 
     with pytest.raises(ComparisonError):
-        check_comparison('one text', less_than, 'another text',
+        check_comparison('one text', lt, 'another text',
                          error=ComparisonError)
     with pytest.raises(AssertionError):
-        check_comparison('one text', less_than, 'another text',
+        check_comparison('one text', lt, 'another text',
                          error=AssertionError)
-    with pytest.raises(NameError, match='not defined'):
-        check_comparison(2, GT, 3)
 
 
 def test_clean_message_edge_cases():
@@ -634,8 +591,6 @@ def test_check_argument_edge_cases():
     assert str(msg_error.value) == msg
 
     x = 5
-    with pytest.raises(TypeError, match='must be string'):
-        check_argument(x, x, expected_condition=x % 2 == 0)
 
 
 def test_check_argument_instance():
@@ -697,22 +652,22 @@ def test_check_argument_choices():
 def test_check_argument_length():
     assert check_argument(5, 'my_arg',
                           expected_length=1,
-                          assign_length_to_numbers=True) is None
+                          assign_length_to_others=True) is None
     assert check_argument(5,
                           expected_length=1,
-                          assign_length_to_numbers=True) is None
+                          assign_length_to_others=True) is None
 
     def foo(x):
         check_argument(x, 'x',
                        expected_length=3,
-                       assign_length_to_numbers=True)
+                       assign_length_to_others=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError):
         foo(1)
 
     def foo(x):
-        check_argument(x, expected_length=3, assign_length_to_numbers=True)
+        check_argument(x, expected_length=3, assign_length_to_others=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError):
@@ -721,40 +676,18 @@ def test_check_argument_length():
     def foo(big_x):
         check_argument(big_x, 'big_x',
                        expected_length=3,
-                       assign_length_to_numbers=True)
+                       assign_length_to_others=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError, match='big_x'):
         foo(1)
 
     def foo(big_x):
-        check_argument(big_x, expected_length=3, assign_length_to_numbers=True)
+        check_argument(big_x, expected_length=3, assign_length_to_others=True)
         pass
     assert foo([1, 2, 3]) is None
     with pytest.raises(ArgumentValueError, match='argument'):
         foo(1)
-
-
-def test_check_argument_condition():
-    x = 5
-    assert check_argument(x, 'x', expected_condition=x in range(0, 10)) is None
-    assert check_argument(x, expected_condition=x in range(0, 10)) is None
-    assert check_argument('x', expected_condition=x in range(0, 10)) is None
-    assert check_argument(x, expected_condition=x in range(0, 10)) is None
-
-    def foo(x):
-        check_argument(x, 'x', expected_condition=x % 2 == 0)
-        pass
-    with pytest.raises(ArgumentValueError):
-        foo(3)
-    assert foo(2) is None
-
-    def foo(x):
-        check_argument(x, expected_condition=x % 2 == 0)
-        pass
-    with pytest.raises(ArgumentValueError):
-        foo(3)
-    assert foo(2) is None
 
 
 def test_check_argument_mix():
@@ -785,17 +718,10 @@ def test_check_argument_mix():
     assert check_argument(
         argument_name='glm_args',
         argument=glm_args,
-        expected_instance=tuple,
-        expected_condition=check_glm_args(glm_args)) is None
+        expected_instance=tuple
+    ) is None
 
     glm_args = 1., 'quasi-poisson', 'logit'
-    with pytest.raises(ArgumentValueError,
-                       match='condition violated for glm_args'):
-        check_argument(
-            argument_name='glm_args',
-            argument=glm_args,
-            expected_instance=tuple,
-            expected_condition=check_glm_args(glm_args))
 
 
 def test_return_from_check_if_paths_exist_edge_cases():
@@ -859,7 +785,7 @@ def test_check_checkit_arguments_edge_cases():
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Operator=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Assign_length_to_numbers=1)
+        _check_checkit_arguments(Assign_length_to_others=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Execution_mode=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
@@ -919,11 +845,11 @@ def test_check_checkit_arguments():
         with pytest.raises(OperatorError):
             _check_checkit_arguments(operator=this_operator.__name__)
 
-    assert _check_checkit_arguments(assign_length_to_numbers=True) is None
-    assert _check_checkit_arguments(assign_length_to_numbers=False) is None
+    assert _check_checkit_arguments(assign_length_to_others=True) is None
+    assert _check_checkit_arguments(assign_length_to_others=False) is None
     for this_assignment in ('nothing', 22, [1]):
         with pytest.raises(TypeError):
-            _check_checkit_arguments(assign_length_to_numbers=this_assignment)
+            _check_checkit_arguments(assign_length_to_others=this_assignment)
 
     assert _check_checkit_arguments(execution_mode='return') is None
     assert _check_checkit_arguments(execution_mode='raise') is None
@@ -957,7 +883,7 @@ def test_check_checkit_arguments():
         condition=2 < 2,
         expected_length=3,
         execution_mode='raise',
-        assign_length_to_numbers=True
+        assign_length_to_others=True
     ) is None
 
     with pytest.raises(TypeError):
@@ -966,7 +892,7 @@ def test_check_checkit_arguments():
             condition=2 < 2,
             expected_length=3,
             execution_mode='raise',
-            assign_length_to_numbers='yes'
+            assign_length_to_others='yes'
         )
 
 
@@ -1005,13 +931,13 @@ def test_assert_functions():
 
     assert assert_length('str', 3) == check_length('str', 3)
     assert (
-        assert_length(5, 1, assign_length_to_numbers=True) ==
-        check_length(5, 1, assign_length_to_numbers=True))
+        assert_length(5, 1, assign_length_to_others=True) ==
+        check_length(5, 1, assign_length_to_others=True))
     with pytest.raises(TypeError):
         assert_length(5, 3) and check_length(5, 3) is None
     with pytest.raises(LengthError):
-        (assert_length(5, 3, assign_length_to_numbers=True)
-         and check_length(5, 3, assign_length_to_numbers=True) is None)
+        (assert_length(5, 3, assign_length_to_others=True)
+         and check_length(5, 3, assign_length_to_others=True) is None)
 
     existing_file = os.listdir('.')[0]
     assert (check_if_paths_exist(existing_file, execution_mode='return') ==
