@@ -52,14 +52,6 @@ Traceback (most recent call last):
     ...
 ValueError: One is bigger than zero
 
-In fact, you could also do the following:
->>> check_if(0 > 1, ValueError('One is bigger than zero'))
-Traceback (most recent call last):
-    ...
-ValueError: One is bigger than zero
-
-but the two first calls are cleaner.
-
 Of course, it's not only the brevity that we aim for, but mainly code
 readability. Of course, as usually, whether this approach is more readable or
 not is a subjective matter, but you will see many examples that in our opinion
@@ -198,6 +190,7 @@ TODO:
 * add a possibility to use a warning instead of raising an exception?
 """
 
+import warnings
 import os
 from collections.abc import Generator
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
@@ -925,8 +918,14 @@ def _parse_error_and_message_from(error_and_message):
 
 
 def _raise(error, message=None):
-    """Raise error with or without message.
+    """Raise exception with or without message, or issue a warning.
+    
+    The error param must contain a class, of whether an exception or a warning.
+    Providing a class's instance will raise TypeError. Since warinings require
+    a message, if you fail to provide one, a default message of 'Warning' will
+    be used.
 
+    Raising exceptions:
     >>> _raise(ValueError)
     Traceback (most recent call last):
        ....
@@ -941,12 +940,33 @@ def _raise(error, message=None):
     Traceback (most recent call last):
        ....
     TypeError: Incorrect type
+
+    Issuing warnings:
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...    _raise(Warning)
+    ...    assert_if(issubclass(w[-1].category, Warning))
+    ...    assert_if('Warning' in str(w[-1].message))
+    
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...    _raise(Warning, 'Watch out! Something might be wrong.')
+    ...    assert_if('Watch out!' in str(w[-1].message))
+    
     """
-    if message is None:
-        raise error
-    else:
+    if not isinstance(error, type):
+        raise TypeError('The error argument must be an exception or warning')
+    is_warning = True if issubclass(error, Warning) else False
+
+    if is_warning:
+        if message is None:
+            message = 'Warning'
         check_instance(message, str, message='message must be string')
-        raise error(message)
+        warnings.warn(message, error)
+    else:
+        if message is None:
+            raise error
+        else:
+            check_instance(message, str, message='message must be string')
+            raise error(message)
 
 
 def _check_checkit_arguments(error=None,

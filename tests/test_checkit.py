@@ -1,3 +1,4 @@
+import warnings
 import os
 import pytest
 from collections.abc import Generator
@@ -546,17 +547,21 @@ def test_raise_edge_cases():
         _raise(Error=TypeError)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _raise(error=TypeError, MEssage='This was an error')
-    with pytest.raises(TypeError,
-                       match='exceptions must derive from BaseException'):
+    with pytest.raises(
+            TypeError,
+            match='The error argument must be an exception or warning'):
         _raise(20)
-    with pytest.raises(TypeError,
-                       match='exceptions must derive from BaseException'):
+    with pytest.raises(
+            TypeError,
+            match='The error argument must be an exception or warning'):
         _raise('TypeError')
-    with pytest.raises(TypeError,
-                       match='exceptions must derive from BaseException'):
+    with pytest.raises(
+            TypeError,
+            match='The error argument must be an exception or warning'):
         _raise(('TypeError'))
-    with pytest.raises(TypeError,
-                       match='exceptions must derive from BaseException'):
+    with pytest.raises(
+            TypeError,
+            match='The error argument must be an exception or warning'):
         _raise([TypeError])
     with pytest.raises(TypeError, match='message must be string'):
         _raise(error=TypeError, message=20)
