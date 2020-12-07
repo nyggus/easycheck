@@ -42,7 +42,7 @@ def test_check_if_edge_cases():
     assert check_if(True) is None
     with pytest.raises(AssertionError):
         check_if(False)
-    with pytest.raises(TypeError, match='error must be an exception'):
+    with pytest.raises(TypeError, match='handle_by must be an exception'):
         check_if(1, 1)
     with pytest.raises(TypeError, match='message must be either None or string'):
         check_if(1, ValueError, 1)
@@ -52,17 +52,31 @@ def test_check_if_edge_cases():
 
 def test_check_if_positive():
     assert check_if(2 > 1) is None
+    assert check_if(2 > 1, Warning) is None
     assert check_if(0 == 0) is None
+    assert check_if(0 == 0, Warning) is None
     assert check_if(None is None) is None
+    assert check_if(None is None, Warning) is None
 
 
 def test_check_if_negative():
     with pytest.raises(AssertionError):
         check_if(2 < 1)
     with pytest.raises(ValueError):
-        check_if(2 < 1, error=ValueError)
+        check_if(2 < 1, handle_by=ValueError)
     with pytest.raises(ValueError, match='incorrect value'):
-        check_if(2 < 1, error=ValueError, message='incorrect value')
+        check_if(2 < 1, handle_by=ValueError, message='incorrect value')
+
+
+def test_check_if_negative_warnings():
+    with warnings.catch_warnings(record=True) as w:
+        check_if(2 < 1, Warning, 'This is a testing warning')
+        assert 'This is a testing warning' in str(w[-1].message)
+
+    with warnings.catch_warnings(record=True) as w:
+        check_if(2 < 1, UserWarning, 'This is a testing warning')
+        assert issubclass(w[-1].category, Warning)
+        assert 'This is a testing warning' in str(w[-1].message)
 
 
 def test_check_if_not_edge_cases():
@@ -80,7 +94,7 @@ def test_check_if_not_edge_cases():
     assert check_if_not(False) is None
     with pytest.raises(AssertionError):
         check_if_not(True)
-    with pytest.raises(TypeError, match='error must be an exception'):
+    with pytest.raises(TypeError, match='handle_by must be an exception'):
         check_if_not(1, 1)
     with pytest.raises(TypeError, match='message must be either None or string'):
         check_if_not(1, ValueError, 1)
@@ -90,16 +104,29 @@ def test_check_if_not_edge_cases():
 
 def test_check_if_not_positive():
     assert check_if_not(2 < 1) is None
+    assert check_if_not(2 < 1, Warning) is None
     assert check_if_not('a' == 'A') is None
+    assert check_if_not('a' == 'A', Warning) is None
 
 
 def test_check_if_not_negative():
     with pytest.raises(AssertionError):
         check_if_not(2 > 1)
     with pytest.raises(ValueError):
-        check_if_not(2 > 1, error=ValueError)
+        check_if_not(2 > 1, handle_by=ValueError)
     with pytest.raises(ValueError, match='incorrect value'):
-        check_if_not(2 > 1, error=ValueError, message='incorrect value')
+        check_if_not(2 > 1, handle_by=ValueError, message='incorrect value')
+
+
+def test_check_if_not_negative_warnings():
+    with warnings.catch_warnings(record=True) as w:
+        check_if_not(2 > 1, Warning, 'This is a testing warning')
+        assert 'This is a testing warning' in str(w[-1].message)
+
+    with warnings.catch_warnings(record=True) as w:
+        check_if_not(2 > 1, UserWarning, 'This is a testing warning')
+        assert issubclass(w[-1].category, Warning)
+        assert 'This is a testing warning' in str(w[-1].message)
 
 
 def test_check_length_edge_cases():
@@ -117,10 +144,18 @@ def test_check_length_edge_cases():
 
 def test_check_length_positive():
     assert check_length(['string'], 1) is None
+    assert check_length(['string'], 1, handle_by=Warning) is None
     assert check_length('string', 6) is None
+    assert check_length('string', 6, handle_by=Warning) is None
     assert check_length([1, 2], 2) is None
+    assert check_length([1, 2], 2, handle_by=Warning) is None
     assert check_length(range(0, 3), 3) is None
+    assert check_length(range(0, 3), 3, handle_by=Warning) is None
     assert check_length(10, 1, assign_length_to_others=True) is None
+    assert check_length(10,
+                        1,
+                        assign_length_to_others=True,
+                        handle_by=Warning) is None
 
 
 def test_check_length_negative():
@@ -384,10 +419,10 @@ def test_check_comparison_negative():
 
     with pytest.raises(ComparisonError):
         check_comparison('one text', lt, 'another text',
-                         error=ComparisonError)
+                         handle_by=ComparisonError)
     with pytest.raises(AssertionError):
         check_comparison('one text', lt, 'another text',
-                         error=AssertionError)
+                         handle_by=AssertionError)
 
 
 def test_clean_message_edge_cases():
@@ -525,7 +560,7 @@ def test_check_if_paths_exist_negative():
     with pytest.raises(FileNotFoundError):
         check_if_paths_exist([non_existing_path] + os.listdir('.'))
     with pytest.raises(IOError):
-        check_if_paths_exist(non_existing_path, error=IOError)
+        check_if_paths_exist(non_existing_path, handle_by=IOError)
 
     failed_check = check_if_paths_exist(non_existing_path,
                                         execution_mode='return')
@@ -544,9 +579,9 @@ def test_raise_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         _raise()
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _raise(Error=TypeError)
+        _raise(handle_by=TypeError)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _raise(error=TypeError, MEssage='This was an error')
+        _raise(handle_by=TypeError, MEssage='This was an error')
     with pytest.raises(
             TypeError,
             match='The error argument must be an exception or warning'):
@@ -592,7 +627,7 @@ def test_check_argument_edge_cases():
         check_argument(10, message='Error!')
     assert str(msg_error.value) == msg
     with pytest.raises(ValueError) as msg_error:
-        check_argument('x', 10, error=TypeError)
+        check_argument('x', 10, handle_by=TypeError)
     assert str(msg_error.value) == msg
 
     x = 5
@@ -746,12 +781,12 @@ def test_return_from_check_if_paths_exist_edge_cases():
             paths=[])
     with pytest.raises(TypeError, match='unexpected keyword'):
         _return_from_check_if_paths_exist(
-            Error=FileNotFoundError,
+            error=FileNotFoundError,
             Message=None,
             paths=[])
     with pytest.raises(TypeError, match='unexpected keyword'):
         _return_from_check_if_paths_exist(
-            Error=FileNotFoundError,
+            error=FileNotFoundError,
             message=None,
             Paths=[])
 
@@ -782,7 +817,7 @@ def test_check_checkit_arguments_edge_cases():
         _check_checkit_arguments()
 
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Error=1)
+        _check_checkit_arguments(Handle_by=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Message=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
@@ -798,49 +833,49 @@ def test_check_checkit_arguments_edge_cases():
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Expected_length=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Error=ValueError, Message=1)
+        _check_checkit_arguments(handle_by=ValueError, Message=1)
 
     with pytest.raises(TypeError,
-                       match='error must be an exception') as msg_error:
-        _check_checkit_arguments(error=20)
+                       match='handle_by must be an exception') as msg_error:
+        _check_checkit_arguments(handle_by=20)
 
     with pytest.raises(TypeError,
-                       match='error must be an exception') as msg_error:
+                       match='handle_by must be an exception') as msg_error:
         class NonExceptionClass:
             pass
-        _check_checkit_arguments(error=NonExceptionClass)
+        _check_checkit_arguments(handle_by=NonExceptionClass)
 
 
 def test_check_checkit_arguments():
 
-    assert _check_checkit_arguments(error=LengthError) is None
+    assert _check_checkit_arguments(handle_by=LengthError) is None
     with pytest.raises(NameError):
-        _check_checkit_arguments(error=NonExistingError)
+        _check_checkit_arguments(handle_by=NonExistingError)
     with pytest.raises(NameError):
-        _check_checkit_arguments(error=NonExistingError())
+        _check_checkit_arguments(handle_by=NonExistingError())
     with pytest.raises(TypeError):
-        _check_checkit_arguments(error='NonExistingError')
+        _check_checkit_arguments(handle_by='NonExistingError')
 
     with pytest.raises(TypeError, match='must be an exception'):
-        _check_checkit_arguments(error=sum)
+        _check_checkit_arguments(handle_by=sum)
 
     with pytest.raises(TypeError):
-        _check_checkit_arguments(error=LengthError, message=False)
-    assert _check_checkit_arguments(error=LengthError,
+        _check_checkit_arguments(handle_by=LengthError, message=False)
+    assert _check_checkit_arguments(handle_by=LengthError,
                                     message='This is error') is None
     with pytest.raises(TypeError):
-        _check_checkit_arguments(error=LengthError, message=25)
+        _check_checkit_arguments(handle_by=LengthError, message=25)
 
-    assert _check_checkit_arguments(error=ValueError,
+    assert _check_checkit_arguments(handle_by=ValueError,
                                     condition='a' == 'a') is None
     assert _check_checkit_arguments(condition='a' == 'a') is None
-    assert _check_checkit_arguments(error=ValueError, condition=2 > 1) is None
-    assert _check_checkit_arguments(error=ValueError, condition=2 < 1) is None
-    assert _check_checkit_arguments(error=ValueError,
+    assert _check_checkit_arguments(handle_by=ValueError, condition=2 > 1) is None
+    assert _check_checkit_arguments(handle_by=ValueError, condition=2 < 1) is None
+    assert _check_checkit_arguments(handle_by=ValueError,
                                     condition=2 == '2') is None
     assert _check_checkit_arguments(condition=2 == '2') is None
     with pytest.raises(ValueError):
-        _check_checkit_arguments(error=ValueError,
+        _check_checkit_arguments(handle_by=ValueError,
                                  condition='not a comparison')
     with pytest.raises(ValueError):
         _check_checkit_arguments(condition='not a comparison')
