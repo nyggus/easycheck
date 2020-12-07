@@ -161,7 +161,7 @@ def test_check_instance_positive():
 
 
 def test_check_instance_negative():
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match='Neither tuple nor list'):
         check_instance(
             'souvenir',
             (tuple, list),
@@ -171,10 +171,10 @@ def test_check_instance_negative():
         check_instance(20.1, (int, None))
     with pytest.raises(TypeError):
         check_instance((i for i in range(3)), tuple)
-    with pytest.raises(TypeError):
+    with pytest.raises(TypeError, match='This is not tuple'):
         check_instance((i for i in range(3)),
                        tuple,
-                       message='This is not tuple.')
+                       message='This is not tuple')
     with pytest.raises(TypeError):
         check_instance(10, None)
     with pytest.raises(TypeError):
