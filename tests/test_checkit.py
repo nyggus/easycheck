@@ -880,8 +880,7 @@ def test_check_argument_instance_warning():
         foo(4)
         assert 'Incorrect argument' in str(w[-1].message)
 
-    assert check_argument(50,
-                          'my_arg',
+    assert check_argument(50, 'my_arg',
                           expected_instance=int,
                           handle_by=Warning) is None
     assert check_argument(50,
@@ -889,16 +888,14 @@ def test_check_argument_instance_warning():
                           handle_by=Warning) is None
 
     with warnings.catch_warnings(record=True) as w:
-        check_argument(50,
-                       'my_arg',
+        check_argument(50, 'my_arg',
                        expected_instance=str,
                        handle_by=Warning)
         assert 'my_arg' in str(w[-1].message)
         assert 'Incorrect instance' in str(w[-1].message)
 
     with warnings.catch_warnings(record=True) as w:
-        check_argument('one',
-                       'my_arg',
+        check_argument('one', 'my_arg',
                        expected_instance=int,
                        handle_by=Warning)
         assert 'my_arg' in str(w[-1].message)

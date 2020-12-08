@@ -755,8 +755,7 @@ def check_all_ifs(*args):
     ...    )
     {'1: check_if': True, '2: check_if_not': ValueError(\'Wrong!...
 
-    Remember that warnings do NOT raise exceptions, so do not use this function
-    with warnings:
+    You can also use this function with warnings:
     >>> check_all_ifs(
     ...    (check_if, 2 > 1),
     ...    (check_if_not, 'a' == 'a', Warning, 'It might be wrong!')
@@ -790,10 +789,6 @@ def check_all_ifs(*args):
             if not this_warn:
                 run_this_check = True
             else:
-                # run_this_check = (
-                #    f"{_read_class(str(this_warn[-1].category))}"
-                #    f"('{str(this_warn[-1].message)}')"
-                # )
                 run_this_check = this_warn[-1].message
         except Exception as e:
             run_this_check = e
