@@ -14,7 +14,7 @@ You can also define complex checks using a function that collects calls to check
     ...        glm_args[0] <= 1 and
     ...        glm_args[1] in ('poisson', 'quasi-poisson') and
     ...        glm_args[2] in ('log', 'identity'),
-    ...        error=ValueError,
+    ...        handle_by=ValueError,
     ...        message='Incorrect argument value'
     ...    )
     >>> def run_glm(glm_args):
@@ -40,7 +40,7 @@ We can do it in a more comprehensive way:
     ...    check_instance(glm_args[1], str)
     ...    check_instance(glm_args[2], str)
     ...    check_if(glm_args[0] > 0 and glm_args[0] <= 1,
-    ...        error=ValueError,
+    ...        handle_by=ValueError,
     ...        message='The first argument\'s value is incorrect'
     ...    )
     ...    check_argument(

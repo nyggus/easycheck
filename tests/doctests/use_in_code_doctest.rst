@@ -15,10 +15,10 @@ Here are several examples of the simplest uses of checkit:
 
 	>>> from checkit import check_if, check_if_not, check_instance
 	>>> def get_family_name(full_name):
-	...    check_if_not(full_name is None, error=TypeError, message='Missing name')
+	...    check_if_not(full_name is None, handle_by=TypeError, message='Missing name')
 	...    check_instance(full_name, str, message='Full name must be string')
 	...    check_if(' ' in full_name.strip(),
-	...        error=ValueError,
+	...        handle_by=ValueError,
 	...        message=('No space in full name: impossible to split first and second name')
 	...    )
 	...    return full_name.split(' ')[1]
