@@ -6,21 +6,23 @@ have to give up the idea, since you should not use assertion in Python code.
 In such cases, this module comes as handy, offering simple and readable
 functions to check various conditions. The idea behind checkit functions is as
 follows: If the condition if met, nothing happens (the function returns None);
-when the condition is violated, either an exception is raised or a warining is
+when the condition is violated, either an exception is raised or a warning is
 issued. You either can go for default exceptions and messages (sometimes no
 message) or you can customize them.
 
 The module also offers aliases to be used in testing, all of which have the
-word "assert" in their names (e.g., assert_if, assert_instance, assert_length).
+word "assert" in their names (e.g., `assert_if()`, `assert_instance()`,
+`assert_length()`).
 
 What the package offers is simplicity and code readability. Instead of
-raising exceptions or issuing warinings in if-blocks, you can use devoted
-functions that are easy to use, while at the same time being easy to
-understand. These functions are simple and easy-to-follow wrappers for checking
-conditions and raising the corresponding exceptions (or issuing the
-corresponding warining). The idea is to keep the resulting code as clean and
+raising exceptions or issuing warnings in if-blocks, you can use devoted
+functions that are easy to use, while at the same time being easy for the user
+to understand. These functions are simple and easy-to-follow wrappers for
+checking conditions and raising the corresponding exceptions (or issuing the
+corresponding warning). The idea is to keep the resulting code as clean and
 readable as possible. The testing functions also aim to add readability, to
-both tests and their output - thanks to customized exceptions and messages.
+both tests and their output - thanks to using customized exceptions
+and messages.
 
 The main function is `check_if()`, with its negative friend `check_if_not()`.
 The other functions are actually wrappers built around `check_if()`, customized
@@ -33,7 +35,7 @@ created by you) or issues a warning (which must derive from the Warning class);
 you can (optionally) send a message along with the exception, and you should
 send a message with a warning. Note that when you're using the `assert`
 expression, you're left with AssertionError, but when using the checkit
-functions, you can use any exception or warining you want.
+functions, you can use any exception or warning you want.
 
 Consider the following example:
 >>> if 1 > 0:
@@ -161,12 +163,15 @@ you can use the following:
 Issuing warnings:
 In order to issue a warning instead of raising an exception, simply choose a
 warning class (which must derive from the Warning class). Since when issuing a
-warining you must provide a message, it's wise to use a message indeed;
-otherwise, a default message 'Warining' will be used, but it's of little use.
+warning you must provide a message, it's wise to use a message indeed;
+otherwise, a default message 'Warning' will be used, but it's of little use.
 Consider these examples:
 >>> my_list = [1, 3, 3]
 >>> with warnings.catch_warnings(record=True) as w:
-...    check_length(my_list, 2, handle_by=Warning, message='The list is too short')
+...    check_length(my_list,
+...                 2,
+...                 handle_by=Warning,
+...                 message='The list is too short')
 ...    print(w[-1].message)
 The list is too short
 >>> with warnings.catch_warnings(record=True) as w:
@@ -1124,7 +1129,7 @@ def _raise(error, message=None):
     """Raise exception with or without message, or issue a warning.
     
     The error param must contain a class, of whether an exception or a warning.
-    Providing a class's instance will raise TypeError. Since warinings require
+    Providing a class's instance will raise TypeError. Since warnings require
     a message, if you fail to provide one, a default message of 'Warning' will
     be used.
 
