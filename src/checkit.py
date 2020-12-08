@@ -714,6 +714,95 @@ def check_all_ifs(*args):
     return results_of_checks
 
 
+def check_all_ifs(*args):
+    """Check all multiple conditions and return all checks.
+
+    If you want to check several conditions, you can simply check them
+    line by line. Use this function if you want to check each condition and
+    catch all the errors (and messages) - it does not behave like the other
+    functions of the module, since it returns the results of the checks.
+
+    The args are to be a list of tuples of the form
+    (check_function, *args, **kwargs), where args and kwargs are
+    positional and keyword arguments to be passed to check_function;
+    check_function is any of the check functions from this module (that is,
+    any of the functions starting off with check_).
+
+    Returns: A dict with the results, of the following (example) structure:
+             {'1: check_if': True, '2: check_if': True}
+             This means that two checks were run, both using check_if, and
+             both returned confirmation (so no exception was raised).
+             In case of an exception raised, the resulting dict gets the
+             following structure:
+             {'1: check_if': True, '2: check_if_not': AssertionError()}
+             when you did not provide the message, and otherwise
+             {'1: check_if': True, '2: check_if_not': AssertionError('Wrong')}
+              ('Wrong" being the message provided as the argument).
+
+    >>> check_all_ifs(
+    ...    (check_if, 2 > 1),
+    ...    (check_if, 'a' == 'a')
+    ...    )
+    {'1: check_if': True, '2: check_if': True}
+    >>> check_all_ifs(
+    ...    (check_if, 2 > 1),
+    ...    (check_if_not, 'a' == 'a')
+    ...    )
+    {'1: check_if': True, '2: check_if_not': AssertionError()}
+    >>> check_all_ifs( # doctest: +ELLIPSIS
+    ...    (check_if, 2 > 1),
+    ...    (check_if_not, 'a' == 'a', ValueError, 'Wrong!')
+    ...    )
+    {'1: check_if': True, '2: check_if_not': ValueError(\'Wrong!...
+
+    Remember that warnings do NOT raise exceptions, so do not use this function
+    with warnings:
+    >>> check_all_ifs(
+    ...    (check_if, 2 > 1),
+    ...    (check_if_not, 'a' == 'a', Warning, 'It might be wrong!')
+    ...    )
+    {'1: check_if': True, '2: check_if_not': Warning('It might be wrong!')}
+    
+    Style suggestion:
+        Use coding style you prefer, but in our opinion you can increase
+        the readability of your code using the style we used above, that
+        is, presenting all the independent conditions in a separate line,
+        unless the call is short if presented in one line.
+    """
+    check_length(args, 0, gt,
+                 ValueError,
+                 'Provide at least one condition.')
+    tuple_error_message = (
+        'Provide all function calls as tuples in the form of '
+        '(check_function, *args)'
+    )
+    for arg in args:
+        check_instance(arg,
+                       tuple,
+                       message=tuple_error_message)
+
+    results_of_checks = dict()
+    for i, this_check in enumerate(args):
+        function, *arguments = this_check
+        try:
+            with warnings.catch_warnings(record=True) as this_warn:
+                run_this_check = function(*arguments)
+            if not this_warn:
+                run_this_check = True
+            else:
+                # run_this_check = (
+                #    f"{_read_class(str(this_warn[-1].category))}"
+                #    f"('{str(this_warn[-1].message)}')"
+                # )
+                run_this_check = this_warn[-1].message
+        except Exception as e:
+            run_this_check = e
+
+        results_of_checks[f'{i + 1}: {function.__name__}'] = run_this_check
+
+    return results_of_checks
+
+
 def check_argument(argument,
                    argument_name=None,
                    expected_instance=None,

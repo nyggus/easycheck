@@ -667,6 +667,33 @@ def test_check_all_ifs():
                for key, value in multiple_check_3.items())
 
 
+def test_check_all_ifs_warnings():
+    multiple_check_1 = check_all_ifs(
+        (check_if, 2 > 1, Warning),
+        (check_if, 'a' == 'a', Warning)
+    )
+    assert all(value for key, value in multiple_check_1.items())
+
+    multiple_check_2 = check_all_ifs(
+        (check_if, 2 > 1, Warning),
+        (check_if, 'a' == 'a')
+    )
+    assert all(value for key, value in multiple_check_2.items())
+
+    multiple_check_3 = check_all_ifs(
+        (check_if, 2 > 1),
+        (check_if, 'a' == 'a', Warning)
+    )
+    assert all(value for key, value in multiple_check_3.items())
+
+    multiple_check_4 = check_all_ifs(
+        (check_if, 2 < 1, Warning),
+        (check_if, 'a' == 'a')
+    )
+    assert any('Warning' in str(value)
+               for key, value in multiple_check_4.items())
+
+
 def test_check_if_paths_exist_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         check_if_paths_exist()
