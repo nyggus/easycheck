@@ -9,10 +9,13 @@ If you do not want to raise exceptions but to catch them, you can do so using th
 	>>> my_check = catch_check(check_if, 2 > 2, ValueError)
     >>> my_check
     ValueError()
+    >>> my_check = catch_check(check_if, 2 > 2, ValueError, 'Incorrect value')
+    >>> my_check
+    ValueError('Incorrect value')
     >>> type(my_check)
     <class 'ValueError'>
     >>> check_instance(my_check, ValueError)
     >>> raise(my_check)
     Traceback (most recent call last):
         ...
-    ValueError
+    ValueError: Incorrect value

@@ -1,7 +1,7 @@
 Use in testing
 --------------
 
-Although we stress that checkit functions are dedicated to be used in code (unlike classical assertions), it does not mean that they cannot be used in testing. In fact, they can be quite helpful, particularly in doctests, but also in pytests. The checkit package offers several aliases of its main checkit functions, aliases that make the functions resemble the :code:`assert` expression. These aliases are
+Although we stress that :code:`checkit` functions are dedicated to be used in code (unlike classical assertions, which should not be used in code outside of testing), it does not mean that they cannot be used in testing. In fact, they can be quite helpful, particularly in doctests, but also in pytests. The :code:`checkit` package offers several aliases of its main :code:`checkit` functions, aliases that make the functions resemble the :code:`assert` expression. These aliases are
 
 * :code:`assert_if` (for :code:`check_if`)
 * :code:`assert_if_not` (for :code:`check_if_not`)
@@ -9,7 +9,7 @@ Although we stress that checkit functions are dedicated to be used in code (unli
 * :code:`assert_instance` (for :code:`check_instance`)
 * :code:`assert_paths` (for :code:`check_if_paths_exist`)
 
-Since they are aliases, they use the very same syntax and arguments as their checkit counterparts. See:
+Being aliases, they use the very same syntax and arguments as their checkit counterparts. See:
 
 .. code-block:: python
 
@@ -37,3 +37,20 @@ When you run doctests, everything will go fine, as in the below simulation of th
 	...    assert_instance(item, str)
 	...    assert_if(item == single_string)
 	>>> assert_length(string_multiplied, 3)
+
+Do remember, however, *not* to use warnings in testing! Consider the following:
+
+.. code-block:: python
+    
+    >>> check_if(2 < 1)
+    Traceback (most recent call last):
+		...
+	AssertionError
+    >>> check_if(2 < 1, ValueError)
+    Traceback (most recent call last):
+		...
+	ValueError
+    >>> assert_if(2 < 1, Warning)
+    >>> assert_if(2 < 1, UserWarning)
+    
+As you see, the two last assertions will not raise exceptions, something that would dramatically break down your testing. Of course, the last two calls would issue warnings, but warnings do *not* make the test stop! So, do remember this basic rule: Never use warnings in testing when you want to catch whether somethink broke or not.
