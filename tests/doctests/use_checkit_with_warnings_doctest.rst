@@ -37,11 +37,11 @@ You can use warnings in most functions, you can also catch them using `catch_che
     ...    expected_length=5,
     ...    handle_by=Warning,
     ...    message='The list should be 5-element long')
-    "Warning('The list should be 5-element long')"
+    Warning('The list should be 5-element long')
     >>> catch_check(check_instance,
     ...    'some string but for sure not a float',
     ...    expected_instance=float,
     ...    handle_by=Warning,
     ...    message='This does not seem to be a float!')
-    "Warning('This does not seem to be a float!')"
+    Warning('This does not seem to be a float!')
     

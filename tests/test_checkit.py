@@ -31,13 +31,13 @@ def test_check_if_edge_cases():
     with pytest.raises(TypeError,
                        match="missing 1 required positional argument"):
         check_if()
-    with pytest.raises(ValueError, match='The condition does not give'):
+    with pytest.raises(ValueError, match='The condition does not return'):
         check_if('tomato soup is good')
-    with pytest.raises(ValueError, match='The condition does not give'):
+    with pytest.raises(ValueError, match='The condition does not return'):
         check_if('')
-    with pytest.raises(ValueError, match='The condition does not give'):
+    with pytest.raises(ValueError, match='The condition does not return'):
         check_if(1)
-    with pytest.raises(ValueError, match='The condition does not give'):
+    with pytest.raises(ValueError, match='The condition does not return'):
         check_if(0)
     assert check_if(True) is None
     with pytest.raises(AssertionError):
@@ -83,13 +83,13 @@ def test_check_if_not_edge_cases():
     with pytest.raises(TypeError,
                        match="missing 1 required positional argument"):
         check_if_not()
-    with pytest.raises(ValueError, match='The condition does not give'):
+    with pytest.raises(ValueError, match='The condition does not return'):
         check_if_not('tomato soup is good')
-    with pytest.raises(ValueError, match='The condition does not give'):
+    with pytest.raises(ValueError, match='The condition does not return'):
         check_if_not('')
-    with pytest.raises(ValueError, match='The condition does not give'):
+    with pytest.raises(ValueError, match='The condition does not return'):
         check_if_not(1)
-    with pytest.raises(ValueError, match='The condition does not give'):
+    with pytest.raises(ValueError, match='The condition does not return'):
         check_if_not(0)
     assert check_if_not(False) is None
     with pytest.raises(AssertionError):
@@ -137,7 +137,7 @@ def test_check_length_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         check_length('tomato soup is good')
     with pytest.raises(OperatorError, match='Unacceptable operator'):
-        check_length(1, 1, 1)
+        check_length(1, 1, operator=1)
     with pytest.raises(TypeError, match='BaseException type, not str'):
         pytest.raises('tomato soup', 'is good')
 
@@ -288,8 +288,7 @@ def test_catch_check_if():
         raise my_check_not
 
     my_check_not = catch_check(check_if, 2 > 2, UserWarning, 'Problem!')
-    assert 'Problem' in my_check_not
-    assert 'UserWarning' in my_check_not
+    assert isinstance(my_check_not, Warning)
 
     my_check_not = catch_check(check_if, 2 > 2, ValueError)
     assert isinstance(my_check_not, ValueError)
@@ -297,7 +296,7 @@ def test_catch_check_if():
         raise my_check_not
 
     my_check_not = catch_check(check_if, 2 > 2, Warning)
-    assert 'Warning' in my_check_not
+    assert isinstance(my_check_not, Warning)
 
 
 def test_catch_check_if_not():
@@ -316,8 +315,7 @@ def test_catch_check_if_not():
                                2 == 2,
                                handle_by=Warning,
                                message='Problem!')
-    assert 'Problem' in my_check_not
-    assert 'Warning' in my_check_not
+    assert isinstance(my_check_not, Warning)
 
 
 def test_catch_check_length():
@@ -341,8 +339,8 @@ def test_catch_check_length():
                            expected_length=3,
                            handle_by=Warning,
                            message='Length problem')
-    assert 'Warning' in my_check
-    assert 'Length problem' in my_check
+    assert isinstance(my_check, Warning)
+    assert 'Length problem' in str(my_check)
 
 
 def test_catch_check_instance():
@@ -363,8 +361,7 @@ def test_catch_check_instance():
 
     my_check = catch_check(check_instance, 25, float,
                            Warning, 'Instance issue')
-    assert 'Warning' in my_check
-    assert 'Instance issue' in my_check
+    assert isinstance(my_check, Warning)
 
     my_check = catch_check(check_instance, 'a', int)
     assert isinstance(my_check, TypeError)
@@ -405,8 +402,7 @@ def test_catch_check_paths_one_path():
                                paths=non_existing_path,
                                handle_by=Warning,
                                message='Path problem')
-    assert 'Warning' in my_check_not
-    assert 'Path problem' in my_check_not
+    assert isinstance(my_check_not, Warning)
 
 
 def test_catch_check_paths_many_paths():
@@ -430,8 +426,7 @@ def test_catch_check_paths_many_paths():
                                paths=non_existing_paths,
                                handle_by=Warning,
                                message='Path issue')
-    assert 'Warning' in my_check_not
-    assert 'Path issue' in my_check_not
+    assert isinstance(my_check_not, Warning)
 
 
 def test_compare_edge_cases():
@@ -690,7 +685,7 @@ def test_check_all_ifs_warnings():
         (check_if, 2 < 1, Warning),
         (check_if, 'a' == 'a')
     )
-    assert any('Warning' in str(value)
+    assert any(isinstance(value, Warning)
                for key, value in multiple_check_4.items())
 
 
@@ -784,19 +779,19 @@ def test_raise_edge_cases():
         _raise(handle_by=TypeError, MEssage='This was an error')
     with pytest.raises(
             TypeError,
-            match='The error argument must be an exception or warning'):
+            match='The error argument must be an exception or a warning'):
         _raise(20)
     with pytest.raises(
             TypeError,
-            match='The error argument must be an exception or warning'):
+            match='The error argument must be an exception or a warning'):
         _raise('TypeError')
     with pytest.raises(
             TypeError,
-            match='The error argument must be an exception or warning'):
+            match='The error argument must be an exception or a warning'):
         _raise(('TypeError'))
     with pytest.raises(
             TypeError,
-            match='The error argument must be an exception or warning'):
+            match='The error argument must be an exception or a warning'):
         _raise([TypeError])
     with pytest.raises(TypeError, match='message must be string'):
         _raise(error=TypeError, message=20)
