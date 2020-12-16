@@ -4,8 +4,8 @@ Use checkit in code
 The basic aim of :code:`checkit` is to provide you with quick-to-use, simple and readable assertion-like functions to make sure that particular conditions you are interested in are met. They are assertion-like because what you do is indeed similar to what the :code:`assert` expression does, since the functions
 
 * check a condition
-* do nothing when it's met, but
-* raise an exception or issue a warning when it is not
+* do nothing when it is met, but
+* raise an exception (or, alternatively, issue a warning) when it is not
 
 Of course, :code:`checkit` is to help you when Python does not handle a particular situation. For example, it does so when you're trying to divide a number by zero, so you need not use :code:`checkit` then. But there is a plethora of various situations which you want to handle.
 
