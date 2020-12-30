@@ -1,29 +1,30 @@
 checkit
 =======
 
-The :code:`checkit` package offers a lightweight tool for running functionized assertion-like checks within Python code; it also offers functions to be used in testing (particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases). The idea is to use the :code:`checkit` functions in a similar way as assertions, but with more functionalities and with a slightly different aim: When a condition you check is met, nothing happens (in fact, the function returns None); if it's violated, an exception is raised or a warning is issued. The main differences between :code:`checkit` functions and assertions are that
+The :code:`checkit` package offers a lightweight tool for running functionized assertion-like checks within Python code; it also offers functions to be used in testing (particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases). The idea is to use the :code:`checkit` functions in a similar way as assertions, but with more functionalities and with a slightly different aim: When a condition you check is met, nothing happens (in fact, the function returns :code:`None`); if it's violated, an exception is raised or a warning is issued. The main differences between :code:`checkit` functions and assertions are that
 
-* while you should not use assertions in your Python code, the :code:`checkit` module is designed in a way so its functions can be used in code;
-* while assertions raise the :code:`AssertionError`, you can choose any exception to be raised by checkit functions;
+* while you should not use assertions in your Python code, you can do so with the :code:`checkit` functions;
+* while assertions raise only the :code:`AssertionError`, you can choose any exception to be raised by checkit functions;
 * instead of raising an exception, you can issue a warning.
 
-Main :code:`checkit` functions (with names starting off with :code:`check_`) are designed so that they can be used as easy-to-understand code that checks whether a condition (or several conditions) is met. They can be used instead of :code:`if`-blocks, which you normally use to check conditions and raise exceptions (of issue warnings) if they are not met. So, you can do the following:
+Main :code:`checkit` functions (with names starting off with :code:`check_`) are designed in such a way that they can be used as easy-to-understand code that checks whether a condition (or several conditions) is met. They can be used instead of :code:`if`-blocks, which you normally use to check conditions and raise exceptions (or issue warnings) if they are not met. So, you can do the following:
 
 .. code-block:: python
 
     if not isinstance(x, (float, int)):
-	    raise TypeError('x must be a number')
+        raise TypeError('x must be a number')
 	if x > 10:
-	    raise ValueError('Too high value of x')
+        raise ValueError('Too high value of x')
 
 or you can use :code:`checkit` for this:
 
 .. code-block:: python
 
     check_instance(x, (float, int), message='x must be a number')
-	check_if(x <= 10, ValueError, 'Too high value of x')
+    check_if(x <= 10, ValueError, 'Too high value of x')
 
 The :code:`checkit` approach has two main advantages over this classical approach:
+
 * it saves a little space; not much, since most of the time you'll end up with one line of code instead of two, and not always, particularly when you provide an exception type to be raised and a long message; but mainly 
 * it increases code simplicity and readability, since both the names of checkit functions and their arguments are designed in such a way that the reader immediately sees what is being checked.
 
@@ -47,12 +48,12 @@ Install and update using pip:
 
 .. code-block:: text
 
-    pip install -U checkit
+    pip install checkit
 
 Testing
 -------
 
-The package is covered with both pytests and doctests. The latter are included in both docstrings of all the functions, but also in documentation files located in the tests/doctests folder. You can run them using the following commands run in shell from the package's root folder, after activating the virtual environment with the installed :code:`checkit` module:
+The package is covered with both pytests and doctests. The latter are included in both docstrings of all the functions, but also in documentation files located in the tests/doctests folder. You can run them in shell from the package's root folder, after activating the virtual environment with the installed :code:`checkit` module, using the following commands:
 
 .. code-block:: text
 
@@ -60,8 +61,8 @@ The package is covered with both pytests and doctests. The latter are included i
     python -m doctest src/checkit.py tests/doctests/*_doctest.rst
 
 
-Use in code, example 1
-----------------------
+Use in code to raise exceptions
+-------------------------------
 
 Here are several examples of a simple use of basic :code:`checkit` functions. The most basic use resembles the following:
 
@@ -74,21 +75,21 @@ This simply checks if :code:`a` is smaller than 10; if it is, nothing happens (i
 .. code-block:: python
 
     check_if(a < 10, handle_by=ValueError)
-	# or shorter and equally readable: check_if(a < 10, ValueError)
+    # or shorter and equally readable: check_if(a < 10, ValueError)
 
 but you can also add a message:
 
 .. code-block:: python
 
     check_if(a < 10, handle_by=ValueError, message='Too high a')
-	# or shorter and equally readable: check_if(a < 10, ValueError, 'Too high a')
+    # or shorter and equally readable: check_if(a < 10, ValueError, 'Too high a')
 
 Some other functions have different default errors; for instance, this call
 
 .. code-block:: python
 
     check_instance(a, expected_instance=str)
-	# or check_instance(a, str)
+    # or check_instance(a, str)
 
 will raise :code:`TypeError` while this
 
@@ -111,8 +112,8 @@ Here is a list of :code:`checkit` functions the module offers, along with their 
 
 You can also use a :code:`catch_check()` function, if you want to catch an exception or a warning the :code:`checkit` function you use would raise.
 
-Use in code, example 2
-----------------------
+Use in code to issue warnings
+-----------------------------
 
 In order to issue a warning if a condition is violated, simply use a warning class (in the :code:`handle_by` argument) instead of an exception class:
 
@@ -124,8 +125,8 @@ In order to issue a warning if a condition is violated, simply use a warning cla
 Remember to always use a message with warnings, in order to make them meaningful. (See more in the use_checkit_with_warnings_doctest.rst file).
 
 
-Use in code, example 3
-----------------------
+Use in code, an example
+-----------------------
 
 You want to connect to a database; if the connection fails for any reason, you want to read an archived flat file. (We will use some undefined functions whose names will clearly convey what the functions are to do.)
 
@@ -180,13 +181,13 @@ Of course, you might use here a dedicated context manager. Sure, you can write i
 .. code-block:: python
 
     def get_data(db_details, db_credentials, archived_data_file):
-            data = get_data_from_db(db_details, db_credentials)
-            if not data:
-                with open(archived_data_file) as f:
-                    data = f.readlines()
-            return data
+        data = get_data_from_db(db_details, db_credentials)
+        if not data:
+            with open(archived_data_file) as f:
+                data = f.readlines()
+        return data
 
-Of course, the :code:`open()` context manager will itself throw an error, but when you use the :code:`check_if()` function and explicitely define an exception class, you clearly show the reader that you're checking if this file exists and raise a particular exception if it doesn't.
+Of course, the :code:`open()` context manager will itself throw an error, but when you use the :code:`check_if()` function and explicitly define an exception class, you clearly show the reader that you're checking if this file exists and raise a particular exception if it doesn't.
         
 Use in testing
 --------------
@@ -195,18 +196,17 @@ As mentioned above, most functions have their aliases to be used in testing. Of 
 
 .. code-block:: python
 
-	# Using assertions
-	def test_something():
-		a, b = my_function_1(), my_function_2()
-		
-		assert a == 2; 
-		assert isinstance(a, int)
-		assert isinstance(b, tuple)
-		assert len(b) == 5
-		
-	# Using checkit assert-like functions:
+    # Using assertions
+    def test_something():
+        a, b = my_function_1(), my_function_2()
 
-	def test_something():
+        assert a == 2; 
+        assert isinstance(a, int)
+        assert isinstance(b, tuple)
+        assert len(b) == 5
+		
+    # Using checkit assert-like functions:
+    def test_something():
         a, b = my_function_1(), my_function_2()
         
         assert_if(a == 2)
@@ -219,4 +219,4 @@ Do note that only the first one will raise :code:`AssertionError` while the othe
 Other examples
 --------------
 
-You will find a number of examples if doctest files located in the package's tests/doctests folder, which also serve as doctests.
+You will find a number of examples in doctest files located in the package's tests/doctests folder, which also serve as doctests.
