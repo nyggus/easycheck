@@ -3,7 +3,7 @@ Complex checks using a self-defined function
 
 You can define complex checks using a function that collects calls to checkit functions. That way, you can simplify the function in which you want to make the check, by using just one line instead of several (8 in the example below).
 
-.. code-block::python
+.. code-block:: python
 
     >>> from checkit import check_if, check_instance, check_argument
     >>> def check_glm_args(glm_args):
@@ -32,7 +32,7 @@ You can define complex checks using a function that collects calls to checkit fu
   
 We can do it in a more comprehensive way:
 
-.. code-block::python
+.. code-block:: python
 
     >>> from checkit import check_if, check_instance
     >>> def check_glm_args(glm_args):

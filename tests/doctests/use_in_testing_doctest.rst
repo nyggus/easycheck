@@ -54,4 +54,4 @@ Do remember, however, *not* to use warnings in testing! Consider the following:
     >>> assert_if(2 < 1, Warning)
     >>> assert_if(2 < 1, UserWarning)
     
-As you see, the two last assertions will not raise exceptions, something that would dramatically break down your testing. Of course, the last two calls would issue warnings, but warnings do *not* make the test does not pass! So, do remember this basic rule: Never use warnings in testing when you want to catch whether somethink broke or not.
+As you see, the two last assertions will not raise exceptions, something that would dramatically break down your testing. Of course, the last two calls would issue warnings, but warnings do *not* make the test does not pass! So, do remember this basic rule: Never use warnings in testing when you want to catch whether something broke or not.
