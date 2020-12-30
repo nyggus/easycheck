@@ -13,43 +13,44 @@ As aliases, they use the very same syntax and arguments as their :code:`checkit`
 
 .. code-block:: python
 
-	>>> from checkit import assert_if, assert_instance, assert_length
-	>>> def multiply_string(string, k):
-	...    """Make a list consisting of string k times.
-	...    >>> single_string = 'aka'
-	...    >>> string_multiplied = multiply_string(single_string, 3)
-	...    >>> assert_instance(string_multiplied, list)
-	...    >>> for i, item in enumerate(string_multiplied):
-	...            assert_instance(item, str)
-	...            assert_if(item == single_string)
-	...    >>> assert_length(string_multiplied, 3)
-	...    """
-	...    return [string] * k
+    >>> from checkit import assert_if, assert_instance, assert_length
+    >>> def multiply_string(string, k):
+    ...    """Make a list consisting of string k times.
+    ...    >>> single_string = 'aka'
+    ...    >>> string_multiplied = multiply_string(single_string, 3)
+    ...    >>> assert_instance(string_multiplied, list)
+    ...    >>> for i, item in enumerate(string_multiplied):
+    ...            assert_instance(item, str)
+    ...            assert_if(item == single_string)
+    ...    >>> assert_length(string_multiplied, 3)
+    ...    """
+    ...    return [string] * k
 
 When you run doctests, everything will go fine, as in the below simulation of the corresponding doctests from the above docstring:
 
 .. code-block:: python
 
-	>>> single_string = 'aka'
-	>>> string_multiplied = multiply_string(single_string, 3)
-	>>> assert_instance(string_multiplied, list)
-	>>> for i, item in enumerate(string_multiplied):
-	...    assert_instance(item, str)
-	...    assert_if(item == single_string)
-	>>> assert_length(string_multiplied, 3)
+    >>> single_string = 'aka'
+    >>> string_multiplied = multiply_string(single_string, 3)
+    >>> assert_instance(string_multiplied, list)
+    >>> for i, item in enumerate(string_multiplied):
+    ...    assert_instance(item, str)
+    ...    assert_if(item == single_string)
+    >>> assert_length(string_multiplied, 3)
 
 Do remember, however, *not* to use warnings in testing! Consider the following:
 
 .. code-block:: python
     
+    >>> from checkit import check_if
     >>> check_if(2 < 1)
     Traceback (most recent call last):
-		...
-	AssertionError
+	    ...
+    AssertionError
     >>> check_if(2 < 1, ValueError)
     Traceback (most recent call last):
-		...
-	ValueError
+        ...
+    ValueError
     >>> assert_if(2 < 1, Warning)
     >>> assert_if(2 < 1, UserWarning)
     
