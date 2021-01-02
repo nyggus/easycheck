@@ -969,7 +969,7 @@ def _read_class(message):
     ValueError: Could not parse the class's name
     """
     try:
-        pattern = re.compile(r"<class '([a-zA-z0-9_]+)'>")
+        pattern = re.compile(r"<class '([a-zA-Z0-9_]+)'>")
         result = pattern.search(str(message))
         return result[1]
     except:
