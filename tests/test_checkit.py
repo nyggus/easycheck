@@ -24,6 +24,7 @@ from checkit import (check_if, assert_if,
                      _return_from_check_if_paths_exist,
                      _check_checkit_arguments,
                      _make_message,
+                     _read_class,
                      )
 
 
@@ -1299,13 +1300,13 @@ def test_assert_functions():
         assert_paths('Q:/E/') and check_if_paths_exist('Q:/E/') is None
 
 
-def _read_class_positive():
+def test_read_class_positive():
     assert _read_class("<class 'Warning'>") == 'Warning'
     assert _read_class("<class 'UserWarning'>") == 'UserWarning'
     assert _read_class("<class 'MyClass'>") == 'MyClass'
 
 
-def _read_class_negative():
+def test_read_class_negative():
     with pytest.raises(ValueError, match='Could not parse'):
         _read_class("class 'WhateverClass'>")
     with pytest.raises(ValueError, match='Could not parse'):

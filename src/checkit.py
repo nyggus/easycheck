@@ -216,8 +216,9 @@ must follow all of the following conditions:
 * its behavior is fully covered by tests (both doctests and pytests)
 """
 
-import warnings
+import re
 import os
+import warnings
 from collections.abc import Generator
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
@@ -967,17 +968,13 @@ def _read_class(message):
        ....
     ValueError: Could not parse the class's name
     """
-    error_message = 'Could not parse the class\'s name'
-    message = str(message)
-    check_if(message.count("'") == 2, ValueError, error_message)
-    check_if(message.count("<") == 1, ValueError, error_message)
-    check_if(message.count(">") == 1, ValueError, error_message)
-    check_if('class' in message, ValueError, error_message)
     try:
-        this_class = message.split("'")[1]
+        pattern = re.compile(r"<class '([a-zA-z0-9_]+)'>")
+        result = pattern.search(str(message))
+        return result[1]
     except:
+        error_message = 'Could not parse the class\'s name'
         raise ValueError(error_message)
-    return this_class
 
 
 def _compare(item_1, operator, item_2):
