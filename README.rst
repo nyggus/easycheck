@@ -34,7 +34,7 @@ You can also issue a warning:
 
     check_if(x <= 10, Warning, 'For stable functioning of the function, x should not be greater than 10.')
 
-The package offers also functions dedicated to testing, e.g.,
+The package also offers functions dedicated to testing, e.g.,
 
 .. code-block:: python
 
@@ -88,7 +88,7 @@ Some other functions have different default errors; for instance, this call
 
 .. code-block:: python
 
-    check_instance(a, expected_instance=str)
+    check_instance(a, expected_type=str)
     # or check_instance(a, str)
 
 will raise :code:`TypeError` while this

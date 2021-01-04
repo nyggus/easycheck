@@ -199,6 +199,8 @@ def test_check_instance_positive():
     assert check_instance('string', str, handle_by=Warning) is None
     assert check_instance((1, 2), tuple) is None
     assert check_instance((1, 2), tuple, handle_by=Warning) is None
+    assert check_instance((1, 2), [tuple, list]) is None
+    assert check_instance((1, 2), [tuple, list], handle_by=Warning) is None
     assert check_instance(
         (1, 2), (tuple, list),
         message='Neither tuple nor list'
@@ -227,6 +229,12 @@ def test_check_instance_negative():
             (tuple, list),
             message='Neither tuple nor list'
         )
+    with pytest.raises(TypeError, match='Neither tuple nor list'):
+        check_instance(
+            'souvenir',
+            [tuple, list],
+            message='Neither tuple nor list'
+        )
     with pytest.raises(TypeError):
         check_instance(20.1, (int, None))
     with pytest.raises(TypeError):
@@ -250,6 +258,15 @@ def test_check_instance_negative_warnings():
         check_instance(
             'souvenir',
             (tuple, list),
+            handle_by=Warning,
+            message='This is a testing warning'
+        )
+        assert 'This is a testing warning' in str(w[-1].message)
+
+    with warnings.catch_warnings(record=True) as w:
+        check_instance(
+            'souvenir',
+            [tuple, list],
             handle_by=Warning,
             message='This is a testing warning'
         )
@@ -840,7 +857,7 @@ def test_check_argument_edge_cases():
 
 def test_check_argument_instance():
     def foo(x):
-        check_argument(x, 'x', expected_instance=str)
+        check_argument(x, 'x', expected_type=str)
         pass
     assert foo('one') is None
     assert foo(('one')) is None
@@ -849,25 +866,25 @@ def test_check_argument_instance():
     with pytest.raises(ArgumentValueError):
         foo(('one', 'two'))
 
-    assert check_argument(50, 'my_arg', expected_instance=int) is None
-    assert check_argument(50, expected_instance=int) is None
-    assert check_argument('my_arg', 'one', expected_instance=str) is None
-    assert check_argument('my_arg', expected_instance=str) is None
+    assert check_argument(50, 'my_arg', expected_type=int) is None
+    assert check_argument(50, expected_type=int) is None
+    assert check_argument('my_arg', 'one', expected_type=str) is None
+    assert check_argument('my_arg', expected_type=str) is None
 
     with pytest.raises(ArgumentValueError, match='my_arg'):
-        check_argument(50, 'my_arg', expected_instance=str)
+        check_argument(50, 'my_arg', expected_type=str)
     with pytest.raises(ArgumentValueError, match='my_arg'):
-        check_argument('one', 'my_arg', expected_instance=int)
+        check_argument('one', 'my_arg', expected_type=int)
     with pytest.raises(ArgumentValueError, match='argument'):
-        check_argument(50, expected_instance=str)
+        check_argument(50, expected_type=str)
     with pytest.raises(ArgumentValueError, match='argument'):
-        check_argument('one', expected_instance=int)
+        check_argument('one', expected_type=int)
 
 
 def test_check_argument_instance_warning():
     def foo(x):
         check_argument(x, 'x',
-                       expected_instance=str,
+                       expected_type=str,
                        handle_by=Warning,
                        message='Incorrect argument?')
         pass
@@ -877,37 +894,37 @@ def test_check_argument_instance_warning():
         assert 'Incorrect argument' in str(w[-1].message)
 
     assert check_argument(50, 'my_arg',
-                          expected_instance=int,
+                          expected_type=int,
                           handle_by=Warning) is None
     assert check_argument(50,
-                          expected_instance=int,
+                          expected_type=int,
                           handle_by=Warning) is None
 
     with warnings.catch_warnings(record=True) as w:
         check_argument(50, 'my_arg',
-                       expected_instance=str,
+                       expected_type=str,
                        handle_by=Warning)
         assert 'my_arg' in str(w[-1].message)
-        assert 'Incorrect instance' in str(w[-1].message)
+        assert 'Incorrect type' in str(w[-1].message)
 
     with warnings.catch_warnings(record=True) as w:
         check_argument('one', 'my_arg',
-                       expected_instance=int,
+                       expected_type=int,
                        handle_by=Warning)
         assert 'my_arg' in str(w[-1].message)
-        assert 'Incorrect instance' in str(w[-1].message)
+        assert 'Incorrect type' in str(w[-1].message)
 
     with warnings.catch_warnings(record=True) as w:
         check_argument(50,
-                       expected_instance=str,
+                       expected_type=str,
                        handle_by=Warning)
-        assert 'Incorrect instance of argument' in str(w[-1].message)
+        assert 'Incorrect type of argument' in str(w[-1].message)
 
     with warnings.catch_warnings(record=True) as w:
         check_argument('one',
-                       expected_instance=int,
+                       expected_type=int,
                        handle_by=Warning)
-        assert 'Incorrect instance of argument' in str(w[-1].message)
+        assert 'Incorrect type of argument' in str(w[-1].message)
 
 
 def test_check_argument_choices():
@@ -1038,13 +1055,13 @@ def test_check_argument_length_warnings():
 
 def test_check_argument_mix():
     def foo(x):
-        check_argument(x, 'x', expected_instance=int, condition=x % 2 == 0)
+        check_argument(x, 'x', expected_type=int, condition=x % 2 == 0)
         pass
     with pytest.raises(TypeError):
         x = 'one'
         check_argument(argument=x,
                        argument_name='x',
-                       expected_instance=int,
+                       expected_type=int,
                        condition=x % 2 == 0)
     with pytest.raises(TypeError):
         foo('one')
@@ -1053,13 +1070,13 @@ def test_check_argument_mix():
 def test_check_argument_mix_warnings():
     def foo(x):
         check_argument(x, 'x',
-                       expected_instance=int,
+                       expected_type=int,
                        expected_length=3,
                        handle_by=Warning)
         pass
     with warnings.catch_warnings(record=True) as w:
         foo('one')
-        assert 'instance' in str(w[-1].message)
+        assert 'type' in str(w[-1].message)
 
 
 def test_return_from_check_if_paths_exist_edge_cases():
@@ -1142,7 +1159,7 @@ def test_check_checkit_arguments_edge_cases():
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Execution_mode=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Expected_instance=1)
+        _check_checkit_arguments(Expected_type=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Expected_length=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
@@ -1220,18 +1237,18 @@ def test_check_checkit_arguments():
             _check_checkit_arguments(expected_length=this_length)
 
     for this_instance in (str, int, float, bool, tuple, list, Generator):
-        assert _check_checkit_arguments(expected_instance=this_instance) is None
+        assert _check_checkit_arguments(expected_type=this_instance) is None
     for this_instance in ('str', 25):
         with pytest.raises(TypeError):
-            _check_checkit_arguments(expected_instance=this_instance)
-    assert _check_checkit_arguments(expected_instance=(str,
+            _check_checkit_arguments(expected_type=this_instance)
+    assert _check_checkit_arguments(expected_type=(str,
                                                        tuple,
                                                        list)) is None
     with pytest.raises(TypeError):
-        _check_checkit_arguments(expected_instance=(str, tuple, list, 26))
+        _check_checkit_arguments(expected_type=(str, tuple, list, 26))
 
     assert _check_checkit_arguments(
-        expected_instance=(str, tuple, list),
+        expected_type=(str, tuple, list),
         condition=2 < 2,
         expected_length=3,
         execution_mode='raise',
@@ -1240,7 +1257,7 @@ def test_check_checkit_arguments():
 
     with pytest.raises(TypeError):
         _check_checkit_arguments(
-            expected_instance=(str, tuple, list),
+            expected_type=(str, tuple, list),
             condition=2 < 2,
             expected_length=3,
             execution_mode='raise',
