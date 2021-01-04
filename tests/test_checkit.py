@@ -186,10 +186,6 @@ def test_check_instance_edge_cases():
         check_instance(True)
     with pytest.raises(TypeError, match='required positional argument'):
         check_instance('tomato soup is good')
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_instance(Item=2)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        check_instance(item=2, instance=str)
 
 
 def test_check_instance_positive():
@@ -201,6 +197,8 @@ def test_check_instance_positive():
     assert check_instance((1, 2), tuple, handle_by=Warning) is None
     assert check_instance((1, 2), [tuple, list]) is None
     assert check_instance((1, 2), [tuple, list], handle_by=Warning) is None
+    assert check_instance((1, 2), [list, tuple]) is None
+    assert check_instance((1, 2), {tuple, list}, handle_by=Warning) is None
     assert check_instance(
         (1, 2), (tuple, list),
         message='Neither tuple nor list'
@@ -224,17 +222,15 @@ def test_check_instance_positive():
 
 def test_check_instance_negative():
     with pytest.raises(TypeError, match='Neither tuple nor list'):
-        check_instance(
-            'souvenir',
-            (tuple, list),
-            message='Neither tuple nor list'
-        )
-    with pytest.raises(TypeError, match='Neither tuple nor list'):
-        check_instance(
-            'souvenir',
-            [tuple, list],
-            message='Neither tuple nor list'
-        )
+        check_instance('souvenir',
+                       (tuple, list),
+                       message='Neither tuple nor list')
+    with pytest.raises(TypeError):
+        check_instance('souvenir', [tuple, list])
+    with pytest.raises(TypeError):
+        check_instance('souvenir', {tuple, list})
+    with pytest.raises(TypeError):
+        check_instance(True, (str, complex))
     with pytest.raises(TypeError):
         check_instance(20.1, (int, None))
     with pytest.raises(TypeError):
@@ -265,8 +261,8 @@ def test_check_instance_negative_warnings():
 
     with warnings.catch_warnings(record=True) as w:
         check_instance(
-            'souvenir',
-            [tuple, list],
+            True,
+            [str, complex],
             handle_by=Warning,
             message='This is a testing warning'
         )
@@ -855,7 +851,7 @@ def test_check_argument_edge_cases():
     assert str(msg_error.value) == msg
 
 
-def test_check_argument_instance():
+def test_check_argument_type():
     def foo(x):
         check_argument(x, 'x', expected_type=str)
         pass
@@ -881,7 +877,7 @@ def test_check_argument_instance():
         check_argument('one', expected_type=int)
 
 
-def test_check_argument_instance_warning():
+def test_check_argument_type_warning():
     def foo(x):
         check_argument(x, 'x',
                        expected_type=str,
@@ -1236,14 +1232,17 @@ def test_check_checkit_arguments():
         with pytest.raises(TypeError):
             _check_checkit_arguments(expected_length=this_length)
 
-    for this_instance in (str, int, float, bool, tuple, list, Generator):
-        assert _check_checkit_arguments(expected_type=this_instance) is None
-    for this_instance in ('str', 25):
+    for this_type in (str, int, float, bool, tuple, list, Generator):
+        assert _check_checkit_arguments(expected_type=this_type) is None
+    for this_type in ('str', 25, True, 1.1):
         with pytest.raises(TypeError):
-            _check_checkit_arguments(expected_type=this_instance)
-    assert _check_checkit_arguments(expected_type=(str,
-                                                       tuple,
-                                                       list)) is None
+            _check_checkit_arguments(expected_type=this_type)
+    assert _check_checkit_arguments(expected_type=(str, tuple)) is None
+    assert _check_checkit_arguments(expected_type=(str, tuple, None)) is None
+    assert _check_checkit_arguments(expected_type=[str, tuple]) is None
+    assert _check_checkit_arguments(expected_type={str, tuple}) is None
+    with pytest.raises(TypeError):
+        _check_checkit_arguments(expected_type='boolintstrcomplexlist')
     with pytest.raises(TypeError):
         _check_checkit_arguments(expected_type=(str, tuple, list, 26))
 
