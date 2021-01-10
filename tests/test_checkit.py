@@ -21,7 +21,6 @@ from checkit import (check_if, assert_if,
                      _parse_error_and_message_from,
                      _clean_message,
                      _raise,
-                     _return_from_check_if_paths_exist,
                      _check_checkit_arguments,
                      _make_message,
                      _read_class,
@@ -711,7 +710,7 @@ def test_check_if_paths_exist_edge_cases():
     with pytest.raises(TypeError, match='Argument paths must be string'):
         check_if_paths_exist(20)
     with pytest.raises(TypeError, match='Argument paths must be string'):
-        check_if_paths_exist({})
+        check_if_paths_exist(True)
     with pytest.raises(ValueError):
         check_if_paths_exist(os.listdir('.')[0], execution_mode='buuu')
 
@@ -729,11 +728,19 @@ def test_check_if_paths_exist_positive():
 
     assert check_if_paths_exist(list_of_paths_to_check) is None
     assert check_if_paths_exist(list_of_paths_to_check, Warning) is None
-    assert check_if_paths_exist(list_of_paths_to_check,
-                                execution_mode='return')
-    assert check_if_paths_exist(list_of_paths_to_check,
-                                handle_by=Warning,
-                                execution_mode='return')
+
+    check_result = check_if_paths_exist(list_of_paths_to_check,
+                                        execution_mode='return')
+    assert len(check_result) == 2
+    assert check_result[0] is None
+    assert check_result[1] == []
+
+    check_result = check_if_paths_exist(list_of_paths_to_check,
+                                        handle_by=Warning,
+                                        execution_mode='return')
+    assert len(check_result) == 2
+    assert check_result[0] is None
+    assert check_result[1] == []
 
 
 def test_check_if_paths_exist_negative():
@@ -747,17 +754,21 @@ def test_check_if_paths_exist_negative():
     with pytest.raises(IOError):
         check_if_paths_exist(non_existing_path, handle_by=IOError)
 
-    failed_check = check_if_paths_exist(non_existing_path,
+    check_result = check_if_paths_exist(non_existing_path,
                                         execution_mode='return')
-    assert failed_check[1] == non_existing_path
+    assert len(check_result) == 2
+    assert type(check_result[0]) == FileNotFoundError
     with pytest.raises(FileNotFoundError):
-        raise failed_check[0]
+        raise check_result[0]
+    assert check_result[1] == [non_existing_path]
 
-    failed_check = check_if_paths_exist([non_existing_path] + os.listdir('.'),
+    check_result = check_if_paths_exist(os.listdir('.') + [non_existing_path],
                                         execution_mode='return')
+    assert len(check_result) == 2
+    assert type(check_result[0]) == FileNotFoundError
     with pytest.raises(FileNotFoundError):
-        raise failed_check[0]
-    assert failed_check[1] == [non_existing_path]
+        raise check_result[0]
+    assert check_result[1] == [non_existing_path]
 
 
 def test_check_if_paths_exist_negative_warnings():
@@ -769,19 +780,23 @@ def test_check_if_paths_exist_negative_warnings():
                              Warning,
                              'Path issue')
 
-    failed_check = check_if_paths_exist(non_existing_path,
+    check_result = check_if_paths_exist(non_existing_path,
                                         handle_by=Warning,
                                         message='Path issue',
                                         execution_mode='return')
-    assert failed_check[1] == non_existing_path
-    assert 'Path issue' in str(failed_check[0])
+    assert len(check_result) == 2
+    assert type(check_result[0]) == Warning
+    assert 'Path issue' in str(check_result[0])
+    assert check_result[1] == [non_existing_path]
 
-    failed_check = check_if_paths_exist([non_existing_path] + os.listdir('.'),
+    check_result = check_if_paths_exist([non_existing_path] + os.listdir('.'),
                                         handle_by=Warning,
                                         message='Path issue',
                                         execution_mode='return')
-    assert failed_check[1] == [non_existing_path]
-    assert 'Path issue' in str(failed_check[0])
+    assert len(check_result) == 2
+    assert type(check_result[0]) == Warning
+    assert 'Path issue' in str(check_result[0])
+    assert check_result[1] == [non_existing_path]
 
 
 def test_raise_edge_cases():
@@ -1073,70 +1088,6 @@ def test_check_argument_mix_warnings():
     with warnings.catch_warnings(record=True) as w:
         foo('one')
         assert 'type' in str(w[-1].message)
-
-
-def test_return_from_check_if_paths_exist_edge_cases():
-    with pytest.raises(TypeError, match='required positional argument'):
-        _return_from_check_if_paths_exist()
-    with pytest.raises(TypeError, match='required positional argument'):
-        _return_from_check_if_paths_exist(
-            error=FileNotFoundError)
-    with pytest.raises(TypeError, match='required positional argument'):
-        _return_from_check_if_paths_exist(
-            error=FileNotFoundError,
-            message=None)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        _return_from_check_if_paths_exist(
-            Error=FileNotFoundError,
-            message=None,
-            paths=[])
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        _return_from_check_if_paths_exist(
-            error=FileNotFoundError,
-            Message=None,
-            paths=[])
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        _return_from_check_if_paths_exist(
-            error=FileNotFoundError,
-            message=None,
-            Paths=[])
-
-    with pytest.raises(TypeError, match='must be an exception'):
-        _return_from_check_if_paths_exist(20, None, [])
-    with pytest.raises(TypeError, match='must be an exception'):
-        _return_from_check_if_paths_exist('TypeError', None, [])
-
-
-def test_return_from_check_if_paths_exist():
-    my_return = _return_from_check_if_paths_exist(
-        error=FileNotFoundError,
-        message=None,
-        paths=[])
-    assert isinstance(my_return[0], Exception)
-    assert my_return[1] == []
-
-    my_return_2 = _return_from_check_if_paths_exist(
-        error=FileNotFoundError,
-        message='No such file',
-        paths='D:/this_dir/this_path.csv')
-    assert isinstance(my_return_2[0], Exception)
-    assert my_return_2[1] == 'D:/this_dir/this_path.csv'
-
-
-def test_return_from_check_if_paths_exist_warnings():
-    my_return = _return_from_check_if_paths_exist(
-        error=Warning,
-        message=None,
-        paths=[])
-    assert isinstance(my_return[0], Exception)
-    assert my_return[1] == []
-
-    my_return_2 = _return_from_check_if_paths_exist(
-        error=Warning,
-        message='No such file',
-        paths='D:/this_dir/this_path.csv')
-    assert isinstance(my_return_2[0], Exception)
-    assert my_return_2[1] == 'D:/this_dir/this_path.csv'
 
 
 def test_check_checkit_arguments_edge_cases():

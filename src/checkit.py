@@ -479,11 +479,13 @@ def check_if_paths_exist(paths,
     """Check if paths exists, and if not either raise or return an exception
     or warning.
 
-    Param paths is either a string or a list/tuple.
-
-    The function's behavior depends on execution_mode. If you want to learn
-    which paths do not exist, choose execution_mode='return', in which case
-    the function will not raise an exception but return it (see below).
+    Parameters
+    ----------
+    paths: string or Iterable of strings
+    execution_mode: determines what happens if not all of the paths exist
+        'raise': exception will be raised
+        'return': exception instance will be returned, along with a list of
+                  the paths that do not exist
 
     >>> check_if_paths_exist('Q:/Op/Oop/')
     Traceback (most recent call last):
@@ -493,9 +495,9 @@ def check_if_paths_exist(paths,
     >>> check_if_paths_exist(os.listdir())
 
     >>> check_if_paths_exist('Q:/Op/Oop/', execution_mode='return')
-    (FileNotFoundError(), 'Q:/Op/Oop/')
+    (FileNotFoundError(), ['Q:/Op/Oop/'])
     >>> check_if_paths_exist(os.listdir()[0], execution_mode='return')
-    (None, None)
+    (None, [])
     >>> check_if_paths_exist(os.listdir(), execution_mode='return')
     (None, [])
 
@@ -504,77 +506,38 @@ def check_if_paths_exist(paths,
     >>> check_if_paths_exist('Q:/Op/Oop/',
     ...    execution_mode='return',
     ...    handle_by=Warning)
-    (Warning(), 'Q:/Op/Oop/')
+    (Warning(), ['Q:/Op/Oop/'])
     >>> check_if_paths_exist('Q:/Op/Oop/',
     ...    execution_mode='return',
     ...    handle_by=Warning,
     ...    message='Attempt to use a non-existing path')
-    (Warning('Attempt to use a non-existing path'), 'Q:/Op/Oop/')
+    (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop/'])
     """
     _check_checkit_arguments(handle_by=handle_by,
                              message=message,
                              execution_mode=execution_mode)
 
     if isinstance(paths, str):
-        path = Path(paths)
-        if execution_mode == 'raise':
-            check_if(path.exists(), handle_by=handle_by, message=message)
-        else:
-            file_exists = path.exists()
-            if not file_exists:
-                return _return_from_check_if_paths_exist(handle_by,
-                                                         message,
-                                                         paths)
-            else:
-                return None, None
-    elif isinstance(paths, (tuple, list)):
-        paths_exist = [Path(path).exists() for path in paths]
-        if not all(paths_exist):
-            non_existing_paths = [
-                path for path in paths
-                if not Path(path).exists()
-            ]
+        paths = (paths,)
+
+    if isinstance(paths, Iterable):
+        non_existing_paths = [
+            path for path in paths
+            if not Path(path).exists()
+        ]
+        if non_existing_paths:
             if execution_mode == 'raise':
                 _raise(handle_by, message)
             elif execution_mode == 'return':
-                return _return_from_check_if_paths_exist(handle_by,
-                                                         message,
-                                                         non_existing_paths)
-        else:
-            if execution_mode == 'return':
-                return None, []
+                if message:
+                    error = handle_by(str(message))
+                else:
+                    error = handle_by()
+                return error, non_existing_paths
+        elif execution_mode == 'return':
+            return None, []
     else:
-        raise TypeError('Argument paths must be string, tuple of strigs,'
-                        ' or list of strings')
-
-
-def _return_from_check_if_paths_exist(error, message, paths):
-    """Create a tuple to return from check_if_paths_exist, message-dependent.
-
-    >>> _return_from_check_if_paths_exist(
-    ...    error=FileNotFoundError,
-    ...    message=None,
-    ...    paths=[])
-    (FileNotFoundError(), [])
-
-    >>> _return_from_check_if_paths_exist(
-    ...    error=FileNotFoundError,
-    ...    message='No such file',
-    ...    paths='D:/this_dir/this_path.csv') # doctest: +ELLIPSIS
-    (FileNotFoundError('No such file'...
-    >>> _return_from_check_if_paths_exist(
-    ...    error=Warning,
-    ...    message='No such file',
-    ...    paths='D:/this_dir/this_path.csv') # doctest: +ELLIPSIS
-    (Warning('No such file'...
-
-    """
-    _check_checkit_arguments(handle_by=error)
-
-    if message:
-        return error(str(message)), paths
-    else:
-        return error(), paths
+        raise TypeError('Argument paths must be string or iterable of strings')
 
 
 def check_comparison(item_1, operator, item_2,
