@@ -258,10 +258,15 @@ class ArgumentValueError(Exception):
 def check_if(condition, handle_by=AssertionError, message=None):
     """Check if a condition is true.
 
-    If yes, the function returns nothing. If not, it raises an exception or
-    issues a warning, in both cases with an optional message (though in the
-    case of warnings, you should always use a message). This is a generic
-    function, used by other functions of the module.
+    Args:
+        condition (bool): condition to check.
+        handle_by (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message
+
+    If condition is true, the function returns nothing. If not, it raises
+    an exception or issues a warning, in both cases with an optional message
+    (though in the case of warnings, you should always use a message).
+    This is a generic function, used by other functions of the module.
 
     It works as follows:
     >>> check_if(2 > 1)
@@ -315,6 +320,11 @@ def check_if(condition, handle_by=AssertionError, message=None):
 def check_if_not(condition, handle_by=AssertionError, message=None):
     """Check if a condition is not true.
 
+    Args:
+        condition (bool): condition to check.
+        handle_by (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message
+
     Use this function to check if something is not true. If it is not true
     indeed, the function returns nothing. If it is true, the function throws
     an error with an optional message, or issues a warning.
@@ -367,18 +377,24 @@ def check_length(item,
                  handle_by=LengthError,
                  message=None,
                  operator=eq,
-                 assign_length_to_others=False,
-                 execution_mode='raise'):
+                 assign_length_to_others=False):
     """Compare item's length with expected_length, using operator.
 
-    An operator can be from those returned by `get_possible_operators()`.
+    Args:
+        item: the object whose type we want to validate.
+        expected_length (int): the expected type of the item
+        handle_by (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message
+        operator (Callable): one of the functions returned by
+            `get_possible_operators()`
+        assign_length_to_others (bool): treat all numeric types as having the
+            length of 1. If false, any attempt to validate a numeric type
+            will raise an exception/warning, as numeric types don't implement
+            __len__().
 
-    If the condition is met, the function returns nothing. If not, it throws
-    LengthError with an optional message, or issues a warning. As a default,
-    the function takes a Pythonic approach, treating numbers as not having
-    length (and throwing TypeError then). Param assign_length_to_others lets
-    you change this behavior, in which case integers, doubles, floats, complex
-    values, and boolean values get the length of 1.
+    Raises:
+        Exception of the type provided by the "handle_by" parameter, LengthError
+        by default.
 
     >>> check_length(['string'], 1)
     >>> check_length('string', 6)
@@ -398,8 +414,7 @@ def check_length(item,
                              message=message,
                              operator=operator,
                              expected_length=expected_length,
-                             assign_length_to_others=assign_length_to_others,
-                             execution_mode=execution_mode)
+                             assign_length_to_others=assign_length_to_others)
 
     if assign_length_to_others:
         if isinstance(item, (int, float, complex, bool)):
@@ -412,9 +427,14 @@ def check_length(item,
 def check_instance(item, expected_type, handle_by=TypeError, message=None):
     """Check if item has the type of expected_type.
 
-    The param expected_type can be an iterable of possible types. If the
-    condition is true, the function returns nothing. Otherwise, it throws
-    TypeError or issues a warning, with an optional message.
+    Args:
+        item: the object whose type we want to validate.
+        expected_type (type, Iterable[type]): the expected type of the item
+        handle_by (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message
+
+    Raises:
+        Exception of the type provided by the "handle_by" parameter
 
     If you want to check if the item is None, you can do so in two ways:
     >>> my_none_object = None
@@ -479,13 +499,22 @@ def check_if_paths_exist(paths,
     """Check if paths exists, and if not either raise or return an exception
     or warning.
 
-    Parameters
-    ----------
-    paths: string or Iterable of strings
-    execution_mode: determines what happens if not all of the paths exist
-        'raise': exception will be raised
-        'return': exception instance will be returned, along with a list of
-                  the paths that do not exist
+    Args:
+        paths (str, Iterable[str]): path or paths to validate.
+        handle_by (type): type of exception or warning to be raised/returned
+        message (str): a text to use as the exception/warning message
+        execution_mode (str): defines what happens if not all the paths exist.
+            May take one of the following values:
+                - raise: exception will be raised
+                - return: function will return information about the errors
+
+    Returns:
+        A tuple containing:
+            - an instance of the type provided by the "handle_by" parameter
+            - a list of the non-existing paths
+
+    Raises:
+        Exception of the type provided by the "handle_by" parameter
 
     >>> check_if_paths_exist('Q:/Op/Oop/')
     Traceback (most recent call last):
