@@ -28,8 +28,7 @@ from checkit import (check_if, assert_if,
 
 
 def test_check_if_edge_cases():
-    with pytest.raises(TypeError,
-                       match="missing 1 required positional argument"):
+    with pytest.raises(TypeError, match="required positional argument"):
         check_if()
     with pytest.raises(ValueError, match='The condition does not return'):
         check_if('tomato soup is good')
@@ -80,8 +79,7 @@ def test_check_if_negative_warnings():
 
 
 def test_check_if_not_edge_cases():
-    with pytest.raises(TypeError,
-                       match="missing 1 required positional argument"):
+    with pytest.raises(TypeError, match="required positional argument"):
         check_if_not()
     with pytest.raises(ValueError, match='The condition does not return'):
         check_if_not('tomato soup is good')
@@ -131,12 +129,8 @@ def test_check_if_not_negative_warnings():
 
 def test_check_length_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
-        check_length()
-    with pytest.raises(TypeError, match='required positional argument'):
-        check_length(1)
-    with pytest.raises(TypeError, match='required positional argument'):
         check_length('tomato soup is good')
-    with pytest.raises(OperatorError, match='Unacceptable operator'):
+    with pytest.raises(OperatorError, match='Incorrect operator'):
         check_length(1, 1, operator=1)
     with pytest.raises(TypeError, match='BaseException type, not str'):
         pytest.raises('tomato soup', 'is good')
@@ -177,12 +171,6 @@ def test_check_length_negative_warnings():
 
 
 def test_check_instance_edge_cases():
-    with pytest.raises(TypeError, match='required positional argument'):
-        check_instance()
-    with pytest.raises(TypeError, match='required positional argument'):
-        check_instance(1)
-    with pytest.raises(TypeError, match='required positional argument'):
-        check_instance(True)
     with pytest.raises(TypeError, match='required positional argument'):
         check_instance('tomato soup is good')
 
@@ -278,8 +266,6 @@ def test_check_instance_negative_warnings():
 
 
 def test_catch_check_edge_cases():
-    with pytest.raises(TypeError, match='required positional argument'):
-        catch_check()
     with pytest.raises(TypeError, match='required positional argument'):
         catch_check(check=check_instance)
     with pytest.raises(TypeError, match='checkit function'):
@@ -385,13 +371,15 @@ def test_catch_check_instance():
 def test_catch_check_paths_with_return():
     existing_path = os.listdir('.')[0]
     with pytest.raises(ValueError, match='execution_mode="return"'):
-        my_check_not = catch_check(check_if_paths_exist,
-                                   paths=existing_path,
-                                   execution_mode='return')
+        catch_check(check_if_paths_exist,
+                    paths=existing_path,
+                    execution_mode='return')
     with pytest.raises(ValueError, match='execution_mode="return"'):
-        my_check_not = catch_check(check_if_paths_exist,
-                                   existing_path,
-                                   'return')
+        catch_check(check_if_paths_exist,
+                    existing_path,
+                    FileNotFoundError,
+                    'Path not found',
+                    'return')
 
 
 def test_catch_check_paths_one_path():
@@ -444,67 +432,45 @@ def test_catch_check_paths_many_paths():
 
 def test_compare_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
-        _compare()
-    with pytest.raises(TypeError, match='required positional argument'):
-        _compare(1)
-    with pytest.raises(TypeError, match='required positional argument'):
-        _compare(True)
-    with pytest.raises(TypeError, match='required positional argument'):
-        _compare('tomato soup is good')
-    with pytest.raises(TypeError, match='required positional argument'):
         _compare(1, 1)
-    with pytest.raises(TypeError, match='required positional argument'):
-        _compare(1, 'tomato soup is good')
-    with pytest.raises(TypeError, match='required positional argument'):
-        _compare(1 > 2)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _compare(item1=1, operator=gt, item_2=2)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _compare(item_1=1, Operator=gt, item_2=2)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _compare(item_1=1, operator=gt, item2=2)
-    with pytest.raises(OperatorError, match='Incorrect operator'):
-        _compare(2, 'greater', 3)
 
 
 def test_compare_positive():
     assert _compare(2, eq, 2)
+    assert _compare(1, ne, 2)
     assert _compare(2, lt, 3)
-    assert _compare(2, le, 2)
     assert _compare(2, le, 2)
     assert _compare(2, le, 3)
     assert _compare(3, gt, 2)
     assert _compare(2, ge, 2)
     assert _compare(3, ge, 2)
+    assert _compare('abc', is_, 'abc')
+    assert _compare('abc', is_not, 'xyz')
 
 
 def test_compare_negative():
     assert not _compare(2, eq, 2.01)
+    assert not _compare(2, ne, 2)
     assert not _compare(3, lt, 3)
     assert not _compare(3, lt, 2)
-    assert not _compare(2.11, le, 2.100001)
     assert not _compare(2.11, le, 2.100001)
     assert not _compare(3, gt, 3)
     assert not _compare(2.11, gt, 2.12)
     assert not _compare(2.11, ge, 2.12)
     assert not _compare(2.1, ge, 2.11)
+    assert not _compare('abc', is_, 'xyz')
+    assert not _compare('abc', is_not, 'abc')
 
 
 def test_check_comparison_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
-        check_comparison()
-    with pytest.raises(TypeError, match='required positional argument'):
-        check_comparison(1)
-    with pytest.raises(TypeError, match='required positional argument'):
-        check_comparison(True)
-    with pytest.raises(TypeError, match='required positional argument'):
-        check_comparison('tomato soup is good')
-    with pytest.raises(TypeError, match='required positional argument'):
         check_comparison(1, 1)
-    with pytest.raises(TypeError, match='required positional argument'):
-        check_comparison(1, 'tomato soup is good')
-    with pytest.raises(TypeError, match='required positional argument'):
-        check_comparison(1 > 2)
     with pytest.raises(TypeError, match='unexpected keyword'):
         check_comparison(item1=1, operator=gt, item_2=2)
     with pytest.raises(TypeError, match='unexpected keyword'):
@@ -516,21 +482,39 @@ def test_check_comparison_edge_cases():
 def test_check_comparison_positive():
     assert check_comparison(2, eq, 2) is None
     assert check_comparison(2, eq, 2, Warning) is None
+    assert check_comparison(2, ne, 3) is None
+    assert check_comparison(2, ne, 3, Warning) is None
     assert check_comparison(2, le, 2) is None
     assert check_comparison(2, le, 2, Warning) is None
     assert check_comparison(2, ge, 2) is None
     assert check_comparison(2, ge, 2, Warning) is None
-    assert check_comparison(3, gt, 2) is None
-    assert check_comparison(3, gt, 2, Warning) is None
     assert check_comparison(3, ge, 2) is None
     assert check_comparison(3, ge, 2, Warning) is None
+    assert check_comparison(3, gt, 2) is None
+    assert check_comparison(3, gt, 2, Warning) is None
     assert check_comparison('One text', lt, 'one text') is None
     assert check_comparison('One text', lt, 'one text', Warning) is None
     assert check_comparison('One text', lt, 'another text') is None
     assert check_comparison('One text', lt, 'another text', Warning) is None
+    assert check_comparison('abc', is_, 'abc') is None
+    assert check_comparison('abc', is_, 'abc', Warning) is None
+    assert check_comparison('abc', is_not, 'xyz') is None
+    assert check_comparison('abc', is_not, 'xyz', Warning) is None
 
 
 def test_check_comparison_negative():
+    with pytest.raises(ValueError):
+        check_comparison(3, eq, 2)
+    with warnings.catch_warnings(record=True) as w:
+        check_comparison(3, eq, 2, Warning, 'This is a testing warning')
+        assert 'This is a testing warning' in str(w[-1].message)
+
+    with pytest.raises(ValueError):
+        check_comparison(2, ne, 2)
+    with warnings.catch_warnings(record=True) as w:
+        check_comparison(2, ne, 2, Warning, 'This is a testing warning')
+        assert 'This is a testing warning' in str(w[-1].message)
+
     with pytest.raises(ValueError):
         check_comparison(2, lt, 2)
     with warnings.catch_warnings(record=True) as w:
@@ -541,12 +525,6 @@ def test_check_comparison_negative():
         check_comparison(2, gt, 2)
     with warnings.catch_warnings(record=True) as w:
         check_comparison(2, gt, 2, Warning, 'This is a testing warning')
-        assert 'This is a testing warning' in str(w[-1].message)
-
-    with pytest.raises(ValueError):
-        check_comparison(3, eq, 2)
-    with warnings.catch_warnings(record=True) as w:
-        check_comparison(3, eq, 2, Warning, 'This is a testing warning')
         assert 'This is a testing warning' in str(w[-1].message)
 
     with pytest.raises(ValueError):
@@ -565,6 +543,22 @@ def test_check_comparison_negative():
         check_comparison('one text', lt, 'another text')
     with warnings.catch_warnings(record=True) as w:
         check_comparison('one text', lt, 'another text',
+                         Warning,
+                         'This is a testing warning')
+        assert 'This is a testing warning' in str(w[-1].message)
+
+    with pytest.raises(ValueError):
+        check_comparison('abc', is_, 'xyz')
+    with warnings.catch_warnings(record=True) as w:
+        check_comparison('abc', is_, 'xyz',
+                         Warning,
+                         'This is a testing warning')
+        assert 'This is a testing warning' in str(w[-1].message)
+
+    with pytest.raises(ValueError):
+        check_comparison('abc', is_not, 'abc')
+    with warnings.catch_warnings(record=True) as w:
+        check_comparison('abc', is_not, 'abc',
                          Warning,
                          'This is a testing warning')
         assert 'This is a testing warning' in str(w[-1].message)
@@ -658,21 +652,21 @@ def test_check_all_ifs():
         (check_if, 2 > 1),
         (check_if, 'a' == 'a')
     )
-    assert all(value for key, value in multiple_check_1.items())
+    assert all(multiple_check_1.values())
 
     multiple_check_2 = check_all_ifs(
         (check_if, 2 > 1),
         (check_if_not, 'a' == 'a')
     )
     assert any(type(value) == AssertionError
-               for key, value in multiple_check_2.items())
+               for value in multiple_check_2.values())
 
     multiple_check_3 = check_all_ifs(
         (check_if, 2 > 1),
         (check_if_not, 'a' == 'a', ValueError)
     )
     assert any(type(value) == ValueError
-               for key, value in multiple_check_3.items())
+               for value in multiple_check_3.values())
 
 
 def test_check_all_ifs_warnings():
@@ -680,26 +674,14 @@ def test_check_all_ifs_warnings():
         (check_if, 2 > 1, Warning),
         (check_if, 'a' == 'a', Warning)
     )
-    assert all(value for key, value in multiple_check_1.items())
+    assert all(multiple_check_1.values())
 
     multiple_check_2 = check_all_ifs(
         (check_if, 2 > 1, Warning),
-        (check_if, 'a' == 'a')
-    )
-    assert all(value for key, value in multiple_check_2.items())
-
-    multiple_check_3 = check_all_ifs(
-        (check_if, 2 > 1),
-        (check_if, 'a' == 'a', Warning)
-    )
-    assert all(value for key, value in multiple_check_3.items())
-
-    multiple_check_4 = check_all_ifs(
-        (check_if, 2 < 1, Warning),
-        (check_if, 'a' == 'a')
+        (check_if_not, 'a' == 'a', Warning)
     )
     assert any(isinstance(value, Warning)
-               for key, value in multiple_check_4.items())
+               for value in multiple_check_2.values())
 
 
 def test_check_if_paths_exist_edge_cases():
@@ -817,11 +799,11 @@ def test_raise_edge_cases():
     with pytest.raises(
             TypeError,
             match='The error argument must be an exception or a warning'):
-        _raise(('TypeError'))
+        _raise(['TypeError'])
     with pytest.raises(
             TypeError,
             match='The error argument must be an exception or a warning'):
-        _raise([TypeError])
+        _raise(NotImplemented)
     with pytest.raises(TypeError, match='message must be string'):
         _raise(error=TypeError, message=20)
     with pytest.raises(TypeError, match='message must be string'):
@@ -850,8 +832,6 @@ def test_raise_warning():
 
 def test_check_argument_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
-        check_argument()
-    with pytest.raises(TypeError, match='required positional argument'):
         check_argument(Argument='x')
 
     msg = 'check_argument() requires at least one condition to be checked'
@@ -871,7 +851,6 @@ def test_check_argument_type():
         check_argument(x, 'x', expected_type=str)
         pass
     assert foo('one') is None
-    assert foo(('one')) is None
     with pytest.raises(ArgumentValueError):
         foo(4)
     with pytest.raises(ArgumentValueError):
@@ -1112,23 +1091,15 @@ def test_check_checkit_arguments_edge_cases():
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(handle_by=ValueError, Message=1)
 
-    with pytest.raises(TypeError,
-                       match='handle_by must be an exception') as msg_error:
+    with pytest.raises(TypeError, match='handle_by must be an exception'):
         _check_checkit_arguments(handle_by=20)
 
-    with pytest.raises(TypeError,
-                       match='handle_by must be an exception') as msg_error:
-        class NonExceptionClass:
-            pass
-        _check_checkit_arguments(handle_by=NonExceptionClass)
+    with pytest.raises(TypeError, match='handle_by must be an exception'):
+        _check_checkit_arguments(handle_by=NotImplemented)
 
 
 def test_check_checkit_arguments():
     assert _check_checkit_arguments(handle_by=LengthError) is None
-    with pytest.raises(NameError):
-        _check_checkit_arguments(handle_by=NonExistingError)
-    with pytest.raises(NameError):
-        _check_checkit_arguments(handle_by=NonExistingError())
     with pytest.raises(TypeError):
         _check_checkit_arguments(handle_by='NonExistingError')
 
@@ -1216,10 +1187,6 @@ def test_check_checkit_arguments():
 
 
 def test_make_message_edge_cases():
-    with pytest.raises(TypeError, match="required positional argument"):
-        _make_message()
-    with pytest.raises(TypeError, match="required positional argument"):
-        _make_message(None)
     with pytest.raises(TypeError, match="required positional argument"):
         _make_message('Provided')
     with pytest.raises(TypeError, match='unexpected keyword'):
