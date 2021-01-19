@@ -627,26 +627,6 @@ def check_comparison(item_1, operator, item_2,
     >>> check_comparison('one text', lt, 'another text',
     ...                  handle_by=Warning,
     ...                  message='Not less!')
-
-    Style suggestion:
-        Use coding style you prefer, but in our opinion you can increase
-        the readability of your code using the following style (in case you
-        need to split the function call into more lines, which is when you
-        need to change the last two parameters):
-        >>> check_comparison(
-        ...    'one text', lt, 'another text',
-        ...    handle_by=ComparisonError,
-        ...    message='Comparison condition violated'
-        ...    )
-        Traceback (most recent call last):
-            ...
-        checkit.ComparisonError: Comparison condition violated
-
-        The idea is to keep the first three arguments in one line, so that
-        the comparison can be read like text:
-        2, ge, 0 - two is greater than or equal to zero,
-        this_text, equal, example_text - this_text is equal to example_text,
-        etc.
     """
     _check_checkit_arguments(handle_by=handle_by,
                              message=message,
@@ -704,12 +684,6 @@ def check_all_ifs(*args):
     ...    (check_if_not, 'a' == 'a', Warning, 'It might be wrong!')
     ...    )
     {'1: check_if': True, '2: check_if_not': Warning('It might be wrong!')}
-
-    Style suggestion:
-        Use coding style you prefer, but in our opinion you can increase
-        the readability of your code using the style we used above, that
-        is, presenting all the independent conditions in a separate line,
-        unless the call is short if presented in one line.
     """
     check_length(args, 0,
                  operator=gt,
@@ -992,29 +966,6 @@ def catch_check(check_function, *args, **kwargs):
         return e
 
 
-def _read_class(message):
-    """Read class from string of the form "<class 'Warning'>".
-
-    >>> _read_class("<class 'Warning'>")
-    'Warning'
-    >>> _read_class("<class 'UserWarning'>")
-    'UserWarning'
-    >>> _read_class("<class 'WhateverClass'>")
-    'WhateverClass'
-    >>> _read_class("class 'WhateverClass'>")
-    Traceback (most recent call last):
-       ....
-    ValueError: Could not parse the class's name
-    """
-    try:
-        pattern = re.compile(r"<class '([a-zA-Z0-9_]+)'>")
-        result = pattern.search(str(message))
-        return result[1]
-    except:
-        error_message = 'Could not parse the class\'s name'
-        raise ValueError(error_message)
-
-
 def _compare(item_1, operator, item_2):
     """Compare item_1 and item_2 using an operator.
 
@@ -1042,47 +993,6 @@ def _compare(item_1, operator, item_2):
     True
     """
     return operator(item_1, item_2)
-
-
-def _clean_message(message):
-    """Clean a message returned along with an error.
-
-    In particular, it removes unnecessary quotation marks and parentheses.
-
-    >>> _clean_message('"Incorrect argument")')
-    'Incorrect argument'
-    >>> _clean_message('"This is testing message (because why not).")')
-    'This is testing message (because why not).'
-    """
-    if isinstance(message, str):
-        message = (message)[:-1].replace('"', '')
-    elif isinstance(message, (tuple, list)):
-        if not all(isinstance(item, str) for item in message):
-            raise TypeError(r'message must be string or tuple/list of strings')
-        message = '('.join(message)[:-1].replace('"', '')
-    else:
-        raise TypeError(r'message must be string or tuple/list of strings')
-    if message == '':
-        message = None
-    return message
-
-
-def _parse_error_and_message_from(error_and_message):
-    """Get error and message presented as one string.
-
-    >>> error_and_message = ('TypeError("Incorrect argument")')
-    >>> _parse_error_and_message_from(error_and_message)
-    ('TypeError', 'Incorrect argument')
-    >>> error_and_message = 'ValueError'
-    >>> _parse_error_and_message_from(error_and_message)
-    ('ValueError', None)
-    """
-    if not error_and_message:
-        return None
-    splitted_error_and_message = error_and_message.split('(')
-    error, *message = splitted_error_and_message
-    message = _clean_message(message)
-    return error, message
 
 
 def _raise(error, message=None):
@@ -1148,11 +1058,8 @@ def _check_checkit_arguments(handle_by=None,
     """Validate the most common arguments used in checkit functions.
 
     This is a generic function working for most checkit functions, customized
-    by providing selected arguments from a given function. The check does not
-    use checkit functions but standard if-conditions; this is to avoid infinite
-    recursion (e.g., `check_if()` should not check `check_if()`, but also to
-    ensure that the checks are done using a standard-library-based approach.
-    Other arguments, not available here, need to be checked using other ways.
+    by providing selected arguments from a given function. Other arguments,
+    not available here, need to be checked using other ways.
 
     >>> _check_checkit_arguments(handle_by=LengthError)
     >>> _check_checkit_arguments(handle_by=ValueError)

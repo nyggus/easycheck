@@ -18,12 +18,9 @@ from checkit import (check_if, assert_if,
                      OperatorError,
                      get_possible_operators,
                      _compare,
-                     _parse_error_and_message_from,
-                     _clean_message,
                      _raise,
                      _check_checkit_arguments,
                      _make_message,
-                     _read_class,
                      )
 
 
@@ -566,66 +563,6 @@ def test_check_comparison_negative():
     with pytest.raises(ComparisonError):
         check_comparison('one text', lt, 'another text',
                          handle_by=ComparisonError)
-
-
-def test_clean_message_edge_cases():
-    with pytest.raises(TypeError, match='required positional argument'):
-        _clean_message()
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        _clean_message(Message='tomato soup is good')
-    with pytest.raises(TypeError, match='string or tuple/list'):
-        _clean_message(1)
-    with pytest.raises(TypeError, match='string or tuple/list'):
-        _clean_message((1, 1))
-    with pytest.raises(TypeError, match='string or tuple/list'):
-        _clean_message(('tomato soup is good', 1))
-    with pytest.raises(TypeError, match='string or tuple/list'):
-        _clean_message([1, 1])
-    with pytest.raises(TypeError, match='string or tuple/list'):
-        _clean_message(['tomato soup is good', 1])
-    with pytest.raises(TypeError, match='string or tuple/list'):
-        _clean_message({'1': 'tomato soup', '2': 'is good'})
-    with pytest.raises(TypeError, match='string or tuple/list'):
-        _clean_message((1, 1))
-
-
-def test_clean_message():
-    assert _clean_message('"This is wrong")') == 'This is wrong'
-    assert _clean_message(
-        '"Incorrect argument (change it).")'
-    ) == 'Incorrect argument (change it).'
-    assert _clean_message(r'D://') == r'D:/'
-
-
-def test_parse_error_and_message_from_edge_cases():
-    with pytest.raises(TypeError, match='required positional argument'):
-        _parse_error_and_message_from()
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        _parse_error_and_message_from(message='tomato soup is good')
-    with pytest.raises(AttributeError, match="no attribute 'split'"):
-        _parse_error_and_message_from(True)
-    with pytest.raises(AttributeError, match="no attribute 'split'"):
-        _parse_error_and_message_from(25)
-    with pytest.raises(AttributeError, match="no attribute 'split'"):
-        _parse_error_and_message_from([1, 1])
-    with pytest.raises(AttributeError, match="no attribute 'split'"):
-        _parse_error_and_message_from((1, 1))
-    with pytest.raises(AttributeError, match="no attribute 'split'"):
-        _parse_error_and_message_from(['TypeError'])
-
-
-def test_parse_error_and_message_from():
-    error_and_message = ('TypeError("Incorrect argument")')
-    error, message = _parse_error_and_message_from(error_and_message)
-    assert error == 'TypeError'
-    assert message == 'Incorrect argument'
-
-    error, message = _parse_error_and_message_from('ValueError')
-    assert error == 'ValueError'
-    assert message is None
-
-    this_item_is_None = None
-    assert _parse_error_and_message_from(this_item_is_None) is None
 
 
 def test_check_all_ifs_edge_cases():
@@ -1233,23 +1170,3 @@ def test_assert_functions():
     with pytest.raises(FileNotFoundError):
         assert_paths('Q:/E/') and check_if_paths_exist('Q:/E/') is None
 
-
-def test_read_class_positive():
-    assert _read_class("<class 'Warning'>") == 'Warning'
-    assert _read_class("<class 'UserWarning'>") == 'UserWarning'
-    assert _read_class("<class 'MyClass'>") == 'MyClass'
-
-
-def test_read_class_negative():
-    with pytest.raises(ValueError, match='Could not parse'):
-        _read_class("class 'WhateverClass'>")
-    with pytest.raises(ValueError, match='Could not parse'):
-        _read_class("<class WhateverClass>")
-    with pytest.raises(ValueError, match='Could not parse'):
-        _read_class("<Warning>")
-    with pytest.raises(ValueError, match='Could not parse'):
-        _read_class("class 'Warning'")
-    with pytest.raises(ValueError, match='Could not parse'):
-        _read_class(20)
-    with pytest.raises(ValueError, match='Could not parse'):
-        _read_class(None)
