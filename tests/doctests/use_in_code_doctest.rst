@@ -1,13 +1,13 @@
 Use checkit in code
 -------------------
 
-The basic aim of :code:`checkit` is to provide you with quick-to-use, simple and readable assertion-like functions to make sure that particular conditions you are interested in are met. They are assertion-like because what you do is indeed similar to what the :code:`assert` expression does, since the functions
+The basic aim of :code:`checkit` is to provide you with easy-to-use, simple and readable assertion-like functions to make sure that particular conditions you wish to check are met. They are similar to assertions because the functionality is indeed similar to the :code:`assert` expression, since these functions
 
 * check a condition
-* do nothing when it is met, but
-* raise an exception (or, alternatively, issue a warning) when it is not
+* do nothing when the condition is met,
+* raise an exception (or, alternatively, issue a warning) when the condition is not met.
 
-Of course, :code:`checkit` is to help you when Python does not handle a particular situation. For example, it does so when you're trying to divide a number by zero, so you need not use :code:`checkit` then. But there is a plethora of various situations which you want to handle.
+Of course, :code:`checkit` is meant to help you when Python does not handle a particular situation. For example, Python handles division-by-zero errors, so you need not use :code:`checkit` for this. However, there are many other situations which you may want to handle.
 
 Here are several examples of the simplest uses of :code:`checkit`:
 
@@ -39,7 +39,7 @@ Here are several examples of the simplest uses of :code:`checkit`:
 		...
 	TypeError: Missing name
 
-If something is wrong, the chosen exception is raised, or alternatively, the chosen warning is issued. If you need to catch these exceptions and handle them accordingly, you can certainly do so (note that two different types of errors can be raised by :code:`get_family_name()`). You can also catch warnings.
+If a condition fails, the chosen exception is raised; or alternatively, the chosen warning is issued. If you need to catch these exceptions and handle them accordingly, you can certainly do so (note that two different types of errors can be raised by :code:`get_family_name()`). You can also catch warnings.
         
 Without :code:`checkit`, this function might have the following form:
     

@@ -1,7 +1,7 @@
 Use in testing
 --------------
 
-Although we stress that :code:`checkit` functions are dedicated to be used in code (unlike classical assertions, which should not be used in code outside of testing), it does not mean that they cannot be used in testing. In fact, they can be quite helpful, particularly in doctests, but also in pytests. The :code:`checkit` package offers several aliases of its main :code:`checkit` functions, aliases that make the functions resemble the :code:`assert` expression. These aliases are
+Although we stress that :code:`checkit` functions are designed to be used within code (unlike classical assertions, which should not be used in code outside of testing), it does not mean that they cannot be used in testing. In fact, they can be quite helpful, particularly in doctests, and also in pytests. The :code:`checkit` package offers several aliases of its main :code:`checkit` functions, which make the functions resemble the :code:`assert` expression. These aliases are
 
 * :code:`assert_if` (for :code:`check_if`)
 * :code:`assert_if_not` (for :code:`check_if_not`)
@@ -9,7 +9,7 @@ Although we stress that :code:`checkit` functions are dedicated to be used in co
 * :code:`assert_instance` (for :code:`check_instance`)
 * :code:`assert_paths` (for :code:`check_if_paths_exist`)
 
-As aliases, they use the very same syntax and arguments as their :code:`checkit` counterparts. See:
+As aliases, they use the same syntax and arguments as their :code:`checkit` counterparts. See:
 
 .. code-block:: python
 
@@ -26,7 +26,7 @@ As aliases, they use the very same syntax and arguments as their :code:`checkit`
     ...    """
     ...    return [string] * k
 
-When you run doctests, everything will go fine, as in the below simulation of the corresponding doctests from the above docstring:
+When you run doctests, all tests will run without error, as in the below simulation of the corresponding doctests from the above docstring:
 
 .. code-block:: python
 
@@ -54,4 +54,4 @@ Do remember, however, *not* to use warnings in testing! Consider the following:
     >>> assert_if(2 < 1, Warning)
     >>> assert_if(2 < 1, UserWarning)
     
-As you see, the two last assertions will not raise exceptions, something that would dramatically break down your testing. Of course, the last two calls would issue warnings, but warnings do *not* make the test does not pass! So, do remember this basic rule: Never use warnings in testing when you want to catch whether something broke or not.
+As you can see, the two last assertions issue warnings, but will not raise exceptions – this could dramatically affect your testing. However, warnings *do not* make the test fail! So, remember this basic rule: Never use warnings in testing when you want to catch critical errors.
