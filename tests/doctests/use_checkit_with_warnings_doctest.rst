@@ -1,7 +1,7 @@
 Use checkit with warnings
 -------------------------
 
-One of the aims of the :code:`checkit` package is to enable you to issue a warning (instead of raising an exception) when a condition is violated. You can use the standard-library :code:`warnings` module for this, but :code:`checkit` lets you issue warnings using the same :code:`checkit` syntax as you would use to raise exceptions. In order to issue a warning, you need to provide a :code:`Warning` class, or its subclass, to the :code:`handle_by` argument, like here:
+One of the aims of the :code:`checkit` package is to enable you to issue a warning (instead of raising an exception) when a condition is violated. You can use the standard-library :code:`warnings` module for this, but :code:`checkit` lets you issue warnings using the same :code:`checkit` syntax as you would use to raise exceptions. In order to issue a warning, you need to provide a :code:`Warning` class, or its subclass, to the :code:`handle_with` argument, like here:
 
 .. code-block:: python
 
@@ -35,12 +35,12 @@ You can use warnings in most :code:`checkit` functions, and you can catch them u
     >>> catch_check(check_length,
     ...    [1, 2, 3],
     ...    expected_length=5,
-    ...    handle_by=Warning,
+    ...    handle_with=Warning,
     ...    message='The list should be 5-element long')
     Warning('The list should be 5-element long')
     >>> catch_check(check_instance,
     ...    'some string but for sure not a float',
     ...    expected_type=float,
-    ...    handle_by=Warning,
+    ...    handle_with=Warning,
     ...    message='This does not seem to be a float!')
     Warning('This does not seem to be a float!')

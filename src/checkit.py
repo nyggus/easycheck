@@ -1,222 +1,15 @@
 """A module for simple checks to be used within code and testing.
 
-The checkit module offers simple functions to check conditions in which
-if a condition is violated, you want to either raise an exception or issue
-a warning. Unlike the assertion expression, you can use checkit functions
-within code. The idea behind checkit functions is as follows: If the
-condition is met, nothing happens (the function returns None); if the condition
-is violated, the function either raises an exception or issues a warning.
-You can either choose default exceptions and messages (or no message) or
-customize them.
+The checkit module offers simple functions to check conditions and either raise
+an exception or issue a warning if the condition is violated; otherwise,
+nothing happens (the function returns None). You can either choose default
+exceptions and messages (or no message) or customize them. Unlike the assertion
+expression, you can use checkit functions within code.
 
 The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
 assert_instance(), assert_length(), and assert_path()).
-
-The checkit package offers simplicity and code readability. Instead of
-raising exceptions or issuing warnings in if-blocks, you can use dedicated
-functions that are not only easy to use, but also easy for the user to
-understand. These functions are simple and easy-to-follow wrappers to check
-conditions and raise the appropriate exceptions (or issue appropriate
-warnings). Testing checkit functions aim to add readability to both testing
-code and testing output, the latter thanks to customized exceptions and
-messages.
-
-The main function is check_if(), with its negative counterpart
-check_if_not(). The other functions are actually wrappers built around
-check_if(), customized to particular situations and conditions.
-
-check_if() checks a condition provided as its argument; if the condition is
-not met, the function raises an exception (which can be either one of
-the Exception classes, built-in ones, ones from the checkit module, or
-user-created) or issues a warning (which must derive from the Warning class);
-you can (optionally) send a message along with the exception, and you should
-send a message with a warning. Note that when you use the built-in assert
-expression, you're limited to AssertionError, but when using checkit assert
-functions, you can use any exception you want.
-
-Consider the following example:
->>> if 1 > 0:
-...    raise ValueError('One is bigger than zero')
-Traceback (most recent call last):
-    ...
-ValueError: One is bigger than zero
-
-The idea is to simplify this call by using
->>> check_if(0 > 1, handle_by=ValueError, message='One is bigger than zero')
-Traceback (most recent call last):
-    ...
-ValueError: One is bigger than zero
-
-or even simpler
->>> check_if(0 > 1, ValueError, 'One is bigger than zero')
-Traceback (most recent call last):
-    ...
-ValueError: One is bigger than zero
-
-Of course, it's not only brevity that we aim for: The package's main purpose is
-code readability. As always, whether this approach results in more readable
-code is a subjective matter, but you will see many examples that, in our
-opinion, make the checkit approach more readable than the equivalent
-if-blocks.
-
-If you are fine with AssertionError (actually, the only built-in exception
-class for regular asserts in Python), you can use this simple code:
->>> check_if(0 > 1)
-Traceback (most recent call last):
-    ...
-AssertionError
-
-This may be the most efficient way for debugging using simple assertions.
-
-In case you want to issue a warning, do the following:
->>> check_if(0 > 1, handle_by=Warning, message='0 is too small')
-
-or simpler
->>> check_if(0 > 1, Warning, '0 is too small')
-
-You can use a check_if_not() wrapper for negative conditions:
->>> check_if_not(2 > 1, ValueError, 'The condition is true')
-Traceback (most recent call last):
-    ...
-ValueError: The condition is true
-
-Other checkit functions use check_if() to check a particular condition, like
-length:
->>> my_list = [1, 12, 1]
->>> check_length(my_list, 3)
->>> check_length(my_list, 10, operator=le)
->>> check_length('the SimpleAssert module', 23)
-
-You can override a Pythonic approach to treating numbers (integers, doubles,
-floats, complex values) and boolean values as not having length:
->>> check_length(True, 1, assign_length_to_others=True)
->>> check_length(1, 1, assign_length_to_others=True)
->>> check_length(1, 2, assign_length_to_others=True)
-Traceback (most recent call last):
-    ...
-checkit.LengthError
-
-Note that in the above example, we used the parameter operator. You can use
-this in several functions, and it can take up to eight operators from the
-operator module (use get_possible_operators() too se the list, which
-includes eq, le, lt, gt, ge, ne, is_, is_not). Since these operators are
-functions, you provide them as function names, as we did above.
-
-Now we want to check the instance of the following string:
->>> my_string = '_'.join(str(item) for item in [1, 2, 3])
-
-Instead of the following if-block to check its instance:
->>> if not isinstance(my_string, str):
-...    raise TypeError('A string is needed')
-
-you can do the following:
->>> check_instance(my_string, str, message='This is not a string')
-
-If the condition is not met, it will raise TypeError:
->>> check_instance('string', list, message='List is required here')
-Traceback (most recent call last):
-    ...
-TypeError: List is required here
-
-You can also assert that a path exists, using
->>> check_if_paths_exist('A:/my_file.txt')
-Traceback (most recent call last):
-    ...
-FileNotFoundError
-
-or that many paths exist:
->>> check_if_paths_exist(('A:/my_file.txt', 'A:/my_other_file.csv'))
-Traceback (most recent call last):
-    ...
-FileNotFoundError
-
-(The function works with both directories and files, but in both cases raises
-FileNotFoundError upon exception; you can change this default behavior using
-the handle_by parameter.)
-
-The module also offers two-item comparisons, also using the operator parameter:
->>> a, b, c = 2, 4, 2
->>> check_comparison(a, lt, b)
->>> check_comparison(b, gt, a)
->>> check_comparison(a, eq, c)
->>> check_comparison('a', eq, 'a')
->>> check_comparison('a', ne, 'b')
->>> check_comparison(['1', '2'], eq, ['1', '2'])
->>> check_comparison(['1', '2'], ne, ['1', 2])
-
-Use in testing:
-The module offers assert-like functions, which are simply aliases of the
-corresponding checkit functions: assert_if(), assert_if_not(),
-assert_instance(), assert_length() and assert_paths(). You can use them
-in doctesting and pytesting, and their main advantage over the classical
-assertion expression is that they can use any exception you want, which makes
-testing output more informative. Also, due to the way they are written, you can
-design customized testing functions for particular situations. For instance,
-instead of
->>> string = 'Shout Bamalama'
->>> assert isinstance(string, str)
->>> assert string != 'Silence prefered'
->>> assert len(string) > 10
-
-you can do the following:
->>> assert_instance(string, str)
->>> check_if_not(string == 'Silence prefered')
->>> assert_length(string, 10, operator=gt)
-
-Issuing warnings:
-In order to issue a warning instead of raising an exception, simply choose a
-warning class (which must derive from the Warning class). Since when issuing a
-warning you must provide a message, it's wise to define a message to use;
-otherwise, a default message 'Warning' will be output, which is of little use
-as it provides no further information. Consider the examples below:
->>> my_list = [1, 3, 3]
->>> with warnings.catch_warnings(record=True) as w:
-...    check_length(my_list,
-...                 2,
-...                 handle_by=Warning,
-...                 message='The list is too short')
-...    print(w[-1].message)
-The list is too short
->>> with warnings.catch_warnings(record=True) as w:
-...    check_if(sum(my_list) > 10, Warning, 'Too small values of the list')
-...    print(w[-1].message)
-Too small values of the list
-
-Comments:
-We thought of adding some more functions, like
-check_if_equal(item_1, item_2, message=None), but we think that
-check_if_equal(item_1, item_2) is less readable than
-check_if(item_1 == item_2) or check_if(item_1 is item_2) (depending on what
-is being checked). For the same reason, we did not add functions
-check_if_unequal(), check_if_greater_than() and the like. In our opinion,
-the generic function check_if() is enough to provide usability and
-readability.
-
-The list of functions in the module is open, and we are open to suggestions,
-but any new function must meet all of the following conditions:
-* It must be readable, in terms of both its code and using it in code, and it
-  must be more readable than any other function from the module (see the above
-  comparison of check_if(item_1 == item_2) and
-  check_if_equal(item_1, item_2)) being used to check the same condition.
-* Its name must clearly convey what is being checked; for checks, the name
-  should follow the check_ convention.
-* It uses a new Exception class only if this is justified.
-* It returns nothing when the checked condition is passed, and otherwise either
-  raises an exception (so it mimics how assertions work, but offers the
-  possibility to raise other exception types than AssertionError) or issues
-  a warning (but functions with other functionalities are also possible, like
-  catch_check()).
-* It covers all possible situations that the check can meet (at least all those
-  that make logical sense).
-* Atypical situations are handled in a reasonable way; for instance, if the
-  function does something in an atypical way for Python (such as how the
-  check_length() function handles the length of numbers), it is hidden in 
-  non-default behavior.
-* It has a well-written docstring that includes doctests.
-* Its behavior is fully covered by tests (both doctests and pytests).
 """
-
 import re
 import os
 import warnings
@@ -256,20 +49,21 @@ class ArgumentValueError(Exception):
     pass
 
 
-def check_if(condition, handle_by=AssertionError, message=None):
+def check_if(condition, handle_with=AssertionError, message=None):
     """Check if a condition is true.
 
     Args:
         condition (bool): condition to check.
-        handle_by (type): the type of exception or warning to be raised
+        handle_with (type): the type of exception to be raised or warning to
+            be issued
         message (str): a text to use as the exception/warning message
 
     Returns:
         None, if check succeeded.
 
     Raises:
-        Exception of the type provided by the handle_by parameter,
-        AssertionError by default.
+        Exception of the type provided by the handle_with parameter,
+        AssertionError by default (unless handle_with is a warning).
 
     >>> check_if(2 > 1)
     >>> check_if(2 < 1)
@@ -277,13 +71,13 @@ def check_if(condition, handle_by=AssertionError, message=None):
         ...
     AssertionError
     >>> check_if(2 < 1,
-    ...    handle_by=ValueError,
+    ...    handle_with=ValueError,
     ...    message='2 is not smaller than 1')
     Traceback (most recent call last):
         ...
     ValueError: 2 is not smaller than 1
 
-    with its shorted version of
+    with its shorter version of
     >>> check_if(2 < 1, ValueError, '2 is not smaller than 1')
     Traceback (most recent call last):
         ...
@@ -306,33 +100,33 @@ def check_if(condition, handle_by=AssertionError, message=None):
     >>> check_if((a < 50 and b > 100) or isinstance(c, str))
 
     To issue a warning, use the Warning class or its subclass:
-    >>> check_if(2 < 1, handle_by=Warning, message='2 is not smaller than 1')
+    >>> check_if(2 < 1, handle_with=Warning, message='2 is not smaller than 1')
 
     or shorter
     >>> check_if(2 < 1, Warning, '2 is not smaller than 1')
 
     """
-    _check_checkit_arguments(handle_by=handle_by,
+    _check_checkit_arguments(handle_with=handle_with,
                              message=message,
                              condition=condition)
     if not condition:
-        _raise(handle_by, message)
+        _raise(handle_with, message)
 
 
-def check_if_not(condition, handle_by=AssertionError, message=None):
+def check_if_not(condition, handle_with=AssertionError, message=None):
     """Check if a condition is not true.
 
     Args:
         condition (bool): condition to check.
-        handle_by (type): the type of exception or warning to be raised
+        handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message
 
     Returns:
         None, if check succeeded.
 
     Raises:
-        Exception of the type provided by the handle_by parameter,
-        AssertionError by default.
+        Exception of the type provided by the handle_with parameter,
+        AssertionError by default (unless handle_with is a warning).
 
     You would normally use these functions in situations like these: This is
     engine speed in the object engine_speed:
@@ -347,8 +141,9 @@ def check_if_not(condition, handle_by=AssertionError, message=None):
     >>> check_if(engine_speed <= 6000, ValueError, 'Danger!')
 
     and both are fine. You simply have two functions to choose from in order to
-    make the code as readable as you want. It's all about what kind of language
-    you want to use in this particular situation.
+    make the code as readable as you want. Sometimes the negative version
+    sounds more natural, and so it's all about what kind of language you want
+    to use in this particular situation.
 
     Consider the examples below:
     >>> check_if_not(2 == 1)
@@ -371,38 +166,38 @@ def check_if_not(condition, handle_by=AssertionError, message=None):
     To issue a warning, use the Warning class or one of its subclasses:
     >>> check_if_not(2 > 1, Warning, '2 is not bigger than 1')
     """
-    _check_checkit_arguments(handle_by=handle_by,
+    _check_checkit_arguments(handle_with=handle_with,
                              message=message,
                              condition=condition)
 
-    check_if(not condition, handle_by=handle_by, message=message)
+    check_if(not condition, handle_with=handle_with, message=message)
 
 
 def check_length(item,
                  expected_length,
-                 handle_by=LengthError,
+                 handle_with=LengthError,
                  message=None,
                  operator=eq,
                  assign_length_to_others=False):
     """Compare item's length with expected_length, using operator.
 
     Args:
-        item: the object whose type we want to validate.
+        item: the object whose type we want to validate
         expected_length (int): the expected type of the item
-        handle_by (type): the type of exception or warning to be raised
+        handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message
         operator: one of the functions returned by get_possible_operators()
         assign_length_to_others (bool): treat all numeric types as having the
-            length of 1. If false, any attempt to validate a numeric type
+            length of 1. If False, any attempt to validate a numeric type
             will raise an exception/warning, as numeric types don't implement
-            __len__().
+            __len__()
 
     Returns:
         None, if check succeeded.
 
     Raises:
-        Exception of the type provided by the handle_by parameter, LengthError
-        by default.
+        Exception of the type provided by the handle_with parameter, LengthError
+        by default (unless handle_with is a warning).
 
     >>> check_length(['string'], 1)
     >>> check_length('string', 6)
@@ -418,7 +213,7 @@ def check_length(item,
     To issue a warning, use the Warning class or its subclass:
     >>> check_length('string', 6, Warning)
     """
-    _check_checkit_arguments(handle_by=handle_by,
+    _check_checkit_arguments(handle_with=handle_with,
                              message=message,
                              operator=operator,
                              expected_length=expected_length,
@@ -428,29 +223,29 @@ def check_length(item,
         if isinstance(item, (int, float, complex, bool)):
             item = [item]
 
-    condition_to_check = _compare(len(item), operator, expected_length)
-    check_if(condition_to_check, handle_by=handle_by, message=message)
+    condition_to_check = operator(len(item), expected_length)
+    check_if(condition_to_check, handle_with=handle_with, message=message)
 
 
-def check_instance(item, expected_type, handle_by=TypeError, message=None):
+def check_instance(item, expected_type, handle_with=TypeError, message=None):
     """Check if item has the type of expected_type.
 
     Args:
-        item: the object whose type we want to validate.
+        item: the object whose type we want to validate
         expected_type (type, Iterable[type]): the expected type of the item
-        handle_by (type): the type of exception or warning to be raised
+        handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message
 
     Returns:
         None, if check succeeded.
 
     Raises:
-        Exception of the type provided by the handle_by parameter, TypeError
+        Exception of the type provided by the handle_with parameter, TypeError
         by default.
 
     If you want to check if the item is None, you can do so in two ways:
     >>> my_none_object = None
-    >>> check_if(my_none_object is None, handle_by=TypeError)
+    >>> check_if(my_none_object is None, handle_with=TypeError)
 
     or
     >>> check_instance(my_none_object, None)
@@ -486,12 +281,12 @@ def check_instance(item, expected_type, handle_by=TypeError, message=None):
     To issue a warning, do the following:
     >>> check_instance('a', (str, None), Warning, 'Undesired instance')
     """
-    _check_checkit_arguments(handle_by=handle_by,
+    _check_checkit_arguments(handle_with=handle_with,
                              message=message,
                              expected_type=expected_type)
 
     if expected_type is None:
-        check_if(item is None, handle_by=handle_by, message=message)
+        check_if(item is None, handle_with=handle_with, message=message)
         return None
 
     if isinstance(expected_type, Iterable):
@@ -500,36 +295,37 @@ def check_instance(item, expected_type, handle_by=TypeError, message=None):
         expected_type = tuple(t for t in expected_type if t is not None)
 
     check_if(isinstance(item, expected_type),
-             handle_by=handle_by,
+             handle_with=handle_with,
              message=message)
 
 
 def check_if_paths_exist(paths,
-                         handle_by=FileNotFoundError,
+                         handle_with=FileNotFoundError,
                          message=None,
                          execution_mode='raise'):
-    """Check if paths exists.
+    """Check if a path or paths exist.
     
-    If it does not, either raise or return an exception or issue a warning.
+    If it does not, either raise (or return) an exception or issue (or return)
+    a warning.
 
     Args:
-        paths (str, Iterable[str]): path or paths to validate.
-        handle_by (type): type of exception or warning to be raised/returned
+        paths (str, Iterable[str]): path or paths to validate
+        handle_with (type): type of exception or warning to be raised/returned
         message (str): a text to use as the exception/warning message
-        execution_mode (str): defines what happens if not all the paths exist.
+        execution_mode (str): defines what happens if not all the paths exist
             May take one of the following values:
-                - raise: exception/warning will be raised
-                - return: function will return information about the errors
+                - 'raise': exception/warning will be raised
+                - 'return': function will return information about the errors
 
     Returns:
         None, if execution_mode is 'raise' and check succeeded
         A tuple, if execution_mode is 'return'. The tuple has two elements:
-            - an instance of the type provided by the handle_by parameter
+            - an instance of the type provided by the handle_with parameter
             - a list of the non-existing paths
 
     Raises:
-        Exception of the type provided by the handle_by parameter,
-        FileNotFoundError by default.
+        Exception of the type provided by the handle_with parameter,
+        FileNotFoundError by default (unless handle_with is a warning).
 
     >>> check_if_paths_exist('Q:/Op/Oop/')
     Traceback (most recent call last):
@@ -546,18 +342,18 @@ def check_if_paths_exist(paths,
     (None, [])
 
     To issue a warning, do the following:
-    >>> check_if_paths_exist('Q:/Op/Oop/', handle_by=Warning)
+    >>> check_if_paths_exist('Q:/Op/Oop/', handle_with=Warning)
     >>> check_if_paths_exist('Q:/Op/Oop/',
     ...    execution_mode='return',
-    ...    handle_by=Warning)
+    ...    handle_with=Warning)
     (Warning(), ['Q:/Op/Oop/'])
     >>> check_if_paths_exist('Q:/Op/Oop/',
     ...    execution_mode='return',
-    ...    handle_by=Warning,
+    ...    handle_with=Warning,
     ...    message='Attempt to use a non-existing path')
     (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop/'])
     """
-    _check_checkit_arguments(handle_by=handle_by,
+    _check_checkit_arguments(handle_with=handle_with,
                              message=message,
                              execution_mode=execution_mode)
 
@@ -573,12 +369,12 @@ def check_if_paths_exist(paths,
 
         if non_existing_paths:
             if execution_mode == 'raise':
-                _raise(handle_by, message)
+                _raise(handle_with, message)
             elif execution_mode == 'return':
                 if message:
-                    error = handle_by(str(message))
+                    error = handle_with(str(message))
                 else:
-                    error = handle_by()
+                    error = handle_with()
 
         if execution_mode == 'return':
             return error, non_existing_paths
@@ -587,7 +383,7 @@ def check_if_paths_exist(paths,
 
 
 def check_comparison(item_1, operator, item_2,
-                     handle_by=ValueError,
+                     handle_with=ValueError,
                      message=None):
     """Check if a comparison of two items is true.
 
@@ -595,15 +391,15 @@ def check_comparison(item_1, operator, item_2,
         item_1: the first item to compare
         operator: one of the functions returned by get_possible_operators()
         item_2: the second item to compare
-        handle_by (type): the type of exception or warning to be raised
+        handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message
 
     Returns:
         None, if check succeeded.
 
     Raises:
-        Exception of the type provided by the handle_by parameter, ValueError
-        by default.
+        Exception of the type provided by the handle_with parameter, ValueError
+        by default (unless handle_with is a warning).
 
     >>> check_comparison(2, lt, 2)
     Traceback (most recent call last):
@@ -620,7 +416,7 @@ def check_comparison(item_1, operator, item_2,
 
     You can use a dedicated ComparisonError class (defined in this module):
     >>> check_comparison('one text', lt, 'another text',
-    ...                  handle_by=ComparisonError,
+    ...                  handle_with=ComparisonError,
     ...                  message='Not less!')
     Traceback (most recent call last):
         ...
@@ -628,15 +424,15 @@ def check_comparison(item_1, operator, item_2,
 
     To issue a warning, do the following:
     >>> check_comparison('one text', lt, 'another text',
-    ...                  handle_by=Warning,
+    ...                  handle_with=Warning,
     ...                  message='Not less!')
     """
-    _check_checkit_arguments(handle_by=handle_by,
+    _check_checkit_arguments(handle_with=handle_with,
                              message=message,
                              operator=operator)
 
-    check_if(_compare(item_1, operator, item_2),
-             handle_by=handle_by,
+    check_if(operator(item_1, item_2),
+             handle_with=handle_with,
              message=message)
 
 
@@ -658,13 +454,14 @@ def check_all_ifs(*args):
             raised). In case of an exception raised, the resulting dict has the
             following structure:
             {'1: check_if': True, '2: check_if_not': AssertionError()}
-            if a failure message is not provided, and otherwise
+            if a failure message was not provided, and otherwise
             {'1: check_if': True, '2: check_if_not': AssertionError('Wrong')}
-            where 'Wrong' us the message provided as the argument.
+            where 'Wrong' was the message provided as the argument.
 
     Use this function if you want to check a list of multiple conditions and
     catch all the errors (and messages) - it does not behave like the other
-    functions in the module, since it returns the results of the checks.
+    functions in the module, since it returns the results of the checks, instad
+    of raising an exception (or issuing a warning).
 
     >>> check_all_ifs(
     ...    (check_if, 2 > 1),
@@ -691,7 +488,7 @@ def check_all_ifs(*args):
     """
     check_length(args, 0,
                  operator=gt,
-                 handle_by=ValueError,
+                 handle_with=ValueError,
                  message='Provide at least one condition.')
     tuple_error_message = (
         'Provide all function calls as tuples in the form of '
@@ -722,7 +519,7 @@ def check_argument(argument,
                    expected_type=None,
                    expected_choices=None,
                    expected_length=None,
-                   handle_by=ArgumentValueError,
+                   handle_with=ArgumentValueError,
                    message=None,
                    **kwargs):
     """Check if the user provided a correct argument value.
@@ -732,14 +529,14 @@ def check_argument(argument,
         argument_name (str): original name of the argument in the calling
             function. If argument_name is not defined, the error messages will
             not include the name of the argument, but will instead only report
-            the default text 'argument'.
+            the default text 'argument'
 
     Returns:
         None, if checks succeeded.
 
     Raises:
-        Exception of the type provided by the handle_by parameter,
-        ArgumentValueError by default.
+        Exception of the type provided by the handle_with parameter,
+        ArgumentValueError by default (unless handle_with is a warning).
 
     You can use this function to check whether an argument's value meets
     various conditions. This is an alternative approach to independent checking
@@ -780,18 +577,14 @@ def check_argument(argument,
     checkit.ArgumentValueError: Incorrect type of x; valid ... <class 'int'>
 
     This is how you can check exceptions and errors provided as arguments:
-    >>> check_argument(
-    ...    TypeError, 'error_arg',
-    ...    expected_type=type)
-    >>> check_argument(
-    ...    TypeError(), 'error_arg',
-    ...    expected_type=Exception)
+    >>> check_argument(TypeError, 'error_arg', expected_type=type)
+    >>> check_argument(TypeError(), 'error_arg', expected_type=Exception)
 
     You can also issue a warning instead of raising an exception:
     >>> check_argument(
     ...    x, 'x',
     ...    expected_type=int,
-    ...    handle_by=Warning,
+    ...    handle_with=Warning,
     ...    message="Incorrect argument's value")
     """
     if all(item is None
@@ -806,7 +599,7 @@ def check_argument(argument,
         argument_name = 'argument'
     check_instance(argument_name,
                    str,
-                   handle_by=handle_by,
+                   handle_with=handle_with,
                    message='argument_name must be string')
 
     if expected_type is not None:
@@ -816,7 +609,7 @@ def check_argument(argument,
              f' {expected_type}'))
         check_instance(item=argument,
                        expected_type=expected_type,
-                       handle_by=handle_by,
+                       handle_with=handle_with,
                        message=instance_message)
     if expected_choices is not None:
         choices_message = _make_message(
@@ -824,7 +617,7 @@ def check_argument(argument,
             (f'{argument_name}\'s value, {argument}, '
              f'is not among valid values: {expected_choices}.'))
         check_if(argument in expected_choices,
-                 handle_by=handle_by,
+                 handle_with=handle_with,
                  message=choices_message)
     if expected_length is not None:
         length_message = _make_message(
@@ -833,7 +626,7 @@ def check_argument(argument,
              f' (should be {expected_length})'))
         check_length(item=argument,
                      expected_length=expected_length,
-                     handle_by=handle_by,
+                     handle_with=handle_with,
                      message=length_message,
                      **kwargs
                      )
@@ -878,9 +671,10 @@ def catch_check(check_function, *args, **kwargs):
 
     Most checkit functions return None when the check is successful, and
     otherwise either raise an exception or issue a warning. You can use this
-    function to change this behavior: it will still return None when all
-    conditions pass, but instead of raising an exception or issuing a warning
-    in case of problems, it will return the specified exception or warning.
+    function to change this behavior: the check_function will still return None
+    when all conditions pass, but instead of raising an exception or issuing
+    a warning in case of problems, it will return the specified exception
+    or warning.
 
     >>> catch_check(check_if, 2==2)
     >>> catch_check(check_if, 2>2)
@@ -897,7 +691,7 @@ def catch_check(check_function, *args, **kwargs):
     ValueError
     >>> print(my_check)
     <BLANKLINE>
-    >>> catch_check(check_if, condition=2>2, handle_by=ValueError)
+    >>> catch_check(check_if, condition=2>2, handle_with=ValueError)
     ValueError()
     >>> catch_check(check_length, [2, 2], 3)
     LengthError()
@@ -916,21 +710,21 @@ def catch_check(check_function, *args, **kwargs):
     TypeError
 
     You can also catch warnings:
-    >>> catch_check(check_if, condition=2>2, handle_by=Warning)
+    >>> catch_check(check_if, condition=2>2, handle_with=Warning)
     Warning('Warning')
     >>> catch_check(check_if,
     ...    condition=2>2,
-    ...    handle_by=UserWarning,
+    ...    handle_with=UserWarning,
     ...    message='Beware of this problem')
     UserWarning('Beware of this problem')
     """
     check_if(isinstance(check_function, Callable),
-             handle_by=TypeError,
+             handle_with=TypeError,
              message=(f'{check_function} does not '
                       'seem to be a checkit function')
              )
     check_if_not(check_function == check_all_ifs,
-                 handle_by=ValueError,
+                 handle_with=ValueError,
                  message=('Do not use catch_check for check_all_ifs() '
                           'because it itself returns its checks.')
                  )
@@ -940,7 +734,7 @@ def catch_check(check_function, *args, **kwargs):
         ('return' in args or kwargs.get('execution_mode', '') == 'return')
     )
     check_if_not(paths_condition,
-                 handle_by=ValueError,
+                 handle_with=ValueError,
                  message=('Do not use catch_check for check_if_paths_exist() '
                           'with execution_mode="return" because it itself '
                           'returns its checks.')
@@ -957,7 +751,7 @@ def catch_check(check_function, *args, **kwargs):
             check_instance, assert_instance,
             check_length, assert_length,
         ),
-        handle_by=ArgumentValueError,
+        handle_with=ArgumentValueError,
         message=(f'{check_function.__name__} is not'
                  ' among acceptable valid checkit functions')
     )
@@ -973,15 +767,12 @@ def catch_check(check_function, *args, **kwargs):
 
 def _compare(item_1, operator, item_2):
     """Compare item_1 and item_2 using an operator.
-
     Args:
         item_1: the first item to compare
         operator: one of the functions returned by get_possible_operators()
         item_2: the second item to compare
-
     Returns:
         True if the comparison is valid and False otherwise.
-
     >>> _compare(2, eq, 2)
     True
     >>> _compare(2, eq, 2.01)
@@ -1011,7 +802,7 @@ def _raise(error, message=None):
 
     Raises:
         Exception of the type provided by the error parameter
-        TypeError if error parameter is not an exception class
+        TypeError if error parameter is not an exception or warning class
 
     Raising exceptions:
     >>> _raise(ValueError)
@@ -1052,7 +843,7 @@ def _raise(error, message=None):
             raise error(message)
 
 
-def _check_checkit_arguments(handle_by=None,
+def _check_checkit_arguments(handle_with=None,
                              message=None,
                              condition=None,
                              operator=None,
@@ -1063,27 +854,28 @@ def _check_checkit_arguments(handle_by=None,
     """Validate the most common arguments used in checkit functions.
 
     This is a generic function that works for most checkit functions, and can
-    be customized by providing selected arguments from a given function. Other arguments,
-    not included in this function, need to be checked using other ways.
+    be customized by providing selected arguments from a given function.
+    Other arguments, not included in this function, need to be checked using
+    other ways.
 
-    >>> _check_checkit_arguments(handle_by=LengthError)
-    >>> _check_checkit_arguments(handle_by=ValueError)
+    >>> _check_checkit_arguments(handle_with=LengthError)
+    >>> _check_checkit_arguments(handle_with=ValueError)
 
     You must provide an exception (or warning) class, not its instance:
-    >>> _check_checkit_arguments(handle_by=ValueError())
+    >>> _check_checkit_arguments(handle_with=ValueError())
     Traceback (most recent call last):
         ...
-    TypeError: handle_by must be an exception
+    TypeError: handle_with must be an exception
 
-    >>> _check_checkit_arguments(handle_by=LengthError, message=False)
+    >>> _check_checkit_arguments(handle_with=LengthError, message=False)
     Traceback (most recent call last):
         ...
     TypeError: message must be either None or string
-    >>> _check_checkit_arguments(handle_by=ValueError, condition=2<1)
+    >>> _check_checkit_arguments(handle_with=ValueError, condition=2<1)
     """
     if all(argument is None
            for argument
-           in (handle_by,
+           in (handle_with,
                message,
                condition,
                operator,
@@ -1093,13 +885,13 @@ def _check_checkit_arguments(handle_by=None,
                expected_type)):
         raise ValueError('Provide at least one argument')
 
-    if handle_by is not None:
+    if handle_with is not None:
         try:
-            is_subclass = issubclass(handle_by, Exception)
+            is_subclass = issubclass(handle_with, Exception)
         except TypeError:
             is_subclass = False
         if not is_subclass:
-            raise TypeError('handle_by must be an exception')
+            raise TypeError('handle_with must be an exception')
     if message is not None:
         if not isinstance(message, str):
             raise TypeError('message must be either None or string')

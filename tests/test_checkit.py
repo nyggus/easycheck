@@ -38,7 +38,7 @@ def test_check_if_edge_cases():
     assert check_if(True) is None
     with pytest.raises(AssertionError):
         check_if(False)
-    with pytest.raises(TypeError, match='handle_by must be an exception'):
+    with pytest.raises(TypeError, match='handle_with must be an exception'):
         check_if(1, 1)
     with pytest.raises(TypeError, match='message must be either None or string'):
         check_if(1, ValueError, 1)
@@ -59,9 +59,9 @@ def test_check_if_negative():
     with pytest.raises(AssertionError):
         check_if(2 < 1)
     with pytest.raises(ValueError):
-        check_if(2 < 1, handle_by=ValueError)
+        check_if(2 < 1, handle_with=ValueError)
     with pytest.raises(ValueError, match='incorrect value'):
-        check_if(2 < 1, handle_by=ValueError, message='incorrect value')
+        check_if(2 < 1, handle_with=ValueError, message='incorrect value')
 
 
 def test_check_if_negative_warnings():
@@ -89,7 +89,7 @@ def test_check_if_not_edge_cases():
     assert check_if_not(False) is None
     with pytest.raises(AssertionError):
         check_if_not(True)
-    with pytest.raises(TypeError, match='handle_by must be an exception'):
+    with pytest.raises(TypeError, match='handle_with must be an exception'):
         check_if_not(1, 1)
     with pytest.raises(TypeError, match='message must be either None or string'):
         check_if_not(1, ValueError, 1)
@@ -108,9 +108,9 @@ def test_check_if_not_negative():
     with pytest.raises(AssertionError):
         check_if_not(2 > 1)
     with pytest.raises(ValueError):
-        check_if_not(2 > 1, handle_by=ValueError)
+        check_if_not(2 > 1, handle_with=ValueError)
     with pytest.raises(ValueError, match='incorrect value'):
-        check_if_not(2 > 1, handle_by=ValueError, message='incorrect value')
+        check_if_not(2 > 1, handle_with=ValueError, message='incorrect value')
 
 
 def test_check_if_not_negative_warnings():
@@ -135,18 +135,18 @@ def test_check_length_edge_cases():
 
 def test_check_length_positive():
     assert check_length(['string'], 1) is None
-    assert check_length(['string'], 1, handle_by=Warning) is None
+    assert check_length(['string'], 1, handle_with=Warning) is None
     assert check_length('string', 6) is None
-    assert check_length('string', 6, handle_by=Warning) is None
+    assert check_length('string', 6, handle_with=Warning) is None
     assert check_length([1, 2], 2) is None
-    assert check_length([1, 2], 2, handle_by=Warning) is None
+    assert check_length([1, 2], 2, handle_with=Warning) is None
     assert check_length(range(0, 3), 3) is None
-    assert check_length(range(0, 3), 3, handle_by=Warning) is None
+    assert check_length(range(0, 3), 3, handle_with=Warning) is None
     assert check_length(10, 1, assign_length_to_others=True) is None
     assert check_length(10,
                         1,
                         assign_length_to_others=True,
-                        handle_by=Warning) is None
+                        handle_with=Warning) is None
 
 
 def test_check_length_negative():
@@ -162,7 +162,7 @@ def test_check_length_negative_warnings():
     with warnings.catch_warnings(record=True) as w:
         check_length([1, 2],
                      expected_length=1,
-                     handle_by=Warning,
+                     handle_with=Warning,
                      message='This is a testing warning')
         assert 'This is a testing warning' in str(w[-1].message)
 
@@ -174,15 +174,15 @@ def test_check_instance_edge_cases():
 
 def test_check_instance_positive():
     assert check_instance(['string'], list) is None
-    assert check_instance(['string'], list, handle_by=Warning) is None
+    assert check_instance(['string'], list, handle_with=Warning) is None
     assert check_instance('string', str) is None
-    assert check_instance('string', str, handle_by=Warning) is None
+    assert check_instance('string', str, handle_with=Warning) is None
     assert check_instance((1, 2), tuple) is None
-    assert check_instance((1, 2), tuple, handle_by=Warning) is None
+    assert check_instance((1, 2), tuple, handle_with=Warning) is None
     assert check_instance((1, 2), [tuple, list]) is None
-    assert check_instance((1, 2), [tuple, list], handle_by=Warning) is None
+    assert check_instance((1, 2), [tuple, list], handle_with=Warning) is None
     assert check_instance((1, 2), [list, tuple]) is None
-    assert check_instance((1, 2), {tuple, list}, handle_by=Warning) is None
+    assert check_instance((1, 2), {tuple, list}, handle_with=Warning) is None
     assert check_instance(
         (1, 2), (tuple, list),
         message='Neither tuple nor list'
@@ -190,18 +190,18 @@ def test_check_instance_positive():
     assert check_instance(
         (1, 2), (tuple, list),
         message='Neither tuple nor list',
-        handle_by=Warning
+        handle_with=Warning
     ) is None
     assert check_instance((i for i in range(3)), Generator) is None
     assert check_instance((i for i in range(3)),
                           Generator,
-                          handle_by=Warning) is None
+                          handle_with=Warning) is None
     assert check_instance(None, (int, None)) is None
-    assert check_instance(None, (int, None), handle_by=Warning) is None
+    assert check_instance(None, (int, None), handle_with=Warning) is None
     assert check_instance(20, (int, None)) is None
-    assert check_instance(20, (int, None), handle_by=Warning) is None
+    assert check_instance(20, (int, None), handle_with=Warning) is None
     assert check_instance(None, None) is None
-    assert check_instance(None, None, handle_by=Warning) is None
+    assert check_instance(None, None, handle_with=Warning) is None
 
 
 def test_check_instance_negative():
@@ -238,7 +238,7 @@ def test_check_instance_negative_warnings():
         check_instance(
             'souvenir',
             (tuple, list),
-            handle_by=Warning,
+            handle_with=Warning,
             message='This is a testing warning'
         )
         assert 'This is a testing warning' in str(w[-1].message)
@@ -247,7 +247,7 @@ def test_check_instance_negative_warnings():
         check_instance(
             True,
             [str, complex],
-            handle_by=Warning,
+            handle_with=Warning,
             message='This is a testing warning'
         )
         assert 'This is a testing warning' in str(w[-1].message)
@@ -256,7 +256,7 @@ def test_check_instance_negative_warnings():
         check_instance(
             20.1,
             (int, None),
-            handle_by=Warning,
+            handle_with=Warning,
             message='This is a testing warning'
         )
         assert 'This is a testing warning' in str(w[-1].message)
@@ -309,7 +309,7 @@ def test_catch_check_if_not():
 
     my_check_not = catch_check(check_if_not,
                                2 == 2,
-                               handle_by=Warning,
+                               handle_with=Warning,
                                message='Problem!')
     assert isinstance(my_check_not, Warning)
 
@@ -321,7 +321,7 @@ def test_catch_check_length():
     my_check = catch_check(check_length,
                            [2, 2],
                            expected_length=2,
-                           handle_by=Warning,
+                           handle_with=Warning,
                            message='Length problem')
     assert my_check is None
 
@@ -333,7 +333,7 @@ def test_catch_check_length():
     my_check = catch_check(check_length,
                            [2, 2],
                            expected_length=3,
-                           handle_by=Warning,
+                           handle_with=Warning,
                            message='Length problem')
     assert isinstance(my_check, Warning)
     assert 'Length problem' in str(my_check)
@@ -386,7 +386,7 @@ def test_catch_check_paths_one_path():
 
     my_check = catch_check(check_if_paths_exist,
                            paths=existing_path,
-                           handle_by=Warning,
+                           handle_with=Warning,
                            message='Path problem')
     assert my_check is None
 
@@ -398,7 +398,7 @@ def test_catch_check_paths_one_path():
 
     my_check_not = catch_check(check_if_paths_exist,
                                paths=non_existing_path,
-                               handle_by=Warning,
+                               handle_with=Warning,
                                message='Path problem')
     assert isinstance(my_check_not, Warning)
 
@@ -410,7 +410,7 @@ def test_catch_check_paths_many_paths():
 
     my_check = catch_check(check_if_paths_exist,
                            paths=existing_paths,
-                           handle_by=Warning,
+                           handle_with=Warning,
                            message='Path issue')
     assert my_check is None
 
@@ -422,7 +422,7 @@ def test_catch_check_paths_many_paths():
 
     my_check_not = catch_check(check_if_paths_exist,
                                paths=non_existing_paths,
-                               handle_by=Warning,
+                               handle_with=Warning,
                                message='Path issue')
     assert isinstance(my_check_not, Warning)
 
@@ -562,7 +562,7 @@ def test_check_comparison_negative():
 
     with pytest.raises(ComparisonError):
         check_comparison('one text', lt, 'another text',
-                         handle_by=ComparisonError)
+                         handle_with=ComparisonError)
 
 
 def test_check_all_ifs_edge_cases():
@@ -642,7 +642,7 @@ def test_check_if_paths_exist_positive():
     assert check_if_paths_exist(single_path_to_check,
                                 execution_mode='return')
     assert check_if_paths_exist(single_path_to_check,
-                                handle_by=Warning,
+                                handle_with=Warning,
                                 execution_mode='return')
 
     assert check_if_paths_exist(list_of_paths_to_check) is None
@@ -655,7 +655,7 @@ def test_check_if_paths_exist_positive():
     assert check_result[1] == []
 
     check_result = check_if_paths_exist(list_of_paths_to_check,
-                                        handle_by=Warning,
+                                        handle_with=Warning,
                                         execution_mode='return')
     assert len(check_result) == 2
     assert check_result[0] is None
@@ -671,7 +671,7 @@ def test_check_if_paths_exist_negative():
     with pytest.raises(FileNotFoundError):
         check_if_paths_exist([non_existing_path] + os.listdir('.'))
     with pytest.raises(IOError):
-        check_if_paths_exist(non_existing_path, handle_by=IOError)
+        check_if_paths_exist(non_existing_path, handle_with=IOError)
 
     check_result = check_if_paths_exist(non_existing_path,
                                         execution_mode='return')
@@ -700,7 +700,7 @@ def test_check_if_paths_exist_negative_warnings():
                              'Path issue')
 
     check_result = check_if_paths_exist(non_existing_path,
-                                        handle_by=Warning,
+                                        handle_with=Warning,
                                         message='Path issue',
                                         execution_mode='return')
     assert len(check_result) == 2
@@ -709,7 +709,7 @@ def test_check_if_paths_exist_negative_warnings():
     assert check_result[1] == [non_existing_path]
 
     check_result = check_if_paths_exist([non_existing_path] + os.listdir('.'),
-                                        handle_by=Warning,
+                                        handle_with=Warning,
                                         message='Path issue',
                                         execution_mode='return')
     assert len(check_result) == 2
@@ -722,9 +722,9 @@ def test_raise_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         _raise()
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _raise(handle_by=TypeError)
+        _raise(handle_with=TypeError)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _raise(handle_by=TypeError, MEssage='This was an error')
+        _raise(handle_with=TypeError, MEssage='This was an error')
     with pytest.raises(
             TypeError,
             match='The error argument must be an exception or a warning'):
@@ -779,7 +779,7 @@ def test_check_argument_edge_cases():
         check_argument(10, message='Error!')
     assert str(msg_error.value) == msg
     with pytest.raises(ValueError) as msg_error:
-        check_argument('x', 10, handle_by=TypeError)
+        check_argument('x', 10, handle_with=TypeError)
     assert str(msg_error.value) == msg
 
 
@@ -812,7 +812,7 @@ def test_check_argument_type_warning():
     def foo(x):
         check_argument(x, 'x',
                        expected_type=str,
-                       handle_by=Warning,
+                       handle_with=Warning,
                        message='Incorrect argument?')
         pass
     assert foo('one') is None
@@ -822,35 +822,35 @@ def test_check_argument_type_warning():
 
     assert check_argument(50, 'my_arg',
                           expected_type=int,
-                          handle_by=Warning) is None
+                          handle_with=Warning) is None
     assert check_argument(50,
                           expected_type=int,
-                          handle_by=Warning) is None
+                          handle_with=Warning) is None
 
     with warnings.catch_warnings(record=True) as w:
         check_argument(50, 'my_arg',
                        expected_type=str,
-                       handle_by=Warning)
+                       handle_with=Warning)
         assert 'my_arg' in str(w[-1].message)
         assert 'Incorrect type' in str(w[-1].message)
 
     with warnings.catch_warnings(record=True) as w:
         check_argument('one', 'my_arg',
                        expected_type=int,
-                       handle_by=Warning)
+                       handle_with=Warning)
         assert 'my_arg' in str(w[-1].message)
         assert 'Incorrect type' in str(w[-1].message)
 
     with warnings.catch_warnings(record=True) as w:
         check_argument(50,
                        expected_type=str,
-                       handle_by=Warning)
+                       handle_with=Warning)
         assert 'Incorrect type of argument' in str(w[-1].message)
 
     with warnings.catch_warnings(record=True) as w:
         check_argument('one',
                        expected_type=int,
-                       handle_by=Warning)
+                       handle_with=Warning)
         assert 'Incorrect type of argument' in str(w[-1].message)
 
 
@@ -888,15 +888,15 @@ def test_check_argument_choices_warnings():
     assert check_argument(5,
                           'my_arg',
                           expected_choices=range(10),
-                          handle_by=Warning) is None
+                          handle_with=Warning) is None
     assert check_argument(5,
                           expected_choices=range(10),
-                          handle_by=Warning) is None
+                          handle_with=Warning) is None
 
     def foo(x):
         check_argument(x,
                        expected_choices=('first choice', 'second choice'),
-                       handle_by=Warning)
+                       handle_with=Warning)
         pass
     assert foo('first choice') is None
     assert foo('second choice') is None
@@ -951,17 +951,17 @@ def test_check_argument_length_warnings():
     assert check_argument(5, 'my_arg',
                           expected_length=1,
                           assign_length_to_others=True,
-                          handle_by=Warning) is None
+                          handle_with=Warning) is None
     assert check_argument(5,
                           expected_length=1,
                           assign_length_to_others=True,
-                          handle_by=Warning) is None
+                          handle_with=Warning) is None
 
     def foo(x):
         check_argument(x, 'x',
                        expected_length=3,
                        assign_length_to_others=True,
-                       handle_by=Warning)
+                       handle_with=Warning)
         pass
     assert foo([1, 2, 3]) is None
     with warnings.catch_warnings(record=True) as w:
@@ -972,7 +972,7 @@ def test_check_argument_length_warnings():
         check_argument(x,
                        expected_length=3,
                        assign_length_to_others=True,
-                       handle_by=Warning)
+                       handle_with=Warning)
         pass
     assert foo([1, 2, 3]) is None
     with warnings.catch_warnings(record=True) as w:
@@ -999,7 +999,7 @@ def test_check_argument_mix_warnings():
         check_argument(x, 'x',
                        expected_type=int,
                        expected_length=3,
-                       handle_by=Warning)
+                       handle_with=Warning)
         pass
     with warnings.catch_warnings(record=True) as w:
         foo('one')
@@ -1010,7 +1010,7 @@ def test_check_checkit_arguments_edge_cases():
     with pytest.raises(ValueError, match='Provide at least one argument'):
         _check_checkit_arguments()
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Handle_by=1)
+        _check_checkit_arguments(Handle_with=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Message=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
@@ -1026,40 +1026,40 @@ def test_check_checkit_arguments_edge_cases():
     with pytest.raises(TypeError, match='unexpected keyword'):
         _check_checkit_arguments(Expected_length=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(handle_by=ValueError, Message=1)
+        _check_checkit_arguments(handle_with=ValueError, Message=1)
 
-    with pytest.raises(TypeError, match='handle_by must be an exception'):
-        _check_checkit_arguments(handle_by=20)
+    with pytest.raises(TypeError, match='handle_with must be an exception'):
+        _check_checkit_arguments(handle_with=20)
 
-    with pytest.raises(TypeError, match='handle_by must be an exception'):
-        _check_checkit_arguments(handle_by=NotImplemented)
+    with pytest.raises(TypeError, match='handle_with must be an exception'):
+        _check_checkit_arguments(handle_with=NotImplemented)
 
 
 def test_check_checkit_arguments():
-    assert _check_checkit_arguments(handle_by=LengthError) is None
+    assert _check_checkit_arguments(handle_with=LengthError) is None
     with pytest.raises(TypeError):
-        _check_checkit_arguments(handle_by='NonExistingError')
+        _check_checkit_arguments(handle_with='NonExistingError')
 
     with pytest.raises(TypeError, match='must be an exception'):
-        _check_checkit_arguments(handle_by=sum)
+        _check_checkit_arguments(handle_with=sum)
 
     with pytest.raises(TypeError):
-        _check_checkit_arguments(handle_by=LengthError, message=False)
-    assert _check_checkit_arguments(handle_by=LengthError,
+        _check_checkit_arguments(handle_with=LengthError, message=False)
+    assert _check_checkit_arguments(handle_with=LengthError,
                                     message='This is error') is None
     with pytest.raises(TypeError):
-        _check_checkit_arguments(handle_by=LengthError, message=25)
+        _check_checkit_arguments(handle_with=LengthError, message=25)
 
-    assert _check_checkit_arguments(handle_by=ValueError,
+    assert _check_checkit_arguments(handle_with=ValueError,
                                     condition='a' == 'a') is None
     assert _check_checkit_arguments(condition='a' == 'a') is None
-    assert _check_checkit_arguments(handle_by=ValueError, condition=2 > 1) is None
-    assert _check_checkit_arguments(handle_by=ValueError, condition=2 < 1) is None
-    assert _check_checkit_arguments(handle_by=ValueError,
+    assert _check_checkit_arguments(handle_with=ValueError, condition=2 > 1) is None
+    assert _check_checkit_arguments(handle_with=ValueError, condition=2 < 1) is None
+    assert _check_checkit_arguments(handle_with=ValueError,
                                     condition=2 == '2') is None
     assert _check_checkit_arguments(condition=2 == '2') is None
     with pytest.raises(ValueError):
-        _check_checkit_arguments(handle_by=ValueError,
+        _check_checkit_arguments(handle_with=ValueError,
                                  condition='not a comparison')
     with pytest.raises(ValueError):
         _check_checkit_arguments(condition='not a comparison')

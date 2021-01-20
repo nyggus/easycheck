@@ -5,7 +5,7 @@ The :code:`checkit` package offers a lightweight tool for running functionized a
 
 * While you should not use assertions in your Python code, you can do so with the :code:`checkit` functions.
 * While assertions only raise :code:`AssertionError`, you can choose any exception to be raised by checkit functions.
-* Instead of raising an exception, you can issue a warning.
+* When using :code:`checkit`, instead of raising an exception, you can issue a warning.
 
 The main :code:`checkit` functions (with names starting off with :code:`check_`) are designed in such a way that they can be used as easy-to-understand code that checks whether one or more conditions are met. They can be used instead of :code:`if`-blocks, which are normally used to check conditions and raise exceptions (or issue warnings) if they are not met. So, you can do the following:
 
@@ -74,14 +74,14 @@ This simply checks if :code:`a` is smaller than 10; if it is, nothing happens (i
 
 .. code-block:: python
 
-    check_if(a < 10, handle_by=ValueError)
+    check_if(a < 10, handle_with=ValueError)
     # or shorter and equally readable: check_if(a < 10, ValueError)
 
 but you can also add a message:
 
 .. code-block:: python
 
-    check_if(a < 10, handle_by=ValueError, message='Too high a')
+    check_if(a < 10, handle_with=ValueError, message='Too high a')
     # or shorter and equally readable: check_if(a < 10, ValueError, 'Too high a')
 
 Some other functions have different default errors; for instance, this call
@@ -115,7 +115,7 @@ You can also use a :code:`catch_check()` function, if you want to catch an excep
 Use in code to issue warnings
 -----------------------------
 
-In order to issue a warning if a condition is violated, simply use a warning class (in the :code:`handle_by` argument) instead of an exception class:
+In order to issue a warning if a condition is violated, simply use a warning class (in the :code:`handle_with` argument) instead of an exception class:
 
 .. code-block:: python
 
@@ -153,7 +153,7 @@ The :code:`checkit` code could look like the following:
         data = get_data_from_db(db_details, db_credentials)
         check_if(
             data,
-            handle_by=DataBaseConnectionError,
+            handle_with=DataBaseConnectionError,
             message='Cannot communicate with the database'
             )
         return data
@@ -167,7 +167,7 @@ You can of course handle this exception, for example like here:
         try:
             check_if(
                 data,
-                handle_by=DataBaseConnectionError,
+                handle_with=DataBaseConnectionError,
                 message='Cannot communicate with the database'
             )
         except DataBaseConnectionError:
@@ -192,7 +192,7 @@ Of course, the :code:`open()` context manager will itself throw an error, but wh
 Use in testing
 --------------
 
-As mentioned above, most functions have aliases to be used in testing. Of course, you can use :code:`check_if()`, but to align with the common use of assertions, the :code:`checkit` module offers those aliases so that the reader will immediately see that you're using these functions to test. Consider these examples:
+As mentioned above, most :code:`checkit` functions have aliases to be used in testing. Of course, you can use :code:`check_if()`, but to align with the common use of assertions, the :code:`checkit` module offers those aliases so that the reader will immediately see that you're using these functions to test. Consider these examples:
 
 .. code-block:: python
 
