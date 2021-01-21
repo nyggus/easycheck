@@ -10,7 +10,6 @@ The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
 assert_instance(), assert_length(), and assert_path()).
 """
-import re
 import os
 import warnings
 from collections.abc import Generator, Iterable, Callable
@@ -304,7 +303,7 @@ def check_if_paths_exist(paths,
                          message=None,
                          execution_mode='raise'):
     """Check if a path or paths exist.
-    
+
     If it does not, either raise (or return) an exception or issue (or return)
     a warning.
 
@@ -460,7 +459,7 @@ def check_all_ifs(*args):
 
     Use this function if you want to check a list of multiple conditions and
     catch all the errors (and messages) - it does not behave like the other
-    functions in the module, since it returns the results of the checks, instad
+    functions in the module, since it returns the results of the checks, instead
     of raising an exception (or issuing a warning).
 
     >>> check_all_ifs(
@@ -628,8 +627,7 @@ def check_argument(argument,
                      expected_length=expected_length,
                      handle_with=handle_with,
                      message=length_message,
-                     **kwargs
-                     )
+                     **kwargs)
 
 
 def _make_message(message_provided, message_otherwise):
@@ -763,32 +761,6 @@ def catch_check(check_function, *args, **kwargs):
             return possible_warn[-1].message
     except Exception as e:
         return e
-
-
-def _compare(item_1, operator, item_2):
-    """Compare item_1 and item_2 using an operator.
-    Args:
-        item_1: the first item to compare
-        operator: one of the functions returned by get_possible_operators()
-        item_2: the second item to compare
-    Returns:
-        True if the comparison is valid and False otherwise.
-    >>> _compare(2, eq, 2)
-    True
-    >>> _compare(2, eq, 2.01)
-    False
-    >>> _compare(2.11, le, 2.100001)
-    False
-    >>> _compare(2, ge, 2)
-    True
-    >>> _compare(2.1, ge, 2.11)
-    False
-    >>> _compare('Sun', eq, 'sun')
-    False
-    >>> _compare('Sun', lt, 'sun')
-    True
-    """
-    return operator(item_1, item_2)
 
 
 def _raise(error, message=None):

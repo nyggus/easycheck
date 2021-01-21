@@ -17,7 +17,6 @@ from checkit import (check_if, assert_if,
                      LengthError,
                      OperatorError,
                      get_possible_operators,
-                     _compare,
                      _raise,
                      _check_checkit_arguments,
                      _make_message,
@@ -425,44 +424,6 @@ def test_catch_check_paths_many_paths():
                                handle_with=Warning,
                                message='Path issue')
     assert isinstance(my_check_not, Warning)
-
-
-def test_compare_edge_cases():
-    with pytest.raises(TypeError, match='required positional argument'):
-        _compare(1, 1)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        _compare(item1=1, operator=gt, item_2=2)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        _compare(item_1=1, Operator=gt, item_2=2)
-    with pytest.raises(TypeError, match='unexpected keyword'):
-        _compare(item_1=1, operator=gt, item2=2)
-
-
-def test_compare_positive():
-    assert _compare(2, eq, 2)
-    assert _compare(1, ne, 2)
-    assert _compare(2, lt, 3)
-    assert _compare(2, le, 2)
-    assert _compare(2, le, 3)
-    assert _compare(3, gt, 2)
-    assert _compare(2, ge, 2)
-    assert _compare(3, ge, 2)
-    assert _compare('abc', is_, 'abc')
-    assert _compare('abc', is_not, 'xyz')
-
-
-def test_compare_negative():
-    assert not _compare(2, eq, 2.01)
-    assert not _compare(2, ne, 2)
-    assert not _compare(3, lt, 3)
-    assert not _compare(3, lt, 2)
-    assert not _compare(2.11, le, 2.100001)
-    assert not _compare(3, gt, 3)
-    assert not _compare(2.11, gt, 2.12)
-    assert not _compare(2.11, ge, 2.12)
-    assert not _compare(2.1, ge, 2.11)
-    assert not _compare('abc', is_, 'xyz')
-    assert not _compare('abc', is_not, 'abc')
 
 
 def test_check_comparison_edge_cases():
