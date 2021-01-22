@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="checkit",
-    version="0.0.1",
+    version="0.1.0",
     author="Nyggus & Ke Boan",
     author_email="nyggus@gmail.com",
     description="A tool for simple functionalized assertions in Python",
