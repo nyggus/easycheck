@@ -1,9 +1,9 @@
 Complex checks using a self-defined function
 --------------------------------------------
 
-You can also define complex checks using a function that collects calls to checkit functions. That way, you can simplify the function in which you want to make the check, by using just one line instead of several (8 in the example below).
+You can define complex checks using a function that collects calls to checkit functions. That way, you can simplify the function in which you want to make the check, by using just one line instead of several (8 in the example below).
 
-.. code-block::python
+.. code-block:: python
 
     >>> from checkit import check_if, check_instance, check_argument
     >>> def check_glm_args(glm_args):
@@ -14,7 +14,7 @@ You can also define complex checks using a function that collects calls to check
     ...        glm_args[0] <= 1 and
     ...        glm_args[1] in ('poisson', 'quasi-poisson') and
     ...        glm_args[2] in ('log', 'identity'),
-    ...        error=ValueError,
+    ...        handle_with=ValueError,
     ...        message='Incorrect argument value'
     ...    )
     >>> def run_glm(glm_args):
@@ -32,7 +32,7 @@ You can also define complex checks using a function that collects calls to check
   
 We can do it in a more comprehensive way:
 
-.. code-block::python
+.. code-block:: python
 
     >>> from checkit import check_if, check_instance
     >>> def check_glm_args(glm_args):
@@ -40,7 +40,7 @@ We can do it in a more comprehensive way:
     ...    check_instance(glm_args[1], str)
     ...    check_instance(glm_args[2], str)
     ...    check_if(glm_args[0] > 0 and glm_args[0] <= 1,
-    ...        error=ValueError,
+    ...        handle_with=ValueError,
     ...        message='The first argument\'s value is incorrect'
     ...    )
     ...    check_argument(

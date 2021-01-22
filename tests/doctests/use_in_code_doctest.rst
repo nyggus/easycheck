@@ -1,25 +1,25 @@
 Use checkit in code
 -------------------
 
-The basic aim of checkit is to provide you with quick-to-use, simple and readable assertion-like functions to make sure that particular conditions you are interested in are met. They are assert-like because what you do is indeed similar to what the assert expression does, since the functions
+The basic aim of :code:`checkit` is to provide you with easy-to-use, simple and readable assertion-like functions to make sure that particular conditions you wish to check are met. They are similar to assertions because the functionality is indeed similar to the :code:`assert` expression, since these functions
 
 * check a condition
-* do nothing when it's met, but
-* raise an exception when it is not
+* do nothing when the condition is met,
+* raise an exception (or, alternatively, issue a warning) when the condition is not met.
 
-Of course, checkit is to help you when Python does not handle a particular situation. For example, it does so when you're trying to divide a number by zero, so you need not use checkit then. But there is a plethora of various situations which you want to handle.
+Of course, :code:`checkit` is meant to help you when Python does not handle a particular situation. For example, Python handles division-by-zero errors, so you need not use :code:`checkit` for this. However, there are many other situations which you may want to handle.
 
-Here are several examples of the simplest uses of checkit:
+Here are several examples of the simplest uses of :code:`checkit`:
 
 .. code-block:: python
 
 	>>> from checkit import check_if, check_if_not, check_instance
 	>>> def get_family_name(full_name):
-	...    check_if_not(full_name is None, error=TypeError, message='Missing name')
+	...    check_if_not(full_name is None, TypeError, 'Missing name')
 	...    check_instance(full_name, str, message='Full name must be string')
 	...    check_if(' ' in full_name.strip(),
-	...        error=ValueError,
-	...        message=('No space in full name: impossible to split first and second name')
+	...        ValueError,
+	...        'No space in name: impossible to split first and second name'
 	...    )
 	...    return full_name.split(' ')[1]
 	>>> get_family_name('John Smith')
@@ -27,7 +27,7 @@ Here are several examples of the simplest uses of checkit:
 	>>> get_family_name('John_Smith')
 	Traceback (most recent call last):
 		...
-	ValueError: No space in full name: impossible to split first and second name
+	ValueError: No space in name: impossible to split first and second name
 
 	>>> get_family_name(57)
 	Traceback (most recent call last):
@@ -39,9 +39,9 @@ Here are several examples of the simplest uses of checkit:
 		...
 	TypeError: Missing name
 
-If something is wrong, the corresponding exception is raised. If you need to catch these exceptions and handle them accordingly, you can certainly do so (note that two different types of errors can be raised by :code:`get_family_name()`).
+If a condition fails, the chosen exception is raised; or alternatively, the chosen warning is issued. If you need to catch these exceptions and handle them accordingly, you can certainly do so (note that two different types of errors can be raised by :code:`get_family_name()`). You can also catch warnings.
         
-Without checkit, this function might have the following form:
+Without :code:`checkit`, this function might have the following form:
     
 .. code-block:: python
 
@@ -51,7 +51,7 @@ Without checkit, this function might have the following form:
 	...    elif not isinstance(full_name, str):
 	...        raise TypeError('Full name must be string')
 	...    elif ' ' not in full_name.strip():
-	...        raise ValueError('No space in full name:'
+	...        raise ValueError('No space in name:'
 	...            ' impossible to split first and second name')
 	...    return full_name.split(' ')[1]
     
@@ -88,9 +88,9 @@ The non-checkit counterpart is rather less readable:
 
 	def get_family_name(full_name):
 	...    if (full_name is None
-	...        or not isinstance(full_name, str) or
-	...        ' ' not in full_name.strip()):
+	...        or not isinstance(full_name, str)
+	...        or ' ' not in full_name.strip()):
 	...        raise Exception
 	...    return full_name.split(' ')[1]
 
-See example_2_doctest.rst file to check out how to catch exceptions instead of raising them.
+See the catch_exceptions_doctest.rst file to check out how to catch exceptions instead of raising them, and use_checkit_with_warnings_doctest.rst to check out what you can do with warnings in :code:`checkit`.
