@@ -58,7 +58,7 @@ The package is covered with both pytests and doctests. The latter are included i
 .. code-block:: text
 
     python -m pytest
-    python -m doctest src/checkit.py tests/doctests/*_doctest.rst
+    python -m doctest checkit/checkit.py tests/doctests/*_doctest.rst
 
 
 Use in code to raise exceptions

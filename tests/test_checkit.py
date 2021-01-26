@@ -3,24 +3,24 @@ import os
 import pytest
 from collections.abc import Generator
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
-from checkit import (check_if, assert_if,
-                     check_if_not, assert_if_not,
-                     check_instance, assert_instance,
-                     check_if_paths_exist, assert_paths,
-                     check_length, assert_length,
-                     check_all_ifs,
-                     check_argument,
-                     check_comparison,
-                     catch_check,
-                     ComparisonError,
-                     ArgumentValueError,
-                     LengthError,
-                     OperatorError,
-                     get_possible_operators,
-                     _raise,
-                     _check_checkit_arguments,
-                     _make_message,
-                     )
+from checkit.checkit import (check_if, assert_if,
+                             check_if_not, assert_if_not,
+                             check_instance, assert_instance,
+                             check_if_paths_exist, assert_paths,
+                             check_length, assert_length,
+                             check_all_ifs,
+                             check_argument,
+                             check_comparison,
+                             catch_check,
+                             ComparisonError,
+                             ArgumentValueError,
+                             LengthError,
+                             OperatorError,
+                             get_possible_operators,
+                             _raise,
+                             _check_checkit_arguments,
+                             _make_message,
+                             )
 
 
 def test_check_if_edge_cases():
