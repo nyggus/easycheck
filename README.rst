@@ -215,4 +215,4 @@ You will find more about using :code:`easycheck` in `use_in_testing_doctest.rst 
 Other examples
 --------------
 
-You will find a number of examples in `doctest files <https://github.com/nyggus/easycheck/blob/master/docs/>`_, which also serve as doctests.
+You will find a number of examples in `doctest files <https://github.com/nyggus/easycheck/tree/master/docs/>`_, which also serve as doctests.
