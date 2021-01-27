@@ -1,13 +1,13 @@
-The :code:`checkit` module
+The :code:`easycheck` module
 --------------------------
 
-The main function is :code:`check_if()`, with its negative counterpart :code:`check_if_not()`. The other functions are actually wrappers built around :code:`check_if()`, customized to particular situations and conditions. :code:`check_if()` checks a condition provided as its argument; if the condition is not met, the function raises an exception (which can be either one of the exception classes, built-in ones, ones from the checkit module, or user-created) or issues a warning (which must derive from the Warning class); you can (optionally) send a message along with the exception, and you should send a message with the warning. Note that when you use the built-in assert expression, you're limited to :code:`AssertionError`, but when using checkit assert functions, you can use any exception you want.
+The main function is :code:`check_if()`, with its negative counterpart :code:`check_if_not()`. The other functions are actually wrappers built around :code:`check_if()`, customized to particular situations and conditions. :code:`check_if()` checks a condition provided as its argument; if the condition is not met, the function raises an exception (which can be either one of the exception classes, built-in ones, ones from the easycheck module, or user-created) or issues a warning (which must derive from the Warning class); you can (optionally) send a message along with the exception, and you should send a message with the warning. Note that when you use the built-in assert expression, you're limited to :code:`AssertionError`, but when using easycheck assert functions, you can use any exception you want.
 
 Consider the following example:
 
 .. code-block:: python
 
-    >>> from checkit import (check_if, check_if_not, check_length, check_instance,
+    >>> from easycheck import (check_if, check_if_not, check_length, check_instance,
     ...                      check_comparison, check_if_paths_exist, assert_if, assert_length,
     ...                      assert_instance)
     >>> if 1 > 0:
@@ -34,7 +34,7 @@ or even simpler
         ...
     ValueError: One is bigger than zero
 
-Of course, it's not only brevity that we aim for: The package's main purpose is code readability. As always, whether this approach results in more readable code is a subjective matter, but you will see many examples that, in our opinion, make the checkit approach more readable than the equivalent if-blocks.
+Of course, it's not only brevity that we aim for: The package's main purpose is code readability. As always, whether this approach results in more readable code is a subjective matter, but you will see many examples that, in our opinion, make the easycheck approach more readable than the equivalent if-blocks.
 
 If you are fine with AssertionError (actually, the only built-in exception class for regular asserts in Python), you can use this simple code:
 
@@ -68,7 +68,7 @@ You can use a :code:`check_if_not()` wrapper for negative conditions:
         ...
     ValueError: The condition is true
 
-Other checkit functions use :code:`check_if()` to check a particular condition, like length:
+Other easycheck functions use :code:`check_if()` to check a particular condition, like length:
 
 .. code-block:: python
 
@@ -87,7 +87,7 @@ You can override a Pythonic approach to treating numbers (integers, doubles, flo
     >>> check_length(1, 2, assign_length_to_others=True)
     Traceback (most recent call last):
         ...
-    checkit.LengthError
+    easycheck.easycheck.LengthError
 
 Note that in the above example, we used the parameter operator. You can use this in several functions, and it can take up to eight operators from the operator module (use :code:`get_possible_operators()` too see the list, which includes :code:`eq`, :code:`le`, :code:`lt`, :code:`gt`, :code:`ge`, :code:`ne`, :code:`is_`, :code:`is_not`). Since these operators are functions, you provide them as function names, as we did above. 
 
@@ -155,7 +155,7 @@ The module also offers two-item comparisons, also using the operator parameter:
 Use in testing
 --------------
 
-The module offers assert-like functions, which are simply aliases of the corresponding checkit functions: :code:`assert_if()`, :code:`assert_if_not()`, :code:`assert_instance()`, :code:`assert_length()` and :code:`assert_paths()`. You can use them in doctesting and pytesting, and their main advantage over the classical assertion expression is that they can use any exception you want, which makes testing output more informative. Also, due to the way they are written, you can design customized testing functions for particular situations.
+The module offers assert-like functions, which are simply aliases of the corresponding easycheck functions: :code:`assert_if()`, :code:`assert_if_not()`, :code:`assert_instance()`, :code:`assert_length()` and :code:`assert_paths()`. You can use them in doctesting and pytesting, and their main advantage over the classical assertion expression is that they can use any exception you want, which makes testing output more informative. Also, due to the way they are written, you can design customized testing functions for particular situations.
 
 For instance, instead of
 
@@ -214,4 +214,4 @@ The list of functions in the module is open, and we are open to suggestions, but
 More examples
 -------------
 
-You will see more examples in the doctest files collected in this folder.
+You will see more examples in the doctest files collected `here <https://github.com/nyggus/easycheck/tree/master/docs/>`_.

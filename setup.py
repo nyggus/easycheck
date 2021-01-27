@@ -4,7 +4,7 @@ with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
-    name="checkit",
+    name="easycheck",
     version="0.1.0",
     author="Nyggus & Ke Boan",
     author_email="nyggus@gmail.com",
@@ -12,7 +12,7 @@ setuptools.setup(
     description="A tool for simple functionalized assertions in Python",
     long_description=long_description,
     long_description_content_type="text/x-rst",
-    url="https://github.com/nyggus/checkit",
+    url="https://github.com/nyggus/easycheck",
     packages=setuptools.find_packages(),
     classifiers=[
         "Intended Audience :: Developers",

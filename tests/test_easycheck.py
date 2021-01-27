@@ -3,7 +3,7 @@ import os
 import pytest
 from collections.abc import Generator
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
-from checkit.checkit import (check_if, assert_if,
+from easycheck.easycheck import (check_if, assert_if,
                              check_if_not, assert_if_not,
                              check_instance, assert_instance,
                              check_if_paths_exist, assert_paths,
@@ -18,7 +18,7 @@ from checkit.checkit import (check_if, assert_if,
                              OperatorError,
                              get_possible_operators,
                              _raise,
-                             _check_checkit_arguments,
+                             _check_easycheck_arguments,
                              _make_message,
                              )
 
@@ -264,10 +264,10 @@ def test_check_instance_negative_warnings():
 def test_catch_check_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         catch_check(check=check_instance)
-    with pytest.raises(TypeError, match='checkit function'):
+    with pytest.raises(TypeError, match='easycheck function'):
         catch_check(1)
     with pytest.raises(ArgumentValueError,
-                       match='acceptable valid checkit functions'):
+                       match='acceptable valid easycheck functions'):
         catch_check(sum)
 
 
@@ -967,106 +967,106 @@ def test_check_argument_mix_warnings():
         assert 'type' in str(w[-1].message)
 
 
-def test_check_checkit_arguments_edge_cases():
+def test_check_easycheck_arguments_edge_cases():
     with pytest.raises(ValueError, match='Provide at least one argument'):
-        _check_checkit_arguments()
+        _check_easycheck_arguments()
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Handle_with=1)
+        _check_easycheck_arguments(Handle_with=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Message=1)
+        _check_easycheck_arguments(Message=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Condition=1)
+        _check_easycheck_arguments(Condition=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Operator=1)
+        _check_easycheck_arguments(Operator=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Assign_length_to_others=1)
+        _check_easycheck_arguments(Assign_length_to_others=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Execution_mode=1)
+        _check_easycheck_arguments(Execution_mode=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Expected_type=1)
+        _check_easycheck_arguments(Expected_type=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(Expected_length=1)
+        _check_easycheck_arguments(Expected_length=1)
     with pytest.raises(TypeError, match='unexpected keyword'):
-        _check_checkit_arguments(handle_with=ValueError, Message=1)
+        _check_easycheck_arguments(handle_with=ValueError, Message=1)
 
     with pytest.raises(TypeError, match='handle_with must be an exception'):
-        _check_checkit_arguments(handle_with=20)
+        _check_easycheck_arguments(handle_with=20)
 
     with pytest.raises(TypeError, match='handle_with must be an exception'):
-        _check_checkit_arguments(handle_with=NotImplemented)
+        _check_easycheck_arguments(handle_with=NotImplemented)
 
 
-def test_check_checkit_arguments():
-    assert _check_checkit_arguments(handle_with=LengthError) is None
+def test_check_easycheck_arguments():
+    assert _check_easycheck_arguments(handle_with=LengthError) is None
     with pytest.raises(TypeError):
-        _check_checkit_arguments(handle_with='NonExistingError')
+        _check_easycheck_arguments(handle_with='NonExistingError')
 
     with pytest.raises(TypeError, match='must be an exception'):
-        _check_checkit_arguments(handle_with=sum)
+        _check_easycheck_arguments(handle_with=sum)
 
     with pytest.raises(TypeError):
-        _check_checkit_arguments(handle_with=LengthError, message=False)
-    assert _check_checkit_arguments(handle_with=LengthError,
+        _check_easycheck_arguments(handle_with=LengthError, message=False)
+    assert _check_easycheck_arguments(handle_with=LengthError,
                                     message='This is error') is None
     with pytest.raises(TypeError):
-        _check_checkit_arguments(handle_with=LengthError, message=25)
+        _check_easycheck_arguments(handle_with=LengthError, message=25)
 
-    assert _check_checkit_arguments(handle_with=ValueError,
+    assert _check_easycheck_arguments(handle_with=ValueError,
                                     condition='a' == 'a') is None
-    assert _check_checkit_arguments(condition='a' == 'a') is None
-    assert _check_checkit_arguments(handle_with=ValueError, condition=2 > 1) is None
-    assert _check_checkit_arguments(handle_with=ValueError, condition=2 < 1) is None
-    assert _check_checkit_arguments(handle_with=ValueError,
+    assert _check_easycheck_arguments(condition='a' == 'a') is None
+    assert _check_easycheck_arguments(handle_with=ValueError, condition=2 > 1) is None
+    assert _check_easycheck_arguments(handle_with=ValueError, condition=2 < 1) is None
+    assert _check_easycheck_arguments(handle_with=ValueError,
                                     condition=2 == '2') is None
-    assert _check_checkit_arguments(condition=2 == '2') is None
+    assert _check_easycheck_arguments(condition=2 == '2') is None
     with pytest.raises(ValueError):
-        _check_checkit_arguments(handle_with=ValueError,
+        _check_easycheck_arguments(handle_with=ValueError,
                                  condition='not a comparison')
     with pytest.raises(ValueError):
-        _check_checkit_arguments(condition='not a comparison')
+        _check_easycheck_arguments(condition='not a comparison')
 
     for this_operator in get_possible_operators():
-        assert _check_checkit_arguments(operator=this_operator) is None
+        assert _check_easycheck_arguments(operator=this_operator) is None
         with pytest.raises(OperatorError):
-            _check_checkit_arguments(operator=this_operator.__name__)
+            _check_easycheck_arguments(operator=this_operator.__name__)
 
-    assert _check_checkit_arguments(assign_length_to_others=True) is None
-    assert _check_checkit_arguments(assign_length_to_others=False) is None
+    assert _check_easycheck_arguments(assign_length_to_others=True) is None
+    assert _check_easycheck_arguments(assign_length_to_others=False) is None
     for this_assignment in ('nothing', 22, [1]):
         with pytest.raises(TypeError):
-            _check_checkit_arguments(assign_length_to_others=this_assignment)
+            _check_easycheck_arguments(assign_length_to_others=this_assignment)
 
-    assert _check_checkit_arguments(execution_mode='return') is None
-    assert _check_checkit_arguments(execution_mode='raise') is None
+    assert _check_easycheck_arguments(execution_mode='return') is None
+    assert _check_easycheck_arguments(execution_mode='raise') is None
     for this_mode in ('nothing', 22, [1]):
         with pytest.raises(ValueError):
-            _check_checkit_arguments(execution_mode=this_mode)
+            _check_easycheck_arguments(execution_mode=this_mode)
 
     for this_length in (0, 3, 5, 7):
-        assert _check_checkit_arguments(expected_length=this_length) is None
-        assert _check_checkit_arguments(
+        assert _check_easycheck_arguments(expected_length=this_length) is None
+        assert _check_easycheck_arguments(
             expected_length=float(this_length)
         ) is None
-    assert _check_checkit_arguments(expected_length=(5)) is None
+    assert _check_easycheck_arguments(expected_length=(5)) is None
     for this_length in ('0', [3], LengthError):
         with pytest.raises(TypeError):
-            _check_checkit_arguments(expected_length=this_length)
+            _check_easycheck_arguments(expected_length=this_length)
 
     for this_type in (str, int, float, bool, tuple, list, Generator):
-        assert _check_checkit_arguments(expected_type=this_type) is None
+        assert _check_easycheck_arguments(expected_type=this_type) is None
     for this_type in ('str', 25, True, 1.1):
         with pytest.raises(TypeError):
-            _check_checkit_arguments(expected_type=this_type)
-    assert _check_checkit_arguments(expected_type=(str, tuple)) is None
-    assert _check_checkit_arguments(expected_type=(str, tuple, None)) is None
-    assert _check_checkit_arguments(expected_type=[str, tuple]) is None
-    assert _check_checkit_arguments(expected_type={str, tuple}) is None
+            _check_easycheck_arguments(expected_type=this_type)
+    assert _check_easycheck_arguments(expected_type=(str, tuple)) is None
+    assert _check_easycheck_arguments(expected_type=(str, tuple, None)) is None
+    assert _check_easycheck_arguments(expected_type=[str, tuple]) is None
+    assert _check_easycheck_arguments(expected_type={str, tuple}) is None
     with pytest.raises(TypeError):
-        _check_checkit_arguments(expected_type='boolintstrcomplexlist')
+        _check_easycheck_arguments(expected_type='boolintstrcomplexlist')
     with pytest.raises(TypeError):
-        _check_checkit_arguments(expected_type=(str, tuple, list, 26))
+        _check_easycheck_arguments(expected_type=(str, tuple, list, 26))
 
-    assert _check_checkit_arguments(
+    assert _check_easycheck_arguments(
         expected_type=(str, tuple, list),
         condition=2 < 2,
         expected_length=3,
@@ -1075,7 +1075,7 @@ def test_check_checkit_arguments():
     ) is None
 
     with pytest.raises(TypeError):
-        _check_checkit_arguments(
+        _check_easycheck_arguments(
             expected_type=(str, tuple, list),
             condition=2 < 2,
             expected_length=3,

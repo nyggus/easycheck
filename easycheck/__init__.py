@@ -1,4 +1,4 @@
-from .checkit import (check_if,
+from .easycheck import (check_if,
                       check_if_not,
                       check_instance,
                       check_if_paths_exist,
