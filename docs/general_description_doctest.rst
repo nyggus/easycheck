@@ -214,4 +214,4 @@ The list of functions in the module is open, and we are open to suggestions, but
 More examples
 -------------
 
-You will see more examples in the doctest files collected `here <https://github.com/nyggus/easycheck/tree/blob/master/docs/>`_.
+You will see more examples in the doctest files collected `here <https://github.com/nyggus/easycheck/blob/master/docs/>`_.

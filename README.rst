@@ -53,7 +53,7 @@ Install and update using pip:
 Testing
 -------
 
-The package is covered with both pytests and doctests. The latter are included in both docstrings of all the functions, but also in `documentation files <https://github.com/nyggus/easycheck/tree/blob/master/docs>`_.
+The package is covered with both pytests and doctests. The latter are included in both docstrings of all the functions, but also in `documentation files <https://github.com/nyggus/easycheck/blob/master/docs>`_.
 
 Use in code to raise exceptions
 -------------------------------
@@ -116,7 +116,7 @@ In order to issue a warning if a condition is violated, simply use a warning cla
     check_if(2 > 1, Warning, 'Too high a value')
     check_length([1, 2, 3], 10, Warning, 'Too short list with data')
 
-Remember to always use a message with warnings, in order to make them meaningful. (See more in `use_with_warnings_doctest.rst <https://github.com/nyggus/easycheck/tree/blob/master/docs/use_with_warnings_doctest.rst>`_).
+Remember to always use a message with warnings, in order to make them meaningful. (See more in `use_with_warnings_doctest.rst <https://github.com/nyggus/easycheck/blob/master/docs/use_with_warnings_doctest.rst>`_).
 
 
 Use in code, an example
@@ -210,9 +210,9 @@ As mentioned above, most :code:`easycheck` functions have aliases to be used in 
 
 Note that only the first one will raise :code:`AssertionError` while the others will raise more meaningful errors (:code:`TypeError` and :code:`LengthError`), which may better explain the reasons that the tests did not pass.
 
-You will find more about using :code:`easycheck` in `use_with_testing_doctest.rst <https://github.com/nyggus/easycheck/tree/blob/master/docs/use_with_testing_doctest.rst>`_.
+You will find more about using :code:`easycheck` in `use_with_testing_doctest.rst <https://github.com/nyggus/easycheck/blob/master/docs/use_with_testing_doctest.rst>`_.
 
 Other examples
 --------------
 
-You will find a number of examples in `doctest files <https://github.com/nyggus/easycheck/tree/blob/master/docs/>`_, which also serve as doctests.
+You will find a number of examples in `doctest files <https://github.com/nyggus/easycheck/blob/master/docs/>`_, which also serve as doctests.
