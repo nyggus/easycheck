@@ -1,19 +1,19 @@
-Use checkit in code
+Use easycheck in code
 -------------------
 
-The basic aim of :code:`checkit` is to provide you with easy-to-use, simple and readable assertion-like functions to make sure that particular conditions you wish to check are met. They are similar to assertions because the functionality is indeed similar to the :code:`assert` expression, since these functions
+The basic aim of :code:`easycheck` is to provide you with easy-to-use, simple and readable assertion-like functions to make sure that particular conditions you wish to check are met. They are similar to assertions because the functionality is indeed similar to the :code:`assert` expression, since these functions
 
 * check a condition
 * do nothing when the condition is met,
 * raise an exception (or, alternatively, issue a warning) when the condition is not met.
 
-Of course, :code:`checkit` is meant to help you when Python does not handle a particular situation. For example, Python handles division-by-zero errors, so you need not use :code:`checkit` for this. However, there are many other situations which you may want to handle.
+Of course, :code:`easycheck` is meant to help you when Python does not handle a particular situation. For example, Python handles division-by-zero errors, so you need not use :code:`easycheck` for this. However, there are many other situations which you may want to handle.
 
-Here are several examples of the simplest uses of :code:`checkit`:
+Here are several examples of the simplest uses of :code:`easycheck`:
 
 .. code-block:: python
 
-	>>> from checkit import check_if, check_if_not, check_instance
+	>>> from easycheck import check_if, check_if_not, check_instance
 	>>> def get_family_name(full_name):
 	...    check_if_not(full_name is None, TypeError, 'Missing name')
 	...    check_instance(full_name, str, message='Full name must be string')
@@ -41,7 +41,7 @@ Here are several examples of the simplest uses of :code:`checkit`:
 
 If a condition fails, the chosen exception is raised; or alternatively, the chosen warning is issued. If you need to catch these exceptions and handle them accordingly, you can certainly do so (note that two different types of errors can be raised by :code:`get_family_name()`). You can also catch warnings.
         
-Without :code:`checkit`, this function might have the following form:
+Without :code:`easycheck`, this function might have the following form:
     
 .. code-block:: python
 
@@ -82,7 +82,7 @@ Above, we used specified errors and messages, but we can make the call shorter b
 		...
 	ValueError
 
-The non-checkit counterpart is rather less readable:
+The non-easycheck counterpart is rather less readable:
 
 .. code-block:: python
 
@@ -93,4 +93,4 @@ The non-checkit counterpart is rather less readable:
 	...        raise Exception
 	...    return full_name.split(' ')[1]
 
-See the catch_exceptions_doctest.rst file to check out how to catch exceptions instead of raising them, and use_checkit_with_warnings_doctest.rst to check out what you can do with warnings in :code:`checkit`.
+See the catch_exceptions_doctest.rst file to check out how to catch exceptions instead of raising them, and use_checkit_with_warnings_doctest.rst to check out what you can do with warnings in :code:`easycheck`.

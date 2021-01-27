@@ -1,11 +1,11 @@
 Complex checks using a self-defined function
 --------------------------------------------
 
-You can define complex checks using a function that collects calls to checkit functions. That way, you can simplify the function in which you want to make the check, by using just one line instead of several (8 in the example below).
+You can define complex checks using a function that collects calls to easycheck functions. That way, you can simplify the function in which you want to make the check, by using just one line instead of several (8 in the example below).
 
 .. code-block:: python
 
-    >>> from checkit import check_if, check_instance, check_argument
+    >>> from easycheck import check_if, check_instance, check_argument
     >>> def check_glm_args(glm_args):
     ...    check_instance(glm_args[0], (int, float))
     ...    check_instance(glm_args[1], str)
@@ -34,7 +34,7 @@ We can do it in a more comprehensive way:
 
 .. code-block:: python
 
-    >>> from checkit import check_if, check_instance
+    >>> from easycheck import check_if, check_instance
     >>> def check_glm_args(glm_args):
     ...    check_instance(glm_args[0], (int, float))
     ...    check_instance(glm_args[1], str)
@@ -59,10 +59,10 @@ We can do it in a more comprehensive way:
     >>> check_glm_args(glm_args)
     Traceback (most recent call last):
         ...
-    checkit.ArgumentValueError: argument's value, logit, is not among valid values: ('log', 'identity').
+    easycheck.easycheck.ArgumentValueError: argument's value, logit, is not among valid values: ('log', 'identity').
 
     >>> glm_args = 1., 'quasi-poissons', 'logit'
     >>> check_glm_args(glm_args)
     Traceback (most recent call last):
         ...
-    checkit.ArgumentValueError: argument's value, quasi-poissons, is not among valid values: ('poisson', 'quasi-poisson').
+    easycheck.easycheck.ArgumentValueError: argument's value, quasi-poissons, is not among valid values: ('poisson', 'quasi-poisson').

@@ -1,10 +1,10 @@
 """A module for simple checks to be used within code and testing.
 
-The checkit module offers simple functions to check conditions and either raise
+The easycheck module offers simple functions to check conditions and either raise
 an exception or issue a warning if the condition is violated; otherwise,
 nothing happens (the function returns None). You can either choose default
 exceptions and messages (or no message) or customize them. Unlike the assertion
-expression, you can use checkit functions within code.
+expression, you can use easycheck functions within code.
 
 The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
@@ -419,7 +419,7 @@ def check_comparison(item_1, operator, item_2,
     ...                  message='Not less!')
     Traceback (most recent call last):
         ...
-    checkit.ComparisonError: Not less!
+    easycheck.ComparisonError: Not less!
 
     To issue a warning, do the following:
     >>> check_comparison('one text', lt, 'another text',
@@ -539,7 +539,7 @@ def check_argument(argument,
 
     You can use this function to check whether an argument's value meets
     various conditions. This is an alternative approach to independent checking
-    of these conditions using separate checkit functions.
+    of these conditions using separate easycheck functions.
 
     The function performs lazy checking, meaning that it first checks the
     instance (if provided), then choices (if provided), and then the expected
@@ -553,7 +553,7 @@ def check_argument(argument,
     ...    )
     Traceback (most recent call last):
         ...
-    checkit.ArgumentValueError: Incorrect type of x; valid type(s): <class 'tuple'>
+    easycheck.ArgumentValueError: Incorrect type of x; valid type(s): <class 'tuple'>
 
     The expected_choices argument helps you check whether the user provided
     a valid value for the argument:
@@ -565,7 +565,7 @@ def check_argument(argument,
     >>> foo('no choice') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    checkit.ArgumentValueError: x's value, no choice, is not among valid ...
+    easycheck.ArgumentValueError: x's value, no choice, is not among valid ...
 
     >>> x = 2.0
     >>> check_argument(
@@ -573,7 +573,7 @@ def check_argument(argument,
     ...    expected_type=int) # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    checkit.ArgumentValueError: Incorrect type of x; valid ... <class 'int'>
+    easycheck.ArgumentValueError: Incorrect type of x; valid ... <class 'int'>
 
     This is how you can check exceptions and errors provided as arguments:
     >>> check_argument(TypeError, 'error_arg', expected_type=type)
@@ -651,10 +651,10 @@ def _make_message(message_provided, message_otherwise):
 
 
 def catch_check(check_function, *args, **kwargs):
-    """Catch an exception or warning raised/issued by a checkit function.
+    """Catch an exception or warning raised/issued by a easycheck function.
 
     Args:
-        check_function: function to call (one of the public checkit functions)
+        check_function: function to call (one of the public easycheck functions)
         args: positional arguments to pass on to check_function
         kwargs: keyword arguments to pass on to check_function
 
@@ -667,7 +667,7 @@ def catch_check(check_function, *args, **kwargs):
         ValueError, if an attempt to call another error-catching function is
             detected
 
-    Most checkit functions return None when the check is successful, and
+    Most easycheck functions return None when the check is successful, and
     otherwise either raise an exception or issue a warning. You can use this
     function to change this behavior: the check_function will still return None
     when all conditions pass, but instead of raising an exception or issuing
@@ -719,7 +719,7 @@ def catch_check(check_function, *args, **kwargs):
     check_if(isinstance(check_function, Callable),
              handle_with=TypeError,
              message=(f'{check_function} does not '
-                      'seem to be a checkit function')
+                      'seem to be a easycheck function')
              )
     check_if_not(check_function == check_all_ifs,
                  handle_with=ValueError,
@@ -751,7 +751,7 @@ def catch_check(check_function, *args, **kwargs):
         ),
         handle_with=ArgumentValueError,
         message=(f'{check_function.__name__} is not'
-                 ' among acceptable valid checkit functions')
+                 ' among acceptable valid easycheck functions')
     )
 
     try:
@@ -823,9 +823,9 @@ def _check_checkit_arguments(handle_with=None,
                              execution_mode=None,
                              expected_length=None,
                              expected_type=None):
-    """Validate the most common arguments used in checkit functions.
+    """Validate the most common arguments used in easycheck functions.
 
-    This is a generic function that works for most checkit functions, and can
+    This is a generic function that works for most easycheck functions, and can
     be customized by providing selected arguments from a given function.
     Other arguments, not included in this function, need to be checked using
     other ways.
@@ -897,7 +897,7 @@ def _check_checkit_arguments(handle_with=None,
 
 
 def get_possible_operators():
-    """Provide a list of possible operators to be used in checkit functions.
+    """Provide a list of possible operators to be used in easycheck functions.
 
     All of these operators come from the operator module, but not all operators
     from this module are allowed.

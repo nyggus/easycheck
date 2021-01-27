@@ -3,7 +3,7 @@ import os
 import pytest
 from collections.abc import Generator
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
-from checkit.checkit import (check_if, assert_if,
+from easycheck.easycheck import (check_if, assert_if,
                              check_if_not, assert_if_not,
                              check_instance, assert_instance,
                              check_if_paths_exist, assert_paths,
@@ -264,10 +264,10 @@ def test_check_instance_negative_warnings():
 def test_catch_check_edge_cases():
     with pytest.raises(TypeError, match='required positional argument'):
         catch_check(check=check_instance)
-    with pytest.raises(TypeError, match='checkit function'):
+    with pytest.raises(TypeError, match='easycheck function'):
         catch_check(1)
     with pytest.raises(ArgumentValueError,
-                       match='acceptable valid checkit functions'):
+                       match='acceptable valid easycheck functions'):
         catch_check(sum)
 
 
