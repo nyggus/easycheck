@@ -210,7 +210,7 @@ As mentioned above, most :code:`easycheck` functions have aliases to be used in 
 
 Note that only the first one will raise :code:`AssertionError` while the others will raise more meaningful errors (:code:`TypeError` and :code:`LengthError`), which may better explain the reasons that the tests did not pass.
 
-You will find more about using :code:`easycheck` `here <https://github.com/nyggus/easycheck/tree/master/docs/use_with_testing_doctest.rst>`_
+You will find more about using :code:`easycheck` `here <https://github.com/nyggus/easycheck/tree/master/docs/use_with_testing_doctest.rst>`_.
 
 Other examples
 --------------
