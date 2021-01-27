@@ -122,7 +122,7 @@ In order to issue a warning if a condition is violated, simply use a warning cla
     check_if(2 > 1, Warning, 'Too high a value')
     check_length([1, 2, 3], 10, Warning, 'Too short list with data')
 
-Remember to always use a message with warnings, in order to make them meaningful. (See more in the use_checkit_with_warnings_doctest.rst file).
+Remember to always use a message with warnings, in order to make them meaningful. (See more in the use_easycheck_with_warnings_doctest.rst file).
 
 
 Use in code, an example
