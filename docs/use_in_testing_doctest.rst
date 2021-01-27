@@ -54,4 +54,4 @@ Do remember, however, *not* to use warnings in testing! Consider the following:
     >>> assert_if(2 < 1, Warning)
     >>> assert_if(2 < 1, UserWarning)
     
-As you can see, the two last assertions issue warnings (see `here <https://github.com/nyggus/easycheck/tree/master/docs/use_with_warnings_doctest.rst>`_ to learn more about using :code:`easycheck` with warnings), but will not raise exceptions – this could dramatically affect your testing. However, warnings *do not* make the test fail! So, remember this basic rule: Never use warnings in testing when you want to catch critical errors.
+As you can see, the two last assertions issue warnings (see `here <https://github.com/nyggus/easycheck/tree/blob/master/docs/use_with_warnings_doctest.rst>`_ to learn more about using :code:`easycheck` with warnings), but will not raise exceptions – this could dramatically affect your testing. However, warnings *do not* make the test fail! So, remember this basic rule: Never use warnings in testing when you want to catch critical errors.
