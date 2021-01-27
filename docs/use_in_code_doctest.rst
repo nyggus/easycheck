@@ -93,4 +93,4 @@ The non-easycheck counterpart is rather less readable:
 	...        raise Exception
 	...    return full_name.split(' ')[1]
 
-See the catch_exceptions_doctest.rst file to check out how to catch exceptions instead of raising them, and use_easycheck_with_warnings_doctest.rst to check out what you can do with warnings in :code:`easycheck`.
+See `here <https://github.com/nyggus/easycheck/tree/master/docs/catch_exceptions_doctest.rst>`_ to check out how to catch exceptions instead of raising them, and `here <https://github.com/nyggus/easycheck/tree/master/docs/use_with_warnings_doctest.rst>`_ to check out what you can do with warnings in :code:`easycheck`.
