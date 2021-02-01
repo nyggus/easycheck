@@ -128,8 +128,6 @@ def test_check_length_edge_cases():
         check_length('tomato soup is good')
     with pytest.raises(OperatorError, match='Incorrect operator'):
         check_length(1, 1, operator=1)
-    with pytest.raises(TypeError, match='BaseException type, not str'):
-        pytest.raises('tomato soup', 'is good')
 
 
 def test_check_length_positive():

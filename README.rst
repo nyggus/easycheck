@@ -13,7 +13,7 @@ The main :code:`easycheck` functions (with names starting off with :code:`check_
 
     if not isinstance(x, (float, int)):
         raise TypeError('x must be a number')
-	if x > 10:
+    if x > 10:
         raise ValueError('Too high value of x')
 
 or you can use :code:`easycheck` for this:
@@ -69,21 +69,24 @@ This simply checks if :code:`a` is smaller than 10; if it is, nothing happens (i
 .. code-block:: python
 
     check_if(a < 10, handle_with=ValueError)
-    # or shorter and equally readable: check_if(a < 10, ValueError)
+    # or shorter and equally readable:
+    check_if(a < 10, ValueError)
 
 but you can also add a message:
 
 .. code-block:: python
 
     check_if(a < 10, handle_with=ValueError, message='Too high a')
-    # or shorter and equally readable: check_if(a < 10, ValueError, 'Too high a')
+    # or shorter and equally readable:
+    check_if(a < 10, ValueError, 'Too high a')
 
 Some other functions have different default errors; for instance, this call
 
 .. code-block:: python
 
     check_instance(a, expected_type=str)
-    # or check_instance(a, str)
+    # or shorter:
+    check_instance(a, str)
 
 will raise :code:`TypeError` while this
 
@@ -99,7 +102,7 @@ Here is a list of :code:`easycheck` functions the module offers, along with thei
 * :code:`check_if_not()`, with the alias of :code:`assert_if_not()`
 * :code:`check_length()`, with the alias of :code:`assert_length()`
 * :code:`check_instance()`, with the alias of :code:`assert_instance()`
-* :code:`check_if_paths_exist()`, with the aliast of :code:`assert_paths()`
+* :code:`check_if_paths_exist()`, with the alias of :code:`assert_paths()`
 * :code:`check_comparison()` (used to compare two items)
 * :code:`check_all_ifs()` (used to check multiple conditions and return all the checks)
 * :code:`check_argument()` (used to make several checks of a function's argument)
