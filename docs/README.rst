@@ -8,4 +8,5 @@ This directory contains more detailed documentation of the :code:`easycheck` mod
 * `how to use in testing <https://github.com/nyggus/easycheck/blob/master/docs/use_in_testing_doctest.rst>`_;
 * `how to issue warnings <https://github.com/nyggus/easycheck/blob/master/docs/use_with_warnings_doctest.rst>`_;
 * `how to catch exceptions instead of raise them <https://github.com/nyggus/easycheck/blob/master/docs/catch_exceptions_doctest.rst>`_;
-* `more detailed examples with self-defined functions <https://github.com/nyggus/easycheck/blob/master/docs/use_for_self_defined_functions_doctest.rst>`_.
+* `more detailed examples with self-defined functions <https://github.com/nyggus/easycheck/blob/master/docs/use_for_self_defined_functions_doctest.rst>`_;
+* `how to use in try-except blocks <https://github.com/nyggus/easycheck/blob/master/docs/use_with_try_doctest.rst>`_.
