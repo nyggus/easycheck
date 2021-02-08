@@ -53,7 +53,7 @@ Install and update using pip:
 Testing
 -------
 
-The package is covered with both pytests and doctests. The latter are included in both docstrings of all the functions, but also in `documentation files <https://github.com/nyggus/easycheck/blob/master/docs>`_.
+The package is covered with both pytests and doctests. The latter are included in both docstrings of all the functions, but also in `documentation files <https://github.com/nyggus/easycheck/tree/master/docs>`_.
 
 Use in code to raise exceptions
 -------------------------------
