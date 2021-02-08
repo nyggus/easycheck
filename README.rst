@@ -107,7 +107,7 @@ Here is a list of :code:`easycheck` functions the module offers, along with thei
 * :code:`check_all_ifs()` (used to check multiple conditions and return all the checks)
 * :code:`check_argument()` (used to make several checks of a function's argument)
 
-You can also use a :code:`catch_check()` function, if you want to catch an exception or a warning the :code:`easycheck` function you use would raise.
+You can also use a :code:`catch_check()` function, if you want to catch an exception or a warning the :code:`easycheck` function you use would raise (see examples `here <https://github.com/nyggus/easycheck/blob/master/docs/catch_exceptions_doctest.rst>`_). Sometimes, however, you will do better using a :code:`try-except` block to catch exceptions (`see examples <https://github.com/nyggus/easycheck/blob/master/docs/use_with_try_doctest.rst>`_).
 
 Use in code to issue warnings
 -----------------------------
