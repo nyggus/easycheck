@@ -20,4 +20,4 @@ If you do not want to raise exceptions but to catch them instead, you can do so 
         ...
     ValueError: Incorrect value
 
-Nonetheless, in many situations, you will do better using a simpler and more readbale approach, that is, catching exceptions using the :code:`try-except` block. This approach is particularly readable and efficient when you want to check several things. See  `how to use in try-except blocks <https://github.com/nyggus/easycheck/blob/master/docs/use_with_try_doctest.rst>`_).
+Nonetheless, in many situations, you will do better using a simpler and more readbale approach, that is, catching exceptions using the :code:`try-except` block. This approach is particularly readable and efficient when you want to check several things. See  `how to use in try-except blocks <https://github.com/nyggus/easycheck/blob/master/docs/use_with_try_doctest.rst>`_.
