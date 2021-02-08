@@ -43,6 +43,6 @@ You can get similar functionality using the function that catches exceptions, th
     Error: a must not be higher than b
     >>> foo(9, 10)
 
-Note that this code is much more complex than the above code. This is because we need to take care of *not* running :code:`catch_check(check_if_not, a > b, ValueError, 'a must not be higher than b')` if `a > b` gives an error (as does the comparison of an integer with a string). Using the :code:`catch_exception()` function, we need to catch each such check, something that the :code:`try-except` block did before. What's more, we did not format what :code:`print()` returns, since it would introduce additional complexity. 
+Note that this code is much more complex than the above code that uses the :code:`try-except` block. This is because we need to take care of *not* running :code:`catch_check(check_if_not, a > b, ValueError, 'a must not be higher than b')` if :code:`a > b` gives an error (as does the comparison of an integer with a string). Using the :code:`catch_exception()` function, we need to catch each such a check, something that the :code:`try-except` block did before for all the checks. What's more, we did not format what :code:`print()` returns, since it would introduce additional complexity. 
 
-As we see, in many instances the simpler approach with the :code:`try-except` block will be better and more readable.
+As we see, in many instances the simpler approach with the :code:`try-except` block will be better and more readable than using the :code:`catch_exception()` function.
