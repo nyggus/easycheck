@@ -14,7 +14,7 @@ import os
 import warnings
 from collections.abc import Generator, Iterable, Callable
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
-from pathlib import Path, WindowsPath, PosixPath
+from pathlib import Path
 
 
 class LengthError(Exception):
@@ -335,7 +335,7 @@ def check_if_paths_exist(paths,
     >>> check_if_paths_exist(Path(os.listdir()[0]))
     >>> check_if_paths_exist(os.listdir())
 
-    >>> check_if_paths_exist('Q:/Op/Oop/', execution_mode='return')
+    >>> check_if_paths_exist('Q:/Op/Oop', execution_mode='return')
     (FileNotFoundError(), ['Q:/Op/Oop'])
     >>> check_if_paths_exist(os.listdir()[0], execution_mode='return')
     (None, [])
@@ -343,12 +343,12 @@ def check_if_paths_exist(paths,
     (None, [])
 
     To issue a warning, do the following:
-    >>> check_if_paths_exist('Q:/Op/Oop/', handle_with=Warning)
-    >>> check_if_paths_exist('Q:/Op/Oop/',
+    >>> check_if_paths_exist('Q:/Op/Oop', handle_with=Warning)
+    >>> check_if_paths_exist('Q:/Op/Oop',
     ...    execution_mode='return',
     ...    handle_with=Warning)
     (Warning(), ['Q:/Op/Oop'])
-    >>> check_if_paths_exist('Q:/Op/Oop/',
+    >>> check_if_paths_exist('Q:/Op/Oop',
     ...    execution_mode='return',
     ...    handle_with=Warning,
     ...    message='Attempt to use a non-existing path')
@@ -358,33 +358,40 @@ def check_if_paths_exist(paths,
                                message=message,
                                execution_mode=execution_mode)
 
-    if isinstance(paths, (str, WindowsPath, PosixPath)):
+    is_allowed_type = (
+        isinstance(paths, (str, Path))
+        or (
+            isinstance(paths, Iterable)
+            and all(isinstance(path, (str, Path)) for path in paths)
+        )
+    )
+
+    if not is_allowed_type:
+        raise TypeError(
+            'Argument paths must be string or pathlib.Path or iterable thereof'
+        )
+
+    error = None
+
+    if isinstance(paths, (str, Path)):
         paths = (paths,)
 
-    if isinstance(paths, Iterable):
-        paths = [Path(path) for path in paths
-                 if isinstance(path, str)]
-        error = None
-        non_existing_paths = [
-            str(path) for path in paths
-            if not path.exists()
-        ]
+    non_existing_paths = [
+        str(path) for path in paths
+        if not Path(path).exists()
+    ]
 
-        if non_existing_paths:
-            if execution_mode == 'raise':
-                _raise(handle_with, message)
-            elif execution_mode == 'return':
-                if message:
-                    error = handle_with(str(message))
-                else:
-                    error = handle_with()
+    if non_existing_paths:
+        if execution_mode == 'raise':
+            _raise(handle_with, message)
+        elif execution_mode == 'return':
+            if message:
+                error = handle_with(str(message))
+            else:
+                error = handle_with()
 
-        if execution_mode == 'return':
-            return error, non_existing_paths
-    else:
-        raise TypeError(
-            'Argument paths must be string or pathlib.Path or their iterable'
-        )
+    if execution_mode == 'return':
+        return error, non_existing_paths
 
 
 def check_comparison(item_1, operator, item_2,

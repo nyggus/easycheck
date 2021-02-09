@@ -3,25 +3,26 @@ import os
 import pytest
 from collections.abc import Generator
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
-from easycheck.easycheck import (check_if, assert_if,
-                             check_if_not, assert_if_not,
-                             check_instance, assert_instance,
-                             check_if_paths_exist, assert_paths,
-                             check_length, assert_length,
-                             check_all_ifs,
-                             check_argument,
-                             check_comparison,
-                             catch_check,
-                             ComparisonError,
-                             ArgumentValueError,
-                             LengthError,
-                             OperatorError,
-                             get_possible_operators,
-                             _raise,
-                             _check_easycheck_arguments,
-                             _make_message,
-                             )
 from pathlib import Path
+from easycheck.easycheck import (check_if, assert_if,
+                                 check_if_not, assert_if_not,
+                                 check_instance, assert_instance,
+                                 check_if_paths_exist, assert_paths,
+                                 check_length, assert_length,
+                                 check_all_ifs,
+                                 check_argument,
+                                 check_comparison,
+                                 catch_check,
+                                 ComparisonError,
+                                 ArgumentValueError,
+                                 LengthError,
+                                 OperatorError,
+                                 get_possible_operators,
+                                 _raise,
+                                 _check_easycheck_arguments,
+                                 _make_message,
+                                 )
+
 
 def test_check_if_edge_cases():
     with pytest.raises(TypeError, match="required positional argument"):
@@ -362,7 +363,7 @@ def test_catch_check_instance():
         raise my_check
 
 
-def test_catch_check_with_return():
+def test_catch_check_paths_with_return():
     existing_path = os.listdir('.')[0]
     with pytest.raises(ValueError, match='execution_mode="return"'):
         catch_check(check_if_paths_exist,
@@ -379,26 +380,31 @@ def test_catch_check_with_return():
 def test_catch_check_paths_one_path():
     existing_path = os.listdir('.')[0]
     my_check = catch_check(check_if_paths_exist, paths=existing_path)
-    my_check_Path = catch_check(check_if_paths_exist, paths=Path(existing_path))
+    my_check_path = catch_check(check_if_paths_exist, paths=Path(existing_path))
     assert my_check is None
-    assert my_check_Path is None
+    assert my_check_path is None
 
     my_check = catch_check(check_if_paths_exist,
                            paths=existing_path,
                            handle_with=Warning,
                            message='Path problem')
     assert my_check is None
-    my_check_Path = catch_check(check_if_paths_exist,
+    my_check_path = catch_check(check_if_paths_exist,
                                 paths=Path(existing_path),
                                 handle_with=Warning,
                                 message='Path problem')
-    assert my_check_Path is None
-    
+    assert my_check_path is None
+
     non_existing_path = 'W:/Op/No_no'
     my_check_not = catch_check(check_if_paths_exist, paths=non_existing_path)
+    my_check_not_path = catch_check(check_if_paths_exist,
+                                    paths=Path(non_existing_path))
     assert isinstance(my_check_not, FileNotFoundError)
     with pytest.raises(FileNotFoundError):
         raise my_check_not
+    assert isinstance(my_check_not_path, FileNotFoundError)
+    with pytest.raises(FileNotFoundError):
+        raise my_check_not_path
 
     my_check_not = catch_check(check_if_paths_exist,
                                paths=non_existing_path,
@@ -410,7 +416,10 @@ def test_catch_check_paths_one_path():
 def test_catch_check_paths_many_paths():
     existing_paths = os.listdir('.')
     my_check = catch_check(check_if_paths_exist, paths=existing_paths)
+    my_check_path = catch_check(check_if_paths_exist,
+                                paths=[Path(path) for path in existing_paths])
     assert my_check is None
+    assert my_check_path is None
 
     my_check = catch_check(check_if_paths_exist,
                            paths=existing_paths,
@@ -420,9 +429,16 @@ def test_catch_check_paths_many_paths():
 
     non_existing_paths = ['W:/Op/No_no'] + os.listdir('.')
     my_check_not = catch_check(check_if_paths_exist, paths=non_existing_paths)
+    my_check_not_path = catch_check(
+        check_if_paths_exist,
+        paths=[Path(path) for path in non_existing_paths]
+    )
     assert isinstance(my_check_not, FileNotFoundError)
     with pytest.raises(FileNotFoundError):
         raise my_check_not
+    assert isinstance(my_check_not_path, FileNotFoundError)
+    with pytest.raises(FileNotFoundError):
+        raise my_check_not_path
 
     my_check_not = catch_check(check_if_paths_exist,
                                paths=non_existing_paths,
@@ -596,6 +612,10 @@ def test_check_if_paths_exist_edge_cases():
         check_if_paths_exist(20)
     with pytest.raises(TypeError, match='Argument paths must be string'):
         check_if_paths_exist(True)
+    with pytest.raises(TypeError, match='Argument paths must be string'):
+        check_if_paths_exist(['/some/path', 1, 2])
+    with pytest.raises(TypeError, match='Argument paths must be string'):
+        check_if_paths_exist(['/some/path', Path('/some/path'), False])
     with pytest.raises(ValueError):
         check_if_paths_exist(os.listdir('.')[0], execution_mode='buuu')
 
@@ -610,9 +630,13 @@ def test_check_if_paths_exist_positive():
     assert check_if_paths_exist(single_path_to_check,
                                 handle_with=Warning,
                                 execution_mode='return')
+    assert check_if_paths_exist(Path(single_path_to_check)) is None
 
     assert check_if_paths_exist(list_of_paths_to_check) is None
     assert check_if_paths_exist(list_of_paths_to_check, Warning) is None
+    assert check_if_paths_exist(
+        Path(path) for path in list_of_paths_to_check
+    ) is None
 
     check_result = check_if_paths_exist(list_of_paths_to_check,
                                         execution_mode='return')
@@ -634,6 +658,8 @@ def test_check_if_paths_exist_negative():
         check_if_paths_exist(non_existing_path, execution_mode='buuu')
     with pytest.raises(FileNotFoundError):
         check_if_paths_exist(non_existing_path)
+    with pytest.raises(FileNotFoundError):
+        check_if_paths_exist(Path(non_existing_path))
     with pytest.raises(FileNotFoundError):
         check_if_paths_exist([non_existing_path] + os.listdir('.'))
     with pytest.raises(IOError):
@@ -660,6 +686,8 @@ def test_check_if_paths_exist_negative_warnings():
     non_existing_path = 'Z:/Op/Oop'
     with warnings.catch_warnings(record=True):
         check_if_paths_exist(non_existing_path, Warning, 'Path issue')
+    with warnings.catch_warnings(record=True):
+        check_if_paths_exist(Path(non_existing_path), Warning, 'Path issue')
     with warnings.catch_warnings(record=True):
         check_if_paths_exist([non_existing_path] + os.listdir('.'),
                              Warning,
