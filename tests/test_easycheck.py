@@ -21,7 +21,7 @@ from easycheck.easycheck import (check_if, assert_if,
                              _check_easycheck_arguments,
                              _make_message,
                              )
-
+from pathlib import Path
 
 def test_check_if_edge_cases():
     with pytest.raises(TypeError, match="required positional argument"):
@@ -362,7 +362,7 @@ def test_catch_check_instance():
         raise my_check
 
 
-def test_catch_check_paths_with_return():
+def test_catch_check_with_return():
     existing_path = os.listdir('.')[0]
     with pytest.raises(ValueError, match='execution_mode="return"'):
         catch_check(check_if_paths_exist,
@@ -379,14 +379,21 @@ def test_catch_check_paths_with_return():
 def test_catch_check_paths_one_path():
     existing_path = os.listdir('.')[0]
     my_check = catch_check(check_if_paths_exist, paths=existing_path)
+    my_check_Path = catch_check(check_if_paths_exist, paths=Path(existing_path))
     assert my_check is None
+    assert my_check_Path is None
 
     my_check = catch_check(check_if_paths_exist,
                            paths=existing_path,
                            handle_with=Warning,
                            message='Path problem')
     assert my_check is None
-
+    my_check_Path = catch_check(check_if_paths_exist,
+                                paths=Path(existing_path),
+                                handle_with=Warning,
+                                message='Path problem')
+    assert my_check_Path is None
+    
     non_existing_path = 'W:/Op/No_no'
     my_check_not = catch_check(check_if_paths_exist, paths=non_existing_path)
     assert isinstance(my_check_not, FileNotFoundError)
@@ -622,7 +629,7 @@ def test_check_if_paths_exist_positive():
 
 
 def test_check_if_paths_exist_negative():
-    non_existing_path = 'Z:/Op/Oop/'
+    non_existing_path = 'Z:/Op/Oop'
     with pytest.raises(ValueError):
         check_if_paths_exist(non_existing_path, execution_mode='buuu')
     with pytest.raises(FileNotFoundError):
@@ -650,7 +657,7 @@ def test_check_if_paths_exist_negative():
 
 
 def test_check_if_paths_exist_negative_warnings():
-    non_existing_path = 'Z:/Op/Oop/'
+    non_existing_path = 'Z:/Op/Oop'
     with warnings.catch_warnings(record=True):
         check_if_paths_exist(non_existing_path, Warning, 'Path issue')
     with warnings.catch_warnings(record=True):
@@ -1005,21 +1012,21 @@ def test_check_easycheck_arguments():
     with pytest.raises(TypeError):
         _check_easycheck_arguments(handle_with=LengthError, message=False)
     assert _check_easycheck_arguments(handle_with=LengthError,
-                                    message='This is error') is None
+                                      message='This is error') is None
     with pytest.raises(TypeError):
         _check_easycheck_arguments(handle_with=LengthError, message=25)
 
     assert _check_easycheck_arguments(handle_with=ValueError,
-                                    condition='a' == 'a') is None
+                                      condition='a' == 'a') is None
     assert _check_easycheck_arguments(condition='a' == 'a') is None
     assert _check_easycheck_arguments(handle_with=ValueError, condition=2 > 1) is None
     assert _check_easycheck_arguments(handle_with=ValueError, condition=2 < 1) is None
     assert _check_easycheck_arguments(handle_with=ValueError,
-                                    condition=2 == '2') is None
+                                      condition=2 == '2') is None
     assert _check_easycheck_arguments(condition=2 == '2') is None
     with pytest.raises(ValueError):
         _check_easycheck_arguments(handle_with=ValueError,
-                                 condition='not a comparison')
+                                   condition='not a comparison')
     with pytest.raises(ValueError):
         _check_easycheck_arguments(condition='not a comparison')
 
@@ -1128,4 +1135,3 @@ def test_assert_functions():
             assert_paths('Q:/E/', execution_mode='return')[1])
     with pytest.raises(FileNotFoundError):
         assert_paths('Q:/E/') and check_if_paths_exist('Q:/E/') is None
-
