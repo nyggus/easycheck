@@ -14,7 +14,7 @@ import os
 import warnings
 from collections.abc import Generator, Iterable, Callable
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
-from pathlib import Path
+from pathlib import Path, WindowsPath, PosixPath
 
 
 class LengthError(Exception):
@@ -106,8 +106,8 @@ def check_if(condition, handle_with=AssertionError, message=None):
 
     """
     _check_easycheck_arguments(handle_with=handle_with,
-                             message=message,
-                             condition=condition)
+                               message=message,
+                               condition=condition)
     if not condition:
         _raise(handle_with, message)
 
@@ -166,8 +166,8 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
     >>> check_if_not(2 > 1, Warning, '2 is not bigger than 1')
     """
     _check_easycheck_arguments(handle_with=handle_with,
-                             message=message,
-                             condition=condition)
+                               message=message,
+                               condition=condition)
 
     check_if(not condition, handle_with=handle_with, message=message)
 
@@ -213,10 +213,10 @@ def check_length(item,
     >>> check_length('string', 6, Warning)
     """
     _check_easycheck_arguments(handle_with=handle_with,
-                             message=message,
-                             operator=operator,
-                             expected_length=expected_length,
-                             assign_length_to_others=assign_length_to_others)
+                               message=message,
+                               operator=operator,
+                               expected_length=expected_length,
+                               assign_length_to_others=assign_length_to_others)
 
     if assign_length_to_others:
         if isinstance(item, (int, float, complex, bool)):
@@ -281,8 +281,8 @@ def check_instance(item, expected_type, handle_with=TypeError, message=None):
     >>> check_instance('a', (str, None), Warning, 'Undesired instance')
     """
     _check_easycheck_arguments(handle_with=handle_with,
-                             message=message,
-                             expected_type=expected_type)
+                               message=message,
+                               expected_type=expected_type)
 
     if expected_type is None:
         check_if(item is None, handle_with=handle_with, message=message)
@@ -308,7 +308,8 @@ def check_if_paths_exist(paths,
     a warning.
 
     Args:
-        paths (str, Iterable[str]): path or paths to validate
+        paths (str, pathlib.Path, Iterable[str or pathlib.Path]): path or paths
+            to validate
         handle_with (type): type of exception or warning to be raised/returned
         message (str): a text to use as the exception/warning message
         execution_mode (str): defines what happens if not all the paths exist
@@ -331,10 +332,11 @@ def check_if_paths_exist(paths,
         ...
     FileNotFoundError
     >>> check_if_paths_exist(os.listdir()[0])
+    >>> check_if_paths_exist(Path(os.listdir()[0]))
     >>> check_if_paths_exist(os.listdir())
 
     >>> check_if_paths_exist('Q:/Op/Oop/', execution_mode='return')
-    (FileNotFoundError(), ['Q:/Op/Oop/'])
+    (FileNotFoundError(), ['Q:/Op/Oop'])
     >>> check_if_paths_exist(os.listdir()[0], execution_mode='return')
     (None, [])
     >>> check_if_paths_exist(os.listdir(), execution_mode='return')
@@ -345,25 +347,27 @@ def check_if_paths_exist(paths,
     >>> check_if_paths_exist('Q:/Op/Oop/',
     ...    execution_mode='return',
     ...    handle_with=Warning)
-    (Warning(), ['Q:/Op/Oop/'])
+    (Warning(), ['Q:/Op/Oop'])
     >>> check_if_paths_exist('Q:/Op/Oop/',
     ...    execution_mode='return',
     ...    handle_with=Warning,
     ...    message='Attempt to use a non-existing path')
-    (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop/'])
+    (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop'])
     """
     _check_easycheck_arguments(handle_with=handle_with,
-                             message=message,
-                             execution_mode=execution_mode)
+                               message=message,
+                               execution_mode=execution_mode)
 
-    if isinstance(paths, str):
+    if isinstance(paths, (str, WindowsPath, PosixPath)):
         paths = (paths,)
 
     if isinstance(paths, Iterable):
+        paths = [Path(path) for path in paths
+                 if isinstance(path, str)]
         error = None
         non_existing_paths = [
-            path for path in paths
-            if not Path(path).exists()
+            str(path) for path in paths
+            if not path.exists()
         ]
 
         if non_existing_paths:
@@ -378,7 +382,9 @@ def check_if_paths_exist(paths,
         if execution_mode == 'return':
             return error, non_existing_paths
     else:
-        raise TypeError('Argument paths must be string or iterable of strings')
+        raise TypeError(
+            'Argument paths must be string or pathlib.Path or their iterable'
+        )
 
 
 def check_comparison(item_1, operator, item_2,
@@ -427,8 +433,8 @@ def check_comparison(item_1, operator, item_2,
     ...                  message='Not less!')
     """
     _check_easycheck_arguments(handle_with=handle_with,
-                             message=message,
-                             operator=operator)
+                               message=message,
+                               operator=operator)
 
     check_if(operator(item_1, item_2),
              handle_with=handle_with,
@@ -816,13 +822,13 @@ def _raise(error, message=None):
 
 
 def _check_easycheck_arguments(handle_with=None,
-                             message=None,
-                             condition=None,
-                             operator=None,
-                             assign_length_to_others=None,
-                             execution_mode=None,
-                             expected_length=None,
-                             expected_type=None):
+                               message=None,
+                               condition=None,
+                               operator=None,
+                               assign_length_to_others=None,
+                               execution_mode=None,
+                               expected_length=None,
+                               expected_type=None):
     """Validate the most common arguments used in easycheck functions.
 
     This is a generic function that works for most easycheck functions, and can
