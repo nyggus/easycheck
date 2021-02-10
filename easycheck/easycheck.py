@@ -366,9 +366,10 @@ def check_if_paths_exist(paths,
         )
     )
 
-    if not is_allowed_type:
-        raise TypeError(
-            'Argument paths must be string or pathlib.Path or iterable thereof'
+    check_if(
+        is_allowed_type,
+        TypeError,
+        'Argument paths must be string or pathlib.Path or iterable thereof'
         )
 
     error = None
