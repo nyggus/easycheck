@@ -12,6 +12,7 @@ assert_instance(), assert_length(), and assert_path()).
 """
 import os
 import warnings
+
 from collections.abc import Generator, Iterable, Callable
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
@@ -105,6 +106,7 @@ def check_if(condition, handle_with=AssertionError, message=None):
     >>> check_if(2 < 1, Warning, '2 is not smaller than 1')
 
     """
+    __tracebackhide__ = True
     _check_easycheck_arguments(handle_with=handle_with,
                                message=message,
                                condition=condition)
@@ -165,6 +167,7 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
     To issue a warning, use the Warning class or one of its subclasses:
     >>> check_if_not(2 > 1, Warning, '2 is not bigger than 1')
     """
+    __tracebackhide__ = True
     _check_easycheck_arguments(handle_with=handle_with,
                                message=message,
                                condition=condition)
@@ -212,6 +215,7 @@ def check_length(item,
     To issue a warning, use the Warning class or its subclass:
     >>> check_length('string', 6, Warning)
     """
+    __tracebackhide__ = True
     _check_easycheck_arguments(handle_with=handle_with,
                                message=message,
                                operator=operator,
@@ -280,6 +284,7 @@ def check_instance(item, expected_type, handle_with=TypeError, message=None):
     To issue a warning, do the following:
     >>> check_instance('a', (str, None), Warning, 'Undesired instance')
     """
+    __tracebackhide__ = True
     _check_easycheck_arguments(handle_with=handle_with,
                                message=message,
                                expected_type=expected_type)
@@ -354,6 +359,7 @@ def check_if_paths_exist(paths,
     ...    message='Attempt to use a non-existing path')
     (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop'])
     """
+    __tracebackhide__ = True
     _check_easycheck_arguments(handle_with=handle_with,
                                message=message,
                                execution_mode=execution_mode)
@@ -440,6 +446,7 @@ def check_comparison(item_1, operator, item_2,
     ...                  handle_with=Warning,
     ...                  message='Not less!')
     """
+    __tracebackhide__ = True
     _check_easycheck_arguments(handle_with=handle_with,
                                message=message,
                                operator=operator)
@@ -499,6 +506,7 @@ def check_all_ifs(*args):
     ...    )
     {'1: check_if': True, '2: check_if_not': Warning('It might be wrong!')}
     """
+    __tracebackhide__ = True
     check_length(args, 0,
                  operator=gt,
                  handle_with=ValueError,
@@ -600,6 +608,7 @@ def check_argument(argument,
     ...    handle_with=Warning,
     ...    message="Incorrect argument's value")
     """
+    __tracebackhide__ = True
     if all(item is None
            for item in (expected_type,
                         expected_choices,
@@ -661,6 +670,7 @@ def _make_message(message_provided, message_otherwise):
     >>> _make_message('Provided', 'Otherwise')
     'Provided'
     """
+    __tracebackhide__ = True
     return message_provided or message_otherwise
 
 
@@ -730,6 +740,7 @@ def catch_check(check_function, *args, **kwargs):
     ...    message='Beware of this problem')
     UserWarning('Beware of this problem')
     """
+    __tracebackhide__ = True
     check_if(isinstance(check_function, Callable),
              handle_with=TypeError,
              message=(f'{check_function} does not '
@@ -813,6 +824,7 @@ def _raise(error, message=None):
     ...    _raise(Warning, 'Watch out! Something might be wrong.')
     ...    assert_if('Watch out!' in str(w[-1].message))
     """
+    __tracebackhide__ = True
     if not isinstance(error, type) or not issubclass(error, Exception):
         raise TypeError('The error argument must be an exception or a warning')
 
@@ -859,6 +871,7 @@ def _check_easycheck_arguments(handle_with=None,
     TypeError: message must be either None or string
     >>> _check_easycheck_arguments(handle_with=ValueError, condition=2<1)
     """
+    __tracebackhide__ = True
     if all(argument is None
            for argument
            in (handle_with,
