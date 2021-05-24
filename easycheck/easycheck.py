@@ -551,6 +551,13 @@ def check_argument(argument,
             function. If argument_name is not defined, the error messages will
             not include the name of the argument, but will instead only report
             the default text 'argument'
+        expected_type (type, Iterable[type]): the expected type of the item
+        expected_choices (Iterable): a list of acceptable values of argument
+        expected_length (int): the expected type of the item
+        handle_with (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message
+        **kwargs: additional arguments passed to check_length (i.e.,
+            operator=eq and assign_length_to_others)
 
     Returns:
         None, if checks succeeded.
