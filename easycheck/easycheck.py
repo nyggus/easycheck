@@ -184,8 +184,8 @@ def check_length(item,
     """Compare item's length with expected_length, using operator.
 
     Args:
-        item: the object whose type we want to validate
-        expected_length (int): the expected type of the item
+        item: the object whose length we want to validate
+        expected_length (int): the expected length of the item
         handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message
         operator: one of the functions returned by get_possible_operators()
@@ -553,7 +553,7 @@ def check_argument(argument,
             the default text 'argument'
         expected_type (type, Iterable[type]): the expected type of the item
         expected_choices (Iterable): a list of acceptable values of argument
-        expected_length (int): the expected type of the item
+        expected_length (int): the expected length of the item
         handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message
         **kwargs: additional arguments passed to check_length (i.e.,
