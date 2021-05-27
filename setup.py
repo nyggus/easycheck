@@ -5,7 +5,7 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="easycheck",
-    version="0.3.0",
+    version="0.3.1",
     author="Nyggus & Ke Boan",
     author_email="nyggus@gmail.com",
     license='MIT',
