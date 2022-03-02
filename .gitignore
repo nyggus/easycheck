@@ -62,6 +62,9 @@ venv-*/
 # Wing project
 project_check_it.wpr
 
+# Visual Studio
+.vscode/*
+
 # Batch scripts
 *.bat
 *.sh
