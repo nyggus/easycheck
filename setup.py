@@ -5,10 +5,10 @@ with open("README.rst", "r") as fh:
 
 setuptools.setup(
     name="easycheck",
-    version="0.3.1",
+    version="0.3.2",
     author="Nyggus & Ke Boan",
     author_email="nyggus@gmail.com",
-    license='MIT',
+    license="MIT",
     description="A tool for simple functionalized assertions in Python",
     long_description=long_description,
     long_description_content_type="text/x-rst",
@@ -21,6 +21,7 @@ setuptools.setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries :: Python Modules",
