@@ -5,11 +5,11 @@ You can define complex checks using a function that collects calls to easycheck 
 
 .. code-block:: python
 
-    >>> from easycheck import check_if, check_instance, check_argument
+    >>> from easycheck import check_if, check_type, check_argument
     >>> def check_glm_args(glm_args):
-    ...    check_instance(glm_args[0], (int, float))
-    ...    check_instance(glm_args[1], str)
-    ...    check_instance(glm_args[2], str)
+    ...    check_type(glm_args[0], (int, float))
+    ...    check_type(glm_args[1], str)
+    ...    check_type(glm_args[2], str)
     ...    check_if(glm_args[0] > 0 and
     ...        glm_args[0] <= 1 and
     ...        glm_args[1] in ('poisson', 'quasi-poisson') and
@@ -34,11 +34,11 @@ We can do it in a more comprehensive way:
 
 .. code-block:: python
 
-    >>> from easycheck import check_if, check_instance
+    >>> from easycheck import check_if, check_type
     >>> def check_glm_args(glm_args):
-    ...    check_instance(glm_args[0], (int, float))
-    ...    check_instance(glm_args[1], str)
-    ...    check_instance(glm_args[2], str)
+    ...    check_type(glm_args[0], (int, float))
+    ...    check_type(glm_args[1], str)
+    ...    check_type(glm_args[2], str)
     ...    check_if(glm_args[0] > 0 and glm_args[0] <= 1,
     ...        handle_with=ValueError,
     ...        message='The first argument\'s value is incorrect'

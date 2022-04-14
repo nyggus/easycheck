@@ -5,7 +5,7 @@ One of the aims of the :code:`easycheck` package is to enable you to issue a war
 
 .. code-block:: python
 
-    >>> from easycheck import check_if, check_instance, check_length
+    >>> from easycheck import check_if, check_type, check_length
     >>> check_if(2 > 2, Warning)
 
 This will raise a warning (of the :code:`Warning` class), with a default (and unhelpful) message 'Warning', leading to the warning :code:`Warning: Warning`. To change this (rather unhelpful) message, use the :code:`message` parameter, as below:
@@ -23,7 +23,7 @@ Let's check other examples, but this time we will catch the warnings in order to
     >>> import warnings
     >>> x = 50
     >>> with warnings.catch_warnings(record=True) as this_warning:
-    ...     check_instance(x, (tuple, list), Warning, 'Incorrect value')
+    ...     check_type(x, (tuple, list), Warning, 'Incorrect value')
     ...     assert 'Incorrect value' in str(this_warning[-1].message)
     ...     assert str(this_warning[-1].category) == "<class 'Warning'>"
 
@@ -38,7 +38,7 @@ You can use warnings in most :code:`easycheck` functions, and you can catch them
     ...    handle_with=Warning,
     ...    message='The list should be 5-element long')
     Warning('The list should be 5-element long')
-    >>> catch_check(check_instance,
+    >>> catch_check(check_type,
     ...    'some string but for sure not a float',
     ...    expected_type=float,
     ...    handle_with=Warning,

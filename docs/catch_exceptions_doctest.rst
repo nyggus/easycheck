@@ -5,7 +5,7 @@ If you do not want to raise exceptions but to catch them instead, you can do so 
 
 .. code-block:: python
 
-    >>> from easycheck import check_if, check_instance, catch_check
+    >>> from easycheck import check_if, check_type, catch_check
     >>> my_check = catch_check(check_if, 2 > 2, ValueError)
     >>> my_check
     ValueError()
@@ -14,7 +14,7 @@ If you do not want to raise exceptions but to catch them instead, you can do so 
     ValueError('Incorrect value')
     >>> type(my_check)
     <class 'ValueError'>
-    >>> check_instance(my_check, ValueError)
+    >>> check_type(my_check, ValueError)
     >>> raise(my_check)
     Traceback (most recent call last):
         ...

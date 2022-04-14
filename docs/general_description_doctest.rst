@@ -7,9 +7,9 @@ Consider the following example:
 
 .. code-block:: python
 
-    >>> from easycheck import (check_if, check_if_not, check_length, check_instance,
+    >>> from easycheck import (check_if, check_if_not, check_length, check_type,
     ...                      check_comparison, check_if_paths_exist, assert_if, assert_length,
-    ...                      assert_instance)
+    ...                      assert_type)
     >>> if 1 > 0:
     ...    raise ValueError('One is bigger than zero')
     Traceback (most recent call last):
@@ -108,13 +108,13 @@ you can do the following:
 
 .. code-block:: python
 
-    >>> check_instance(my_string, str, message='This is not a string')
+    >>> check_type(my_string, str, message='This is not a string')
 
 If the condition is not met, it will raise :code:`TypeError`:
 
 .. code-block:: python
 
-    >>> check_instance('string', list, message='List is required here')
+    >>> check_type('string', list, message='List is required here')
     Traceback (most recent call last):
         ...
     TypeError: List is required here
@@ -155,7 +155,7 @@ The module also offers two-item comparisons, also using the operator parameter:
 Use in testing
 --------------
 
-The module offers assert-like functions, which are simply aliases of the corresponding easycheck functions: :code:`assert_if()`, :code:`assert_if_not()`, :code:`assert_instance()`, :code:`assert_length()` and :code:`assert_paths()`. You can use them in doctesting and pytesting, and their main advantage over the classical assertion expression is that they can use any exception you want, which makes testing output more informative. Also, due to the way they are written, you can design customized testing functions for particular situations.
+The module offers assert-like functions, which are simply aliases of the corresponding easycheck functions: :code:`assert_if()`, :code:`assert_if_not()`, :code:`assert_type()`, :code:`assert_length()` and :code:`assert_paths()`. You can use them in doctesting and pytesting, and their main advantage over the classical assertion expression is that they can use any exception you want, which makes testing output more informative. Also, due to the way they are written, you can design customized testing functions for particular situations.
 
 For instance, instead of
 
@@ -170,7 +170,7 @@ you can do the following:
 
 .. code-block:: python
 
-    >>> assert_instance(string, str)
+    >>> assert_type(string, str)
     >>> check_if_not(string == 'Silence prefered')
     >>> assert_length(string, 10, operator=gt)
 

@@ -13,10 +13,10 @@ Here are several examples of the simplest uses of :code:`easycheck`:
 
 .. code-block:: python
 
-	>>> from easycheck import check_if, check_if_not, check_instance
+	>>> from easycheck import check_if, check_if_not, check_type
 	>>> def get_family_name(full_name):
 	...    check_if_not(full_name is None, TypeError, 'Missing name')
-	...    check_instance(full_name, str, message='Full name must be string')
+	...    check_type(full_name, str, message='Full name must be string')
 	...    check_if(' ' in full_name.strip(),
 	...        ValueError,
 	...        'No space in name: impossible to split first and second name'
@@ -61,7 +61,7 @@ Above, we used specified errors and messages, but we can make the call shorter b
 
 	>>> def get_family_name(full_name):
 	...    check_if_not(full_name is None, ValueError)
-	...    check_instance(full_name, str)
+	...    check_type(full_name, str)
 	...    check_if(' ' in full_name.strip(), ValueError)
 	...    return full_name.split(' ')[1]
 
