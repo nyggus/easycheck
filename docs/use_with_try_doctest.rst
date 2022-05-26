@@ -5,11 +5,11 @@ You can use :code:`easycheck` functions within a :code:`try-except` block to cat
 
 .. code-block:: python
 
-    >>> from easycheck import check_if_not, check_instance
+    >>> from easycheck import check_if_not, check_type
     >>> def foo(a, b):
     ...    try:
-    ...        check_instance(a, int, message='a must be integer')
-    ...        check_instance(b, int, message='b must be integer')
+    ...        check_type(a, int, message='a must be integer')
+    ...        check_type(b, int, message='b must be integer')
     ...        check_if_not(a > b, ValueError, 'a must not be higher than b')
     ...    except Exception as e:
     ...        print(f'Error: {e}')
@@ -25,10 +25,10 @@ You can get similar functionality using the function that catches exceptions, th
 
 .. code-block:: python
 
-    >>> from easycheck import check_if_not, check_instance, catch_check
+    >>> from easycheck import check_if_not, check_type, catch_check
     >>> def bar(a, b):
-    ...    a_check = catch_check(check_instance, a, int, message='a must be integer')
-    ...    b_check = catch_check(check_instance, b, int, message='b must be integer')
+    ...    a_check = catch_check(check_type, a, int, message='a must be integer')
+    ...    b_check = catch_check(check_type, b, int, message='b must be integer')
     ...    if not a_check and not b_check:
     ...        a_b_check = catch_check(check_if_not, a > b, ValueError, 'a must not be higher than b')
     ...        if a_b_check:

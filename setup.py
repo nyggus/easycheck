@@ -4,12 +4,12 @@ with open("README.rst", "r") as fh:
     long_description = fh.read()
 
 extras_requirements = {
-    "dev": ["pytest==7.0.1", "wheel==0.37.1", ],
+    "dev": ["pytest", "wheel", "black"],
 }
 
 setuptools.setup(
     name="easycheck",
-    version="0.3.2",
+    version="0.3.3",
     author="Nyggus & Ke Boan",
     author_email="nyggus@gmail.com",
     license="MIT",
@@ -30,6 +30,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries :: Python Modules",
     ],
-    python_requires='>=3.6',
+    python_requires=">=3.6",
     extras_require=extras_requirements,
 )

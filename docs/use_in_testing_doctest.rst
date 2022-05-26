@@ -6,21 +6,21 @@ Although we stress that :code:`easycheck` functions are designed to be used with
 * :code:`assert_if` (for :code:`check_if`)
 * :code:`assert_if_not` (for :code:`check_if_not`)
 * :code:`assert_length` (for :code:`check_length`)
-* :code:`assert_instance` (for :code:`check_instance`)
+* :code:`assert_type` (for :code:`check_type`)
 * :code:`assert_paths` (for :code:`check_if_paths_exist`)
 
 As aliases, they use the same syntax and arguments as their :code:`easycheck` counterparts. See:
 
 .. code-block:: python
 
-    >>> from easycheck import assert_if, assert_instance, assert_length
+    >>> from easycheck import assert_if, assert_type, assert_length
     >>> def multiply_string(string, k):
     ...    """Make a list consisting of string k times.
     ...    >>> single_string = 'aka'
     ...    >>> string_multiplied = multiply_string(single_string, 3)
-    ...    >>> assert_instance(string_multiplied, list)
+    ...    >>> assert_type(string_multiplied, list)
     ...    >>> for i, item in enumerate(string_multiplied):
-    ...            assert_instance(item, str)
+    ...            assert_type(item, str)
     ...            assert_if(item == single_string)
     ...    >>> assert_length(string_multiplied, 3)
     ...    """
@@ -32,9 +32,9 @@ When you run doctests, all tests will run without error, as in the below simulat
 
     >>> single_string = 'aka'
     >>> string_multiplied = multiply_string(single_string, 3)
-    >>> assert_instance(string_multiplied, list)
+    >>> assert_type(string_multiplied, list)
     >>> for i, item in enumerate(string_multiplied):
-    ...    assert_instance(item, str)
+    ...    assert_type(item, str)
     ...    assert_if(item == single_string)
     >>> assert_length(string_multiplied, 3)
 

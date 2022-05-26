@@ -20,7 +20,7 @@ or you can use :code:`easycheck` for this:
 
 .. code-block:: python
 
-    check_instance(x, (float, int), message='x must be a number')
+    check_type(x, (float, int), message='x must be a number')
     check_if(x <= 10, ValueError, 'Too high value of x')
 
 The :code:`easycheck` approach has two main advantages over this classical approach:
@@ -38,7 +38,7 @@ The package also offers functions dedicated to testing, e.g.,
 
 .. code-block:: python
 
-    assert_instance(x, (float, int))
+    assert_type(x, (float, int))
     assert_if(x <= 10)
 
 Installing
@@ -84,9 +84,9 @@ Some other functions have different default errors; for instance, this call
 
 .. code-block:: python
 
-    check_instance(a, expected_type=str)
+    check_type(a, expected_type=str)
     # or shorter:
-    check_instance(a, str)
+    check_type(a, str)
 
 will raise :code:`TypeError` while this
 
@@ -101,7 +101,7 @@ Here is a list of :code:`easycheck` functions the module offers, along with thei
 * :code:`check_if()`, with the alias of :code:`assert_if()`
 * :code:`check_if_not()`, with the alias of :code:`assert_if_not()`
 * :code:`check_length()`, with the alias of :code:`assert_length()`
-* :code:`check_instance()`, with the alias of :code:`assert_instance()`
+* :code:`check_type()`, with the alias of :code:`assert_type()`
 * :code:`check_if_paths_exist()`, with the alias of :code:`assert_paths()`
 * :code:`check_comparison()` (used to compare two items)
 * :code:`check_all_ifs()` (used to check multiple conditions and return all the checks)
@@ -207,8 +207,8 @@ As mentioned above, most :code:`easycheck` functions have aliases to be used in 
         a, b = my_function_1(), my_function_2()
         
         assert_if(a == 2)
-        assert_instance(a, int)
-        assert_instance(b, tuple)
+        assert_type(a, int)
+        assert_type(b, tuple)
         assert_length(b, 5)
 
 Note that only the first one will raise :code:`AssertionError` while the others will raise more meaningful errors (:code:`TypeError` and :code:`LengthError`), which may better explain the reasons that the tests did not pass.
