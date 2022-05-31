@@ -100,6 +100,7 @@ Here is a list of :code:`easycheck` functions the module offers, along with thei
 
 * :code:`check_if()`, with the alias of :code:`assert_if()`
 * :code:`check_if_not()`, with the alias of :code:`assert_if_not()`
+* :code:`check_if_isclose()`, with the alias of :code:`assert_if_isclose()`
 * :code:`check_length()`, with the alias of :code:`assert_length()`
 * :code:`check_type()`, with the alias of :code:`assert_type()`
 * :code:`check_if_paths_exist()`, with the alias of :code:`assert_paths()`
