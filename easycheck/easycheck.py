@@ -14,6 +14,7 @@ import os
 import warnings
 
 from collections.abc import Generator, Iterable, Callable
+from math import isclose
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
 
@@ -21,13 +22,9 @@ from pathlib import Path
 class LengthError(Exception):
     """Exception class used by the check_length() function."""
 
-    pass
-
 
 class OperatorError(Exception):
     """Exception class used for catching incorrect operators."""
-
-    pass
 
 
 class ComparisonError(Exception):
@@ -38,8 +35,13 @@ class ComparisonError(Exception):
     error for comparison purposes.
     """
 
-    pass
 
+class NotCloseEnoughError(Exception):
+    """Exception class used by check_if_isclose().
+    
+    The exception is raised when two compared floats are not close enough,
+    given relative or absolute tolerance.
+    """
 
 class ArgumentValueError(Exception):
     """Exception class to catch incorrect values of arguments.
@@ -50,7 +52,9 @@ class ArgumentValueError(Exception):
     a default exception.
     """
 
-    pass
+
+class MissingToleranceError(Exception):
+    """Exception class to be used when no tolerance is provided in check_if_isclose()"""
 
 
 def check_if(condition, handle_with=AssertionError, message=None):
@@ -311,6 +315,92 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
         handle_with=handle_with,
         message=message,
     )
+
+
+
+def check_if_isclose(x, y, /,
+                     handle_with=NotCloseEnoughError,
+                     message=None,
+                     rel_tol=None, abs_tol=None):
+    """Check if two floats are close in value.
+    
+    The function uses math.isclose(), but slightly changes its behavior (when
+    the user provides both tolerances). Then, two values will be considered
+    close when the difference between them is smaller than at least one of
+    the tolerances.
+    
+    Note: Before applying math.isclose(), x and y are first converted to
+    floats, so you can provide them as integers or even strings.
+    
+    At least one tolerance needs to be provided (so not be zero); otherwise
+    the function will do nothing.
+    
+    Unlike most easycheck functions, check_if_isclose() uses two
+    positional-only and four keyword-only arguments. So when providing one of
+    the two tolerances, you have to specify it using the argument's name. You
+    have to do the same also for handle_with and message.
+    
+    Args:
+        x, y (float): two numbers to compare
+        rel_tol (float): maximum difference for being considered "close",
+            relative to the magnitude of the input values
+        abs_tol (float): maximum difference for being considered "close",
+            regardless of the magnitude of the input values
+        handle_with (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message
+
+    Returns:
+        None, if check succeeded.
+
+    Raises:
+        Exception of the type provided by the handle_with parameter,
+        NotCloseEnoughError by default.
+
+    >>> check_if_isclose(1.12, 1.12, rel_tol=1e-09)
+    >>> check_if_isclose('1.12', '1.12', rel_tol=1e-09)
+    >>> check_if_isclose(1.12, 1.13, rel_tol=1e-09)
+    Traceback (most recent call last):
+        ...
+    easycheck.NotCloseEnoughError
+    
+    >>> check_if_isclose(1.12, 1.13, rel_tol=.05)
+    >>> check_if_isclose(1.12, 1.13, abs_tol=.05)
+    >>> check_if_isclose(1.12, 1.13, abs_tol=.005)
+    Traceback (most recent call last):
+        ...
+    easycheck.NotCloseEnoughError
+
+    >>> check_if_isclose(1.12, 2.12, rel_tol=1e-09)
+    Traceback (most recent call last):
+        ...
+    easycheck.NotCloseEnoughError
+
+    >>> check_if_isclose(1.12, 2.12, ValueError, rel_tol=1e-09)
+    Traceback (most recent call last):
+        ...
+    ValueError
+    """
+    __tracebackhide__ = True
+    _check_easycheck_arguments(
+        handle_with=handle_with, message=message,
+    )
+    x = float(x)
+    y = float(y)
+
+    if rel_tol is not None:
+        check_if(
+            isclose(x, y, rel_tol=rel_tol),
+            handle_with,
+            message
+        )
+    if abs_tol is not None:
+        check_if(
+            isclose(x, y, abs_tol=abs_tol),
+            handle_with,
+            message
+        )
+    if rel_tol is None and abs_tol is None:
+        raise MissingToleranceError("Provide abs_tol or rel_tol, or both")
 
 
 def check_if_paths_exist(
@@ -1003,7 +1093,7 @@ assert_if_not = check_if_not
 assert_length = check_length
 assert_type = check_type
 assert_paths = check_if_paths_exist
-
+assert_if_isclose = check_if_isclose
 
 # Alias to ensure backward compatibility
 
