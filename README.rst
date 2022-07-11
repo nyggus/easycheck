@@ -98,17 +98,20 @@ will raise :code:`LengthError` (an exception class defined in the :code:`easyche
 
 Here is a list of :code:`easycheck` functions the module offers, along with their aliases to be used for testing:
 
-* :code:`check_if()`, with the alias of :code:`assert_if()`
-* :code:`check_if_not()`, with the alias of :code:`assert_if_not()`
-* :code:`check_if_isclose()`, with the alias of :code:`assert_if_isclose()`
-* :code:`check_length()`, with the alias of :code:`assert_length()`
-* :code:`check_type()`, with the alias of :code:`assert_type()`
-* :code:`check_if_paths_exist()`, with the alias of :code:`assert_paths()`
-* :code:`check_comparison()` (used to compare two items)
-* :code:`check_all_ifs()` (used to check multiple conditions and return all the checks)
-* :code:`check_argument()` (used to make several checks of a function's argument)
+* :code:`check_if()`, with the alias of :code:`assert_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
+* :code:`check_if_not()`, with the alias of :code:`assert_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is _not_ met;
+* :code:`check_if_isclose()`, with the alias of :code:`assert_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
+* :code:`check_length()`, with the alias of :code:`assert_length()`; to compare length (equal to, smaller than, greater than, and the like);
+* :code:`check_type()`, with the alias of :code:`assert_type()`; to check expected type, similar to :code:`isinstance()`;
+* :code:`check_if_paths_exist()`, with the alias of :code:`assert_paths()`; to compare paths (or just one path) exist;
+* :code:`check_comparison()` (used to compare two items); to compare to objectsm just like you would do using :code:`if obj1 != obj2: raise`
+* :code:`check_all_ifs()`; used to check multiple conditions and return all the checks;
+* :code:`check_argument()`; used to make one or more checks of a function's argument.
 
 You can also use a :code:`catch_check()` function, if you want to catch an exception or a warning the :code:`easycheck` function you use would raise (see examples `here <https://github.com/nyggus/easycheck/blob/master/docs/catch_exceptions_doctest.rst>`_). Sometimes, however, you will do better using a :code:`try-except` block to catch exceptions (`see examples <https://github.com/nyggus/easycheck/blob/master/docs/use_with_try_doctest.rst>`_).
+
+> Note that some :code:`easycheck` functions are simple wrappers around built-in functions, but their behavior is different, as they have the typical behavior of an :code:`easycheck` function: if a condition is not met, an exception is raised or an issue is raised.
+
 
 Use in code to issue warnings
 -----------------------------

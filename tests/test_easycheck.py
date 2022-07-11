@@ -26,7 +26,6 @@ from easycheck.easycheck import (
     LengthError,
     OperatorError,
     NotCloseEnoughError,
-    MissingToleranceError,
     get_possible_operators,
     _raise,
     _check_easycheck_arguments,
@@ -193,9 +192,6 @@ def test_check_if_isclose_edge_cases():
     with pytest.raises(ValueError,
                        match="could not convert string to float: '1,1'"):
         check_if_isclose('1,1', '1.2', abs_tol='.1')
-    with pytest.raises(MissingToleranceError,
-                       match="Provide abs_tol or rel_tol, or both"):
-        check_if_isclose('1.1', '1.2')
     with pytest.raises(TypeError,
                        match=("positional-only arguments passed"
                               " as keyword arguments")):
@@ -221,27 +217,23 @@ def test_check_if_isclose_positive():
                             rel_tol=.05,
                             handle_with=ValueError) is None
 
-    # both checks (abs_tol and rel_tol) have to pass:
+    # any of the two check (abs_tol or rel_tol) is enough
+    # for the test to pass:
     assert check_if_isclose(1.12, 1.123, rel_tol=.05, abs_tol=.05) is None
+    
+    check_if_isclose(1.12, 1.123, rel_tol=.000005, abs_tol=.05)
 
 
 def test_check_if_isclose_negative():
     with pytest.raises(NotCloseEnoughError):
         check_if_isclose(1.12, 1.123, abs_tol=.0005)
-    
-    # if only one does not pass:
-    with pytest.raises(NotCloseEnoughError):
-        check_if_isclose(1.12, 1.123, rel_tol=.000005, abs_tol=.05)
-    with pytest.raises(NotCloseEnoughError):
-        check_if_isclose(1.12, 1.123, rel_tol=.05, abs_tol=.000005)
-
-    # with message:
     with pytest.raises(NotCloseEnoughError):
         check_if_isclose(1.12, 1.123,
                          message="Not close",
-                         rel_tol=.000005, abs_tol=.05)
+                         rel_tol=0,
+                         abs_tol=.0005)
     with pytest.raises(NotCloseEnoughError):
-        check_if_isclose(1.12, 1.123, rel_tol=.05, abs_tol=.000005)
+        check_if_isclose(1.12, 1.123, rel_tol=.0005)
 
 
 def test_check_type_edge_cases():

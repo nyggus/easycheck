@@ -16,7 +16,6 @@ from .easycheck import (
     LengthError,
     OperatorError,
     NotCloseEnoughError,
-    MissingToleranceError,
     # Testing aliases
     assert_if,
     assert_if_not,
