@@ -41,6 +41,7 @@ The package also offers functions dedicated to testing, e.g.,
     assert_type(x, (float, int))
     assert_if(x <= 10)
 
+
 Installing
 ----------
 
@@ -72,7 +73,20 @@ This simply checks if :code:`a` is smaller than 10; if it is, nothing happens (i
     # or shorter and equally readable:
     check_if(a < 10, ValueError)
 
-but you can also add a message:
+The default setting is to use the exception's docstring (`.__doc__`) as a message. In the case of :code:`ValueError`, it is "Inappropriate argument value (of correct type).". You can use this when you create custom exceptions:
+
+.. code-block:: python
+
+    class IncorrectNameTypeError(Exception):
+        """Argument name must be a string."""
+    
+    name = 40
+    check_type(name, IncorrectNameTypeError)
+    Traceback (most recent call last):
+      ...
+    IncorrectNameTypeError: Argument name must be a string.
+
+If you do not want any message to be printed, use :code:`message=None`. You can also add a custom message:
 
 .. code-block:: python
 
@@ -124,6 +138,19 @@ In order to issue a warning if a condition is violated, simply use a warning cla
     check_length([1, 2, 3], 10, Warning, 'Too short list with data')
 
 Remember to always use a message with warnings, in order to make them meaningful. (See more in `use_with_warnings_doctest.rst <https://github.com/nyggus/easycheck/blob/master/docs/use_with_warnings_doctest.rst>`_).
+
+
+Of course, you can use a custom warning:
+
+.. code-block:: python
+
+    class TooSmallSampleSize(Warning):
+        """Results for samples size below 100 can be unstable."""
+    
+    n = 50
+    check_if(n >= 100, TooSmallSampleSize)
+    ... TooSmallSampleSize: Results for samples size below 100 can be unstable.
+      warnings.warn(message, error)
 
 
 Use in code, an example
