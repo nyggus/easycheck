@@ -43,7 +43,7 @@ If you are fine with AssertionError (actually, the only built-in exception class
     >>> check_if(0 > 1)
     Traceback (most recent call last):
         ...
-    AssertionError
+    AssertionError: Assertion failed.
 
 This may be the most efficient way for debugging using simple assertions.
 
