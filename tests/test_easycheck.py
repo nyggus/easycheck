@@ -26,6 +26,7 @@ from easycheck.easycheck import (
     LengthError,
     OperatorError,
     NotCloseEnoughError,
+    IncorrectMessageType,
     get_possible_operators,
     _raise,
     _check_easycheck_arguments,
@@ -50,7 +51,7 @@ def test_check_if_edge_cases():
     with pytest.raises(TypeError, match="handle_with must be an exception"):
         check_if(1, 1)
     with pytest.raises(
-        TypeError, match="message must be either None or string"
+        TypeError, match="DocAsMessage"
     ):
         check_if(1, ValueError, 1)
     with pytest.raises(TypeError, match="takes from 1 to 3 positional"):
@@ -103,7 +104,7 @@ def test_check_if_not_edge_cases():
     with pytest.raises(TypeError, match="handle_with must be an exception"):
         check_if_not(1, 1)
     with pytest.raises(
-        TypeError, match="message must be either None or string"
+        TypeError, match="DocAsMessage"
     ):
         check_if_not(1, ValueError, 1)
     with pytest.raises(TypeError, match="takes from 1 to 3 positional"):
@@ -831,9 +832,9 @@ def test_raise_edge_cases():
         TypeError, match="The error argument must be an exception or a warning"
     ):
         _raise(NotImplemented)
-    with pytest.raises(TypeError, match="message must be string"):
+    with pytest.raises(IncorrectMessageType, match="DocAsMessage"):
         _raise(error=TypeError, message=20)
-    with pytest.raises(TypeError, match="message must be string"):
+    with pytest.raises(IncorrectMessageType, match="DocAsMessage"):
         _raise(TypeError, ("This was an error", ""))
 
 
@@ -1327,3 +1328,31 @@ def test_assert_functions():
     )
     with pytest.raises(FileNotFoundError):
         assert_paths("Q:/E/") and check_if_paths_exist("Q:/E/") is None
+
+
+class TestingErrorWithDoc(Exception):
+    """This is error for testing purposes."""
+
+
+class TestingErrorWithoutDoc(Exception):
+    ...
+
+
+def test_DocAsMessage_with_doc():
+    with pytest.raises(AssertionError, match=""):
+        check_if(1 == 2, message=None)
+    with pytest.raises(AssertionError, match="Error"):
+        check_if(1 == 2, message="Error")
+    with pytest.raises(AssertionError, match="Assertion failed"):
+        check_if(1 == 2)
+    assert check_if(1 == 1, TestingErrorWithDoc) is None
+    with pytest.raises(TestingErrorWithDoc, match="for testing purposes"):
+        check_if(1 == 2, TestingErrorWithDoc)
+
+
+def test_DocAsMessage_without_doc():
+    assert check_if(1 == 1, TestingErrorWithoutDoc) is None
+    with pytest.raises(TestingErrorWithoutDoc, match="Error! Shout!"):
+        check_if(1 == 2, TestingErrorWithoutDoc, message="Error! Shout!")
+    with pytest.raises(TestingErrorWithoutDoc, match=""):
+        check_if(1 == 2, TestingErrorWithoutDoc)
