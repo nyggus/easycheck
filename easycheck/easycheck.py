@@ -13,47 +13,40 @@ assert_type(), assert_length(), and assert_path()).
 import os
 import warnings
 
-from collections.abc import Generator, Iterable, Callable
+from collections.abc import Iterable, Callable
 from math import isclose
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
 
 
 class LengthError(Exception):
-    """Exception class used by the check_length() function."""
+    """Check of length is incorrect."""
 
 
 class OperatorError(Exception):
-    """Exception class used for catching incorrect operators."""
+    """Invalid operator."""
 
 
 class ComparisonError(Exception):
-    """Optional exception class for the check_comparison() function.
-
-    The default exception class for check_comparison() is ValueError, but
-    this class is ready for you to use in case you want to catch a customized
-    error for comparison purposes.
-    """
+    """The comparison is not true."""
 
 
 class NotCloseEnoughError(Exception):
-    """Exception class used by check_if_isclose().
-    
-    The exception is raised when two compared floats are not close enough,
-    given relative or absolute tolerance.
-    """
+    """The two float numbers are not close enough."""
 
 class ArgumentValueError(Exception):
-    """Exception class to catch incorrect values of arguments.
-
-    Normally such situations are represented by ValueError, but since we are
-    checking this aspect of function calls very often, it may be good to use
-    a dedicated exception. The function check_argument() uses this class as
-    a default exception.
-    """
+    """Argument's value is incorrect."""
 
 
-def check_if(condition, handle_with=AssertionError, message=None):
+class IncorrectMessageType(Exception):
+    """Argument message must be either None, string or instance of DocAsMessage."""
+
+
+class DocAsMessage:
+    """Use exception class's __doc__ as message."""
+
+
+def check_if(condition, handle_with=AssertionError, message=DocAsMessage()):
     """Check if a condition is true.
 
     Args:
@@ -955,14 +948,22 @@ def _raise(error, message=None):
     if issubclass(error, Warning):
         if message is None:
             message = "Warning"
-        check_type(message, str, message="message must be string")
+        elif isinstance(message, str):
+            message = message
+        elif isinstance(message, DocAsMessage):
+            message = error.__doc__
+        else:
+            raise IncorrectMessageType(IncorrectMessageType.__doc__)
         warnings.warn(message, error)
     else:
         if message is None:
             raise error
-        else:
-            check_type(message, str, message="message must be string")
+        elif isinstance(message, DocAsMessage):
+            raise error(error.__doc__)
+        elif isinstance(message, str):
             raise error(message)
+        else:
+            raise IncorrectMessageType(IncorrectMessageType.__doc__)
 
 
 def _check_easycheck_arguments(
@@ -1021,8 +1022,8 @@ def _check_easycheck_arguments(
         if not is_subclass:
             raise TypeError("handle_with must be an exception")
     if message is not None:
-        if not isinstance(message, str):
-            raise TypeError("message must be either None or string")
+        if not isinstance(message, (str, DocAsMessage)):
+            raise TypeError("message must be DocAsMessage(), None or string")
     if condition is not None:
         if not isinstance(condition, bool):
             raise ValueError("The condition does not return a boolean value")
