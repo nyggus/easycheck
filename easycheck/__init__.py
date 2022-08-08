@@ -5,6 +5,7 @@ from .easycheck import (
     check_type,
     check_if_paths_exist,
     check_length,
+    check_if_isclose,
     check_all_ifs,
     check_argument,
     check_comparison,
@@ -14,10 +15,12 @@ from .easycheck import (
     ArgumentValueError,
     LengthError,
     OperatorError,
+    NotCloseEnoughError,
     # Testing aliases
     assert_if,
     assert_if_not,
     assert_length,
+    assert_if_isclose,
     assert_type,
     assert_paths,
     # Backward-compatibility aliases

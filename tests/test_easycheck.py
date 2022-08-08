@@ -11,6 +11,8 @@ from easycheck.easycheck import (
     assert_if_not,
     check_type,
     assert_type,
+    check_if_isclose,
+    assert_if_isclose,
     check_if_paths_exist,
     assert_paths,
     check_length,
@@ -23,6 +25,7 @@ from easycheck.easycheck import (
     ArgumentValueError,
     LengthError,
     OperatorError,
+    NotCloseEnoughError,
     get_possible_operators,
     _raise,
     _check_easycheck_arguments,
@@ -175,6 +178,62 @@ def test_check_length_negative_warnings():
             message="This is a testing warning",
         )
         assert "This is a testing warning" in str(w[-1].message)
+
+
+def test_check_if_isclose_edge_cases():
+    with pytest.raises(ValueError, match="tolerances must be non-negative"):
+        check_if_isclose(1.1, 1.2, abs_tol=-1)
+    with pytest.raises(ValueError, match="tolerances must be non-negative"):
+        check_if_isclose(1.1, 1.2, rel_tol=-1)
+    with pytest.raises(TypeError, match="must be real number, not str"):
+        check_if_isclose(1.1, 1.2, rel_tol='.1')
+    with pytest.raises(TypeError, match="must be real number, not str"):
+        check_if_isclose(1.1, 1.2, abs_tol='.1')
+    with pytest.raises(ValueError,
+                       match="could not convert string to float: '1,1'"):
+        check_if_isclose('1,1', '1.2', abs_tol='.1')
+    with pytest.raises(TypeError,
+                       match=("positional-only arguments passed"
+                              " as keyword arguments")):
+        check_if_isclose(x='1.1', y='1.2')
+    
+
+def test_check_if_isclose_positive():
+    assert check_if_isclose(1.12, 1.12, abs_tol=.01) is None
+    assert check_if_isclose(1.12, 1.123, abs_tol=.05) is None
+    assert check_if_isclose(1.12, 1.123, rel_tol=.01) is None
+    assert check_if_isclose(1.12, 1.123, rel_tol=.05) is None
+
+    assert check_if_isclose("1.12", 1.12, abs_tol=.01) is None
+    assert check_if_isclose(1.12, "1.12", abs_tol=.01) is None
+    assert check_if_isclose("1.12", "1.12", abs_tol=.01) is None
+    assert check_if_isclose(" 1.12 ", 1.12, abs_tol=.01) is None
+    assert check_if_isclose(" 1.12 ", "\t1.12\n", abs_tol=.01) is None
+    assert check_if_isclose(
+        " 1.12 ", "\t     1.12   \n  \n   \n\n\n",
+        abs_tol=.01) is None
+    
+    assert check_if_isclose(1.12, 1.123,
+                            rel_tol=.05,
+                            handle_with=ValueError) is None
+
+    # any of the two check (abs_tol or rel_tol) is enough
+    # for the test to pass:
+    assert check_if_isclose(1.12, 1.123, rel_tol=.05, abs_tol=.05) is None
+    
+    check_if_isclose(1.12, 1.123, rel_tol=.000005, abs_tol=.05)
+
+
+def test_check_if_isclose_negative():
+    with pytest.raises(NotCloseEnoughError):
+        check_if_isclose(1.12, 1.123, abs_tol=.0005)
+    with pytest.raises(NotCloseEnoughError):
+        check_if_isclose(1.12, 1.123,
+                         message="Not close",
+                         rel_tol=0,
+                         abs_tol=.0005)
+    with pytest.raises(NotCloseEnoughError):
+        check_if_isclose(1.12, 1.123, rel_tol=.0005)
 
 
 def test_check_type_edge_cases():
