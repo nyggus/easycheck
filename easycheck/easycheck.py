@@ -966,9 +966,15 @@ def _raise(error, message=None):
         raise IncorrectMessageType(IncorrectMessageType.__doc__)
 
     if issubclass(error, Warning):
-        warnings.warn(message, error)
+        if message:
+            warnings.warn(message, error)
+        else:
+            warnings.warn(error)
     elif issubclass(error, Exception):
-        raise error(message)
+        if message:
+            raise error(message)
+        else:
+            raise error
     else:
         raise IncorrectMessageType(IncorrectMessageType.__doc__)
 
@@ -1094,3 +1100,9 @@ assert_if_isclose = check_if_isclose
 
 check_instance = check_type
 assert_instance = assert_type
+
+
+if __name__ == "__main__":
+    import doctest
+    
+    doctest.testmod()
