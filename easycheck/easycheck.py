@@ -50,8 +50,9 @@ def check_if(condition, handle_with=AssertionError, message=None):
         handle_with (type): the type of exception to be raised or warning to
             be issued
         message (str): a text to use as the exception/warning message. 
-            Defaults to None, which means using the docstrings of the
-            exception class as a message.
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
     Returns:
         None, if check succeeded.
@@ -115,7 +116,11 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
     Args:
         condition (bool): condition to check.
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+
 
     Returns:
         None, if check succeeded.
@@ -188,7 +193,10 @@ def check_length(
         item: the object whose length we want to validate
         expected_length (int): the expected length of the item
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
         operator: one of the functions returned by get_possible_operators()
         assign_length_to_others (bool): treat all numeric types as having the
             length of 1. If False, any attempt to validate a numeric type
@@ -240,7 +248,10 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
         item: the object whose type we want to validate
         expected_type (type, Iterable[type]): the expected type of the item
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
     Returns:
         None, if check succeeded.
@@ -341,7 +352,10 @@ def check_if_isclose(x, y, /,
         abs_tol (float): maximum difference for being considered "close",
             regardless of the magnitude of the input values
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
     Returns:
         None, if check succeeded.
@@ -398,7 +412,10 @@ def check_if_paths_exist(
         paths (str, pathlib.Path, Iterable[str or pathlib.Path]): path or paths
             to validate
         handle_with (type): type of exception or warning to be raised/returned
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
         execution_mode (str): defines what happens if not all the paths exist
             May take one of the following values:
                 - 'raise': exception/warning will be raised
@@ -490,7 +507,10 @@ def check_comparison(
         operator: one of the functions returned by get_possible_operators()
         item_2: the second item to compare
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
     Returns:
         None, if check succeeded.
@@ -639,7 +659,10 @@ def check_argument(
         expected_choices (Iterable): a list of acceptable values of argument
         expected_length (int): the expected length of the item
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
         **kwargs: additional arguments passed to check_length (i.e.,
             operator=eq and assign_length_to_others)
 
@@ -914,9 +937,11 @@ def _raise(error, message=None):
 
     Args:
         error (type): the type of exception or warning to be raised
-        message (str): a text of the exception/warning message. If error
-        is a Warning subclass, you should provide your own message, otherwise
-        a default message ('Warning') will be used.
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+
 
     Raises:
         Exception of the type provided by the error parameter
