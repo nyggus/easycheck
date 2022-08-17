@@ -20,7 +20,7 @@ from pathlib import Path
 
 
 class LengthError(Exception):
-    """Check of length is incorrect."""
+    """Violated length check."""
 
 
 class OperatorError(Exception):
