@@ -8,7 +8,7 @@ If you do not want to raise exceptions but to catch them instead, you can do so 
     >>> from easycheck import check_if, check_type, catch_check
     >>> my_check = catch_check(check_if, 2 > 2, ValueError)
     >>> my_check
-    ValueError('Inappropriate argument value (of correct type).')
+    ValueError()
     >>> my_check = catch_check(check_if, 2 > 2, ValueError, 'Incorrect value')
     >>> my_check
     ValueError('Incorrect value')

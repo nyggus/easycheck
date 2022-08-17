@@ -46,11 +46,11 @@ Do remember, however, *not* to use warnings in testing! Consider the following:
     >>> check_if(2 < 1)
     Traceback (most recent call last):
 	    ...
-    AssertionError: Assertion failed.
+    AssertionError
     >>> check_if(2 < 1, ValueError)
     Traceback (most recent call last):
         ...
-    ValueError: Inappropriate argument value (of correct type).
+    ValueError
     >>> assert_if(2 < 1, Warning)
     >>> assert_if(2 < 1, UserWarning)
     

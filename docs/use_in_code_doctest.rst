@@ -70,7 +70,7 @@ Above, we used specified errors and messages, but we can make the call shorter b
 	>>> get_family_name('John_Smith')
 	Traceback (most recent call last):
 		...
-	ValueError: Inappropriate argument value (of correct type).
+	ValueError
 
 	>>> get_family_name(57)
 	Traceback (most recent call last):
