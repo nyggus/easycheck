@@ -51,7 +51,7 @@ def test_check_if_edge_cases():
     with pytest.raises(TypeError, match="handle_with must be an exception"):
         check_if(1, 1)
     with pytest.raises(
-        TypeError, match="message must be None or string"
+        TypeError, match="message must be either None or string"
     ):
         check_if(1, ValueError, 1)
     with pytest.raises(TypeError, match="takes from 1 to 3 positional"):
@@ -104,7 +104,7 @@ def test_check_if_not_edge_cases():
     with pytest.raises(TypeError, match="handle_with must be an exception"):
         check_if_not(1, 1)
     with pytest.raises(
-        TypeError, match="message must be None or string"
+        TypeError, match="message must be either None or string"
     ):
         check_if_not(1, ValueError, 1)
     with pytest.raises(TypeError, match="takes from 1 to 3 positional"):
@@ -1343,7 +1343,7 @@ def test_message_is_None_exception_with_docstring():
         check_if(1 == 2, message=None)
     with pytest.raises(AssertionError, match="Error"):
         check_if(1 == 2, message="Error")
-    with pytest.raises(AssertionError, match="Assertion failed"):
+    with pytest.raises(AssertionError):
         check_if(1 == 2)
     assert check_if(1 == 1, ForTestingErrorWithDoc) is None
     with pytest.raises(ForTestingErrorWithDoc, match="for testing purposes"):
