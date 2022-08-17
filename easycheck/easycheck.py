@@ -146,7 +146,7 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
     >>> check_if_not(2 > 1)
     Traceback (most recent call last):
         ...
-    AssertionError: Assertion failed.
+    AssertionError
     >>> check_if_not(2 > 1, message="")
     Traceback (most recent call last):
         ...
@@ -272,7 +272,7 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
     >>> check_type((i for i in range(3)), tuple)
     Traceback (most recent call last):
         ...
-    TypeError: Inappropriate argument type.
+    TypeError
     >>> check_type(
     ...    (i for i in range(3)), tuple, message='This is not tuple.')
     Traceback (most recent call last):
@@ -355,19 +355,19 @@ def check_if_isclose(x, y, /,
     >>> check_if_isclose(1.12, 1.13, rel_tol=1e-09)
     Traceback (most recent call last):
         ...
-    easycheck.NotCloseEnoughError
+    NotCloseEnoughError: The two float numbers are not close enough.
     
     >>> check_if_isclose(1.12, 1.13, rel_tol=.05)
     >>> check_if_isclose(1.12, 1.13, abs_tol=.05)
     >>> check_if_isclose(1.12, 1.13, abs_tol=.005)
     Traceback (most recent call last):
         ...
-    easycheck.NotCloseEnoughError
+    NotCloseEnoughError: The two float numbers are not close enough.
 
     >>> check_if_isclose(1.12, 2.12)
     Traceback (most recent call last):
         ...
-    easycheck.NotCloseEnoughError
+    NotCloseEnoughError: The two float numbers are not close enough.
 
     >>> check_if_isclose(1.12, 2.12, ValueError, rel_tol=1e-09)
     Traceback (most recent call last):
@@ -518,7 +518,7 @@ def check_comparison(
     ...                  message='Not less!')
     Traceback (most recent call last):
         ...
-    easycheck.ComparisonError: Not less!
+    ComparisonError: Not less!
 
     To issue a warning, do the following:
     >>> check_comparison('one text', lt, 'another text',
@@ -666,7 +666,7 @@ def check_argument(
     ...    )
     Traceback (most recent call last):
         ...
-    easycheck.ArgumentValueError: Incorrect type of x; valid type(s): <class 'tuple'>
+    ArgumentValueError: Incorrect type of x; valid type(s): <class 'tuple'>
 
     The expected_choices argument helps you check whether the user provided
     a valid value for the argument:
@@ -678,7 +678,7 @@ def check_argument(
     >>> foo('no choice') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    easycheck.ArgumentValueError: x's value, no choice, is not among valid ...
+    ArgumentValueError: x's value, no choice, is not among valid ...
 
     >>> x = 2.0
     >>> check_argument(
@@ -686,7 +686,7 @@ def check_argument(
     ...    expected_type=int) # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    easycheck.ArgumentValueError: Incorrect type of x; valid ... <class 'int'>
+    ArgumentValueError: Incorrect type of x; valid ... <class 'int'>
 
     This is how you can check exceptions and errors provided as arguments:
     >>> check_argument(TypeError, 'error_arg', expected_type=type)
@@ -823,7 +823,7 @@ def catch_check(check_function, *args, **kwargs):
     <BLANKLINE>
     >>> catch_check(check_if, condition=2>2, handle_with=ValueError)
     ValueError()
-    >>> catch_check(check_length, [2, 2], 3)
+    >>> catch_check(check_length, [2, 2], 3, message='')
     LengthError()
     >>> my_check = catch_check(
     ...    check_type, 25, float, ValueError, 'This is no float!')
@@ -841,7 +841,7 @@ def catch_check(check_function, *args, **kwargs):
 
     You can also catch warnings:
     >>> catch_check(check_if, condition=2>2, handle_with=Warning)
-    Warning('Warning')
+    UserWarning(<class 'Warning'>)
     >>> catch_check(check_if,
     ...    condition=2>2,
     ...    handle_with=UserWarning,
@@ -1036,7 +1036,7 @@ def _check_easycheck_arguments(
             raise TypeError("handle_with must be an exception")
     if message is not None:
         if not isinstance(message, str):
-            raise TypeError("message must be None or string")
+            raise TypeError("message must be either None or string")
     if condition is not None:
         if not isinstance(condition, bool):
             raise ValueError("The condition does not return a boolean value")
