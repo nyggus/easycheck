@@ -10,7 +10,6 @@ The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
 assert_type(), assert_length(), and assert_path()).
 """
-import os
 import warnings
 
 from collections.abc import Iterable, Callable
@@ -39,21 +38,19 @@ class ArgumentValueError(Exception):
 
 
 class IncorrectMessageType(Exception):
-    """Argument message must be either None, string or instance of DocAsMessage."""
+    """Argument message must be either None or string."""
 
 
-class DocAsMessage:
-    """Use exception class's __doc__ as message."""
-
-
-def check_if(condition, handle_with=AssertionError, message=DocAsMessage()):
+def check_if(condition, handle_with=AssertionError, message=None):
     """Check if a condition is true.
 
     Args:
         condition (bool): condition to check.
         handle_with (type): the type of exception to be raised or warning to
             be issued
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using the docstrings of the
+            exception class as a message.
 
     Returns:
         None, if check succeeded.
@@ -114,55 +111,59 @@ def check_if(condition, handle_with=AssertionError, message=DocAsMessage()):
 def check_if_not(condition, handle_with=AssertionError, message=None):
     """Check if a condition is not true.
 
-        Args:
-            condition (bool): condition to check.
-            handle_with (type): the type of exception or warning to be raised
-            message (str): a text to use as the exception/warning message
+    Args:
+        condition (bool): condition to check.
+        handle_with (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message
 
-        Returns:
-            None, if check succeeded.
+    Returns:
+        None, if check succeeded.
 
-        Raises:
-            Exception of the type provided by the handle_with parameter,
-            AssertionError by default (unless handle_with is a warning).
+    Raises:
+        Exception of the type provided by the handle_with parameter,
+        AssertionError by default (unless handle_with is a warning).
 
-        You would normally use these functions in situations like these: This is
-        engine speed in the object engine_speed:
-        >>> engine_speed = 5900
+    You would normally use these functions in situations like these: This is
+    engine speed in the object engine_speed:
+    >>> engine_speed = 5900
 
-        In this case, assume that if this value is higher than 6000, than this
-        situation may cause problems. So, let us check this:
-    :
-        >>> check_if_not(engine_speed > 6000, ValueError, 'Danger!')
+    In this case, assume that if this value is higher than 6000, than this
+    situation may cause problems. So, let us check this:
 
-        Sure, you can do so using the check_if() function, like here:
-        >>> check_if(engine_speed <= 6000, ValueError, 'Danger!')
+    >>> check_if_not(engine_speed > 6000, ValueError, 'Danger!')
 
-        and both are fine. You simply have two functions to choose from in order to
-        make the code as readable as you want. Sometimes the negative version
-        sounds more natural, and so it's all about what kind of language you want
-        to use in this particular situation.
+    Sure, you can do so using the check_if() function, like here:
+    >>> check_if(engine_speed <= 6000, ValueError, 'Danger!')
 
-        Consider the examples below:
-        >>> check_if_not(2 == 1)
-        >>> check_if_not(2 > 1)
-        Traceback (most recent call last):
-            ...
-        AssertionError
-        >>> check_if_not(2 > 1, ValueError, '2 is not smaller than 1')
-        Traceback (most recent call last):
-            ...
-        ValueError: 2 is not smaller than 1
+    and both are fine. You simply have two functions to choose from in order to
+    make the code as readable as you want. Sometimes the negative version
+    sounds more natural, and so it's all about what kind of language you want
+    to use in this particular situation.
 
-        >>> BMI = 50
-        >>> disaster = True if BMI > 30 else False
-        >>> check_if_not(disaster, message='BMI disaster! Watch out for candies!')
-        Traceback (most recent call last):
-            ...
-        AssertionError: BMI disaster! Watch out for candies!
+    Consider the examples below:
+    >>> check_if_not(2 == 1)
+    >>> check_if_not(2 > 1)
+    Traceback (most recent call last):
+        ...
+    AssertionError: Assertion failed.
+    >>> check_if_not(2 > 1, message="")
+    Traceback (most recent call last):
+        ...
+    AssertionError
+    >>> check_if_not(2 > 1, ValueError, '2 is not smaller than 1')
+    Traceback (most recent call last):
+        ...
+    ValueError: 2 is not smaller than 1
 
-        To issue a warning, use the Warning class or one of its subclasses:
-        >>> check_if_not(2 > 1, Warning, '2 is not bigger than 1')
+    >>> BMI = 50
+    >>> disaster = True if BMI > 30 else False
+    >>> check_if_not(disaster, message='BMI disaster! Watch out for candies!')
+    Traceback (most recent call last):
+        ...
+    AssertionError: BMI disaster! Watch out for candies!
+
+    To issue a warning, use the Warning class or one of its subclasses:
+    >>> check_if_not(2 > 1, Warning, '2 is not bigger than 1')
     """
     __tracebackhide__ = True
     _check_easycheck_arguments(
@@ -270,7 +271,7 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
     >>> check_type((i for i in range(3)), tuple)
     Traceback (most recent call last):
         ...
-    TypeError
+    TypeError: Inappropriate argument type.
     >>> check_type(
     ...    (i for i in range(3)), tuple, message='This is not tuple.')
     Traceback (most recent call last):
@@ -947,18 +948,14 @@ def _raise(error, message=None):
 
     if issubclass(error, Warning):
         if message is None:
-            message = "Warning"
+            message = error.__doc__
         elif isinstance(message, str):
             message = message
-        elif isinstance(message, DocAsMessage):
-            message = error.__doc__
         else:
             raise IncorrectMessageType(IncorrectMessageType.__doc__)
         warnings.warn(message, error)
     else:
         if message is None:
-            raise error
-        elif isinstance(message, DocAsMessage):
             raise error(error.__doc__)
         elif isinstance(message, str):
             raise error(message)
@@ -1022,8 +1019,8 @@ def _check_easycheck_arguments(
         if not is_subclass:
             raise TypeError("handle_with must be an exception")
     if message is not None:
-        if not isinstance(message, (str, DocAsMessage)):
-            raise TypeError("message must be DocAsMessage(), None or string")
+        if not isinstance(message, str):
+            raise TypeError("message must be None or string")
     if condition is not None:
         if not isinstance(condition, bool):
             raise ValueError("The condition does not return a boolean value")
