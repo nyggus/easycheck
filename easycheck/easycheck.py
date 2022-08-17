@@ -942,7 +942,6 @@ def _raise(error, message=None):
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
 
-
     Raises:
         Exception of the type provided by the error parameter
         TypeError if error parameter is not an exception or warning class
