@@ -933,7 +933,7 @@ def catch_check(check_function, *args, **kwargs):
 
 
 def _raise(error, message=None):
-    """Raise exception with or without message, or issue a warning.
+    """Raise exception or issue a warning, with or without message.
 
     Args:
         error (type): the type of exception or warning to be raised
