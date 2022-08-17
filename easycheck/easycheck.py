@@ -10,6 +10,7 @@ The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
 assert_type(), assert_length(), and assert_path()).
 """
+import builtins
 import warnings
 
 from collections.abc import Iterable, Callable
@@ -277,6 +278,7 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
     Traceback (most recent call last):
         ...
     TypeError: This is not tuple.
+    >>> from collections.abc import Generator
     >>> check_type((i for i in range(3)), Generator)
 
     You can include None:
@@ -412,6 +414,7 @@ def check_if_paths_exist(
         Exception of the type provided by the handle_with parameter,
         FileNotFoundError by default (unless handle_with is a warning).
 
+    >>> import os
     >>> check_if_paths_exist('Q:/Op/Oop/')
     Traceback (most recent call last):
         ...
@@ -944,23 +947,30 @@ def _raise(error, message=None):
     """
     __tracebackhide__ = True
     if not isinstance(error, type) or not issubclass(error, Exception):
-        raise TypeError("The error argument must be an exception or a warning")
+        raise TypeError(
+            "The error argument must be an exception or a warning"
+        )
+
+    if message is None:
+        # Use docstring as a message only for custom exceptions.
+        if error.__name__ not in dir(builtins):
+            message = error.__doc__
+    elif isinstance(message, str):
+        if not message:
+            # Instead of passing an empty string,
+            # better to pass None as message.
+            message = None
+        else:
+            message = message
+    else:
+        raise IncorrectMessageType(IncorrectMessageType.__doc__)
 
     if issubclass(error, Warning):
-        if message is None:
-            message = error.__doc__
-        elif isinstance(message, str):
-            message = message
-        else:
-            raise IncorrectMessageType(IncorrectMessageType.__doc__)
         warnings.warn(message, error)
+    elif issubclass(error, Exception):
+        raise error(message)
     else:
-        if message is None:
-            raise error(error.__doc__)
-        elif isinstance(message, str):
-            raise error(message)
-        else:
-            raise IncorrectMessageType(IncorrectMessageType.__doc__)
+        raise IncorrectMessageType(IncorrectMessageType.__doc__)
 
 
 def _check_easycheck_arguments(
