@@ -999,8 +999,6 @@ def _raise(error, message=None):
             raise error(message)
         else:
             raise error
-    else:
-        raise IncorrectMessageType(IncorrectMessageType.__doc__)
 
 
 def _check_easycheck_arguments(
