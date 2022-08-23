@@ -41,7 +41,7 @@ The package also offers functions dedicated to testing, e.g.,
     assert_type(x, (float, int))
     assert_if(x <= 10)
 
-The :code:`message` argument has the default value of :code:`None`, which does the following. If the exception class provided in :code:`handle_with` is built-in (that is, can be found in :code:`dir(builtins)`), no message is provided. But if it is not a built-in exception (or warning) class, then the exception/warning class's docstring is taken as the message. This is a convinient way of providing a  typical message. If you want to customize the message (e.g., depending on the value of a variable), you should use a customized string (e.g., through an f-string). But if do not want to use any message with a custom exception/warning, simply provide an empty string (:code:`message=''`).
+The :code:`message` argument has the default value of :code:`None`, which does the following. If the exception class provided in :code:`handle_with` is built-in (that is, can be found in :code:`dir(builtins)`), no message is provided. But if it is not a built-in exception (or warning) class, then the exception/warning class's docstring is taken as the message. This is a convenient way of providing a  typical message. If you want to customize the message (e.g., depending on the value of a variable), you should use a customized string (e.g., through an f-string). But if you do not want to use any message with a custom exception/warning, simply provide an empty string (:code:`message=''`).
 
 
 Installing
@@ -75,7 +75,7 @@ This simply checks if :code:`a` is smaller than 10; if it is, nothing happens (i
     # or shorter and equally readable:
     check_if(a < 10, ValueError)
 
-The default setting is to use the exception's docstring (`.__doc__`) as a message. In the case of :code:`ValueError`, it is "Inappropriate argument value (of correct type).". You can use this when you create custom exceptions:
+For built-in exceptions, like :code:`ValueError`, the default behaviour is to not print any message. For custom exceptions, however, the exception's docstring (`.__doc__`) serves as a message. You can use this when you create custom exceptions:
 
 .. code-block:: python
 
@@ -88,7 +88,7 @@ The default setting is to use the exception's docstring (`.__doc__`) as a messag
       ...
     IncorrectNameTypeError: Argument name must be a string.
 
-If you do not want any message to be printed, use :code:`message=None`. You can also add a custom message:
+If you want to ensure that no message is printed, even for a custom exception, override the default behaviour by passing an empty string :code:`message=''`. You can also add a custom message:
 
 .. code-block:: python
 

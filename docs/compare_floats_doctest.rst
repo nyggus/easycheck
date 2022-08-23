@@ -19,7 +19,7 @@ As you see, nothing has happened, as indeed the absolute difference of 2.01 and 
         ...
     easycheck.easycheck.NotCloseEnoughError: The two float numbers are not close enough.
 
-If you do not to see the message after the exception's name, provide an empty string as a message:
+If you do not want to see the message after the exception's name, provide an empty string as a message:
 
     >>> check_if_isclose(2.01, 2.02, abs_tol=0.005, message='')
     Traceback (most recent call last):
