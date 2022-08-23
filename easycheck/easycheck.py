@@ -10,47 +10,36 @@ The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
 assert_type(), assert_length(), and assert_path()).
 """
-import os
+import builtins
 import warnings
 
-from collections.abc import Generator, Iterable, Callable
+from collections.abc import Iterable, Callable
 from math import isclose
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
 
 
 class LengthError(Exception):
-    """Exception class used by the check_length() function."""
+    """Violated length check."""
 
 
 class OperatorError(Exception):
-    """Exception class used for catching incorrect operators."""
+    """Invalid operator."""
 
 
 class ComparisonError(Exception):
-    """Optional exception class for the check_comparison() function.
-
-    The default exception class for check_comparison() is ValueError, but
-    this class is ready for you to use in case you want to catch a customized
-    error for comparison purposes.
-    """
+    """The comparison is not true."""
 
 
 class NotCloseEnoughError(Exception):
-    """Exception class used by check_if_isclose().
-    
-    The exception is raised when two compared floats are not close enough,
-    given relative or absolute tolerance.
-    """
+    """The two float numbers are not close enough."""
 
 class ArgumentValueError(Exception):
-    """Exception class to catch incorrect values of arguments.
+    """Argument's value is incorrect."""
 
-    Normally such situations are represented by ValueError, but since we are
-    checking this aspect of function calls very often, it may be good to use
-    a dedicated exception. The function check_argument() uses this class as
-    a default exception.
-    """
+
+class IncorrectMessageType(Exception):
+    """Argument message must be either None or string."""
 
 
 def check_if(condition, handle_with=AssertionError, message=None):
@@ -60,7 +49,10 @@ def check_if(condition, handle_with=AssertionError, message=None):
         condition (bool): condition to check.
         handle_with (type): the type of exception to be raised or warning to
             be issued
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
     Returns:
         None, if check succeeded.
@@ -121,55 +113,63 @@ def check_if(condition, handle_with=AssertionError, message=None):
 def check_if_not(condition, handle_with=AssertionError, message=None):
     """Check if a condition is not true.
 
-        Args:
-            condition (bool): condition to check.
-            handle_with (type): the type of exception or warning to be raised
-            message (str): a text to use as the exception/warning message
+    Args:
+        condition (bool): condition to check.
+        handle_with (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
-        Returns:
-            None, if check succeeded.
 
-        Raises:
-            Exception of the type provided by the handle_with parameter,
-            AssertionError by default (unless handle_with is a warning).
+    Returns:
+        None, if check succeeded.
 
-        You would normally use these functions in situations like these: This is
-        engine speed in the object engine_speed:
-        >>> engine_speed = 5900
+    Raises:
+        Exception of the type provided by the handle_with parameter,
+        AssertionError by default (unless handle_with is a warning).
 
-        In this case, assume that if this value is higher than 6000, than this
-        situation may cause problems. So, let us check this:
-    :
-        >>> check_if_not(engine_speed > 6000, ValueError, 'Danger!')
+    You would normally use these functions in situations like these: This is
+    engine speed in the object engine_speed:
+    >>> engine_speed = 5900
 
-        Sure, you can do so using the check_if() function, like here:
-        >>> check_if(engine_speed <= 6000, ValueError, 'Danger!')
+    In this case, assume that if this value is higher than 6000, than this
+    situation may cause problems. So, let us check this:
 
-        and both are fine. You simply have two functions to choose from in order to
-        make the code as readable as you want. Sometimes the negative version
-        sounds more natural, and so it's all about what kind of language you want
-        to use in this particular situation.
+    >>> check_if_not(engine_speed > 6000, ValueError, 'Danger!')
 
-        Consider the examples below:
-        >>> check_if_not(2 == 1)
-        >>> check_if_not(2 > 1)
-        Traceback (most recent call last):
-            ...
-        AssertionError
-        >>> check_if_not(2 > 1, ValueError, '2 is not smaller than 1')
-        Traceback (most recent call last):
-            ...
-        ValueError: 2 is not smaller than 1
+    Sure, you can do so using the check_if() function, like here:
+    >>> check_if(engine_speed <= 6000, ValueError, 'Danger!')
 
-        >>> BMI = 50
-        >>> disaster = True if BMI > 30 else False
-        >>> check_if_not(disaster, message='BMI disaster! Watch out for candies!')
-        Traceback (most recent call last):
-            ...
-        AssertionError: BMI disaster! Watch out for candies!
+    and both are fine. You simply have two functions to choose from in order to
+    make the code as readable as you want. Sometimes the negative version
+    sounds more natural, and so it's all about what kind of language you want
+    to use in this particular situation.
 
-        To issue a warning, use the Warning class or one of its subclasses:
-        >>> check_if_not(2 > 1, Warning, '2 is not bigger than 1')
+    Consider the examples below:
+    >>> check_if_not(2 == 1)
+    >>> check_if_not(2 > 1)
+    Traceback (most recent call last):
+        ...
+    AssertionError
+    >>> check_if_not(2 > 1, message="")
+    Traceback (most recent call last):
+        ...
+    AssertionError
+    >>> check_if_not(2 > 1, ValueError, '2 is not smaller than 1')
+    Traceback (most recent call last):
+        ...
+    ValueError: 2 is not smaller than 1
+
+    >>> BMI = 50
+    >>> disaster = True if BMI > 30 else False
+    >>> check_if_not(disaster, message='BMI disaster! Watch out for candies!')
+    Traceback (most recent call last):
+        ...
+    AssertionError: BMI disaster! Watch out for candies!
+
+    To issue a warning, use the Warning class or one of its subclasses:
+    >>> check_if_not(2 > 1, Warning, '2 is not bigger than 1')
     """
     __tracebackhide__ = True
     _check_easycheck_arguments(
@@ -193,7 +193,10 @@ def check_length(
         item: the object whose length we want to validate
         expected_length (int): the expected length of the item
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
         operator: one of the functions returned by get_possible_operators()
         assign_length_to_others (bool): treat all numeric types as having the
             length of 1. If False, any attempt to validate a numeric type
@@ -245,7 +248,10 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
         item: the object whose type we want to validate
         expected_type (type, Iterable[type]): the expected type of the item
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
     Returns:
         None, if check succeeded.
@@ -283,6 +289,7 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
     Traceback (most recent call last):
         ...
     TypeError: This is not tuple.
+    >>> from collections.abc import Generator
     >>> check_type((i for i in range(3)), Generator)
 
     You can include None:
@@ -345,7 +352,10 @@ def check_if_isclose(x, y, /,
         abs_tol (float): maximum difference for being considered "close",
             regardless of the magnitude of the input values
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
     Returns:
         None, if check succeeded.
@@ -359,19 +369,19 @@ def check_if_isclose(x, y, /,
     >>> check_if_isclose(1.12, 1.13, rel_tol=1e-09)
     Traceback (most recent call last):
         ...
-    easycheck.NotCloseEnoughError
+    NotCloseEnoughError: The two float numbers are not close enough.
     
     >>> check_if_isclose(1.12, 1.13, rel_tol=.05)
     >>> check_if_isclose(1.12, 1.13, abs_tol=.05)
     >>> check_if_isclose(1.12, 1.13, abs_tol=.005)
     Traceback (most recent call last):
         ...
-    easycheck.NotCloseEnoughError
+    NotCloseEnoughError: The two float numbers are not close enough.
 
     >>> check_if_isclose(1.12, 2.12)
     Traceback (most recent call last):
         ...
-    easycheck.NotCloseEnoughError
+    NotCloseEnoughError: The two float numbers are not close enough.
 
     >>> check_if_isclose(1.12, 2.12, ValueError, rel_tol=1e-09)
     Traceback (most recent call last):
@@ -402,7 +412,10 @@ def check_if_paths_exist(
         paths (str, pathlib.Path, Iterable[str or pathlib.Path]): path or paths
             to validate
         handle_with (type): type of exception or warning to be raised/returned
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
         execution_mode (str): defines what happens if not all the paths exist
             May take one of the following values:
                 - 'raise': exception/warning will be raised
@@ -418,6 +431,7 @@ def check_if_paths_exist(
         Exception of the type provided by the handle_with parameter,
         FileNotFoundError by default (unless handle_with is a warning).
 
+    >>> import os
     >>> check_if_paths_exist('Q:/Op/Oop/')
     Traceback (most recent call last):
         ...
@@ -493,7 +507,10 @@ def check_comparison(
         operator: one of the functions returned by get_possible_operators()
         item_2: the second item to compare
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
     Returns:
         None, if check succeeded.
@@ -521,7 +538,7 @@ def check_comparison(
     ...                  message='Not less!')
     Traceback (most recent call last):
         ...
-    easycheck.ComparisonError: Not less!
+    ComparisonError: Not less!
 
     To issue a warning, do the following:
     >>> check_comparison('one text', lt, 'another text',
@@ -642,7 +659,10 @@ def check_argument(
         expected_choices (Iterable): a list of acceptable values of argument
         expected_length (int): the expected length of the item
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
         **kwargs: additional arguments passed to check_length (i.e.,
             operator=eq and assign_length_to_others)
 
@@ -669,7 +689,7 @@ def check_argument(
     ...    )
     Traceback (most recent call last):
         ...
-    easycheck.ArgumentValueError: Incorrect type of x; valid type(s): <class 'tuple'>
+    ArgumentValueError: Incorrect type of x; valid type(s): <class 'tuple'>
 
     The expected_choices argument helps you check whether the user provided
     a valid value for the argument:
@@ -681,7 +701,7 @@ def check_argument(
     >>> foo('no choice') # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    easycheck.ArgumentValueError: x's value, no choice, is not among valid ...
+    ArgumentValueError: x's value, no choice, is not among valid ...
 
     >>> x = 2.0
     >>> check_argument(
@@ -689,7 +709,7 @@ def check_argument(
     ...    expected_type=int) # doctest: +ELLIPSIS
     Traceback (most recent call last):
         ...
-    easycheck.ArgumentValueError: Incorrect type of x; valid ... <class 'int'>
+    ArgumentValueError: Incorrect type of x; valid ... <class 'int'>
 
     This is how you can check exceptions and errors provided as arguments:
     >>> check_argument(TypeError, 'error_arg', expected_type=type)
@@ -826,7 +846,7 @@ def catch_check(check_function, *args, **kwargs):
     <BLANKLINE>
     >>> catch_check(check_if, condition=2>2, handle_with=ValueError)
     ValueError()
-    >>> catch_check(check_length, [2, 2], 3)
+    >>> catch_check(check_length, [2, 2], 3, message='')
     LengthError()
     >>> my_check = catch_check(
     ...    check_type, 25, float, ValueError, 'This is no float!')
@@ -844,7 +864,7 @@ def catch_check(check_function, *args, **kwargs):
 
     You can also catch warnings:
     >>> catch_check(check_if, condition=2>2, handle_with=Warning)
-    Warning('Warning')
+    UserWarning(<class 'Warning'>)
     >>> catch_check(check_if,
     ...    condition=2>2,
     ...    handle_with=UserWarning,
@@ -913,13 +933,14 @@ def catch_check(check_function, *args, **kwargs):
 
 
 def _raise(error, message=None):
-    """Raise exception with or without message, or issue a warning.
+    """Raise exception or issue a warning, with or without message.
 
     Args:
         error (type): the type of exception or warning to be raised
-        message (str): a text of the exception/warning message. If error
-        is a Warning subclass, you should provide your own message, otherwise
-        a default message ('Warning') will be used.
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
 
     Raises:
         Exception of the type provided by the error parameter
@@ -950,19 +971,34 @@ def _raise(error, message=None):
     """
     __tracebackhide__ = True
     if not isinstance(error, type) or not issubclass(error, Exception):
-        raise TypeError("The error argument must be an exception or a warning")
+        raise TypeError(
+            "The error argument must be an exception or a warning"
+        )
+
+    if message is None:
+        # Use docstring as a message only for custom exceptions.
+        if error.__name__ not in dir(builtins):
+            message = error.__doc__
+    elif isinstance(message, str):
+        if not message:
+            # Instead of passing an empty string,
+            # better to pass None as message.
+            message = None
+        else:
+            message = message
+    else:
+        raise IncorrectMessageType(IncorrectMessageType.__doc__)
 
     if issubclass(error, Warning):
-        if message is None:
-            message = "Warning"
-        check_type(message, str, message="message must be string")
-        warnings.warn(message, error)
-    else:
-        if message is None:
-            raise error
+        if message:
+            warnings.warn(message, error)
         else:
-            check_type(message, str, message="message must be string")
+            warnings.warn(error)
+    elif issubclass(error, Exception):
+        if message:
             raise error(message)
+        else:
+            raise error
 
 
 def _check_easycheck_arguments(
@@ -1086,3 +1122,9 @@ assert_if_isclose = check_if_isclose
 
 check_instance = check_type
 assert_instance = assert_type
+
+
+if __name__ == "__main__":
+    import doctest
+    
+    doctest.testmod()

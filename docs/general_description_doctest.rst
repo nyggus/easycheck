@@ -87,7 +87,7 @@ You can override a Pythonic approach to treating numbers (integers, doubles, flo
     >>> check_length(1, 2, assign_length_to_others=True)
     Traceback (most recent call last):
         ...
-    easycheck.easycheck.LengthError
+    easycheck.easycheck.LengthError: Violated length check.
 
 Note that in the above example, we used the parameter operator. You can use this in several functions, and it can take up to eight operators from the operator module (use :code:`get_possible_operators()` too see the list, which includes :code:`eq`, :code:`le`, :code:`lt`, :code:`gt`, :code:`ge`, :code:`ne`, :code:`is_`, :code:`is_not`). Since these operators are functions, you provide them as function names, as we did above. 
 

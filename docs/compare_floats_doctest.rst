@@ -17,7 +17,15 @@ As you see, nothing has happened, as indeed the absolute difference of 2.01 and 
     >>> check_if_isclose(2.01, 2.02, abs_tol=0.005)
     Traceback (most recent call last):
         ...
+    easycheck.easycheck.NotCloseEnoughError: The two float numbers are not close enough.
+
+If you do not want to see the message after the exception's name, provide an empty string as a message:
+
+    >>> check_if_isclose(2.01, 2.02, abs_tol=0.005, message='')
+    Traceback (most recent call last):
+        ...
     easycheck.easycheck.NotCloseEnoughError
+
 
 Do note that the first two arguments (the numbers) are positional-only while all the other arguments are keyword-only. This makes you provide the argument's name, and thanks to this, any call to this function will be clearer. For instance, :code:`check_if_isclose(2.01, 2.02, 0.05)` would be less clear than :code:`check_if_isclose(2.01, 2.02, abs_tol=0.05)`.
 

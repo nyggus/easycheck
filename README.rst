@@ -41,6 +41,9 @@ The package also offers functions dedicated to testing, e.g.,
     assert_type(x, (float, int))
     assert_if(x <= 10)
 
+The :code:`message` argument has the default value of :code:`None`, which does the following. If the exception class provided in :code:`handle_with` is built-in (that is, can be found in :code:`dir(builtins)`), no message is provided. But if it is not a built-in exception (or warning) class, then the exception/warning class's docstring is taken as the message. This is a convenient way of providing a  typical message. If you want to customize the message (e.g., depending on the value of a variable), you should use a customized string (e.g., through an f-string). But if you do not want to use any message with a custom exception/warning, simply provide an empty string (:code:`message=''`).
+
+
 Installing
 ----------
 
@@ -72,7 +75,20 @@ This simply checks if :code:`a` is smaller than 10; if it is, nothing happens (i
     # or shorter and equally readable:
     check_if(a < 10, ValueError)
 
-but you can also add a message:
+For built-in exceptions, like :code:`ValueError`, the default behaviour is to not print any message. For custom exceptions, however, the exception's docstring (`.__doc__`) serves as a message. You can use this when you create custom exceptions:
+
+.. code-block:: python
+
+    class IncorrectNameTypeError(Exception):
+        """Argument name must be a string."""
+    
+    name = 40
+    check_type(name, IncorrectNameTypeError)
+    Traceback (most recent call last):
+      ...
+    IncorrectNameTypeError: Argument name must be a string.
+
+If you want to ensure that no message is printed, even for a custom exception, override the default behaviour by passing an empty string :code:`message=''`. You can also add a custom message:
 
 .. code-block:: python
 
@@ -124,6 +140,19 @@ In order to issue a warning if a condition is violated, simply use a warning cla
     check_length([1, 2, 3], 10, Warning, 'Too short list with data')
 
 Remember to always use a message with warnings, in order to make them meaningful. (See more in `use_with_warnings_doctest.rst <https://github.com/nyggus/easycheck/blob/master/docs/use_with_warnings_doctest.rst>`_).
+
+
+Of course, you can use a custom warning:
+
+.. code-block:: python
+
+    class TooSmallSampleSize(Warning):
+        """Results for samples size below 100 can be unstable."""
+    
+    n = 50
+    check_if(n >= 100, TooSmallSampleSize)
+    ... TooSmallSampleSize: Results for samples size below 100 can be unstable.
+      warnings.warn(message, error)
 
 
 Use in code, an example

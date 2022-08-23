@@ -26,6 +26,7 @@ from easycheck.easycheck import (
     LengthError,
     OperatorError,
     NotCloseEnoughError,
+    IncorrectMessageType,
     get_possible_operators,
     _raise,
     _check_easycheck_arguments,
@@ -831,9 +832,9 @@ def test_raise_edge_cases():
         TypeError, match="The error argument must be an exception or a warning"
     ):
         _raise(NotImplemented)
-    with pytest.raises(TypeError, match="message must be string"):
+    with pytest.raises(IncorrectMessageType, match="Argument message must be either None or string"):
         _raise(error=TypeError, message=20)
-    with pytest.raises(TypeError, match="message must be string"):
+    with pytest.raises(IncorrectMessageType, match="Argument message must be either None or string"):
         _raise(TypeError, ("This was an error", ""))
 
 
@@ -1327,3 +1328,31 @@ def test_assert_functions():
     )
     with pytest.raises(FileNotFoundError):
         assert_paths("Q:/E/") and check_if_paths_exist("Q:/E/") is None
+
+
+class ForTestingErrorWithDoc(Exception):
+    """This is error for testing purposes."""
+
+
+class ForTestingErrorWithoutDoc(Exception):
+    ...
+
+
+def test_message_is_None_exception_with_docstring():
+    with pytest.raises(AssertionError, match=""):
+        check_if(1 == 2, message=None)
+    with pytest.raises(AssertionError, match="Error"):
+        check_if(1 == 2, message="Error")
+    with pytest.raises(AssertionError):
+        check_if(1 == 2)
+    assert check_if(1 == 1, ForTestingErrorWithDoc) is None
+    with pytest.raises(ForTestingErrorWithDoc, match="for testing purposes"):
+        check_if(1 == 2, ForTestingErrorWithDoc)
+
+
+def test_message_is_None_exception_without_docstring():
+    assert check_if(1 == 1, ForTestingErrorWithoutDoc) is None
+    with pytest.raises(ForTestingErrorWithoutDoc, match="Error! Shout!"):
+        check_if(1 == 2, ForTestingErrorWithoutDoc, message="Error! Shout!")
+    with pytest.raises(ForTestingErrorWithoutDoc, match=""):
+        check_if(1 == 2, ForTestingErrorWithoutDoc)
