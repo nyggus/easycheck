@@ -1003,4 +1003,5 @@ assert_instance = assert_type
 if __name__ == "__main__":
     import doctest
     
-    doctest.testmod()
+    flags = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
+    doctest.testmod(optionflags=flags)
