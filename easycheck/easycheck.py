@@ -3,8 +3,8 @@
 The easycheck module offers simple functions to check conditions and either raise
 an exception or issue a warning if the condition is violated; otherwise,
 nothing happens (the function returns None). You can either choose default
-exceptions and messages (or no message) or customize them. Unlike the assertion
-expression, you can use easycheck functions within code.
+exceptions and messages (or no message) or customize them. Unlike the assert
+statement, you can use easycheck functions within code.
 
 The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
@@ -23,10 +23,6 @@ class LengthError(Exception):
     """Violated length check."""
 
 
-class OperatorError(Exception):
-    """Invalid operator."""
-
-
 class ComparisonError(Exception):
     """The comparison is not true."""
 
@@ -36,10 +32,6 @@ class NotCloseEnoughError(Exception):
 
 class ArgumentValueError(Exception):
     """Argument's value is incorrect."""
-
-
-class IncorrectMessageType(Exception):
-    """Argument message must be either None or string."""
 
 
 def check_if(condition, handle_with=AssertionError, message=None):
@@ -103,9 +95,6 @@ def check_if(condition, handle_with=AssertionError, message=None):
 
     """
     __tracebackhide__ = True
-    _check_easycheck_arguments(
-        handle_with=handle_with, message=message, condition=condition
-    )
     if not condition:
         _raise(handle_with, message)
 
@@ -172,10 +161,6 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
     >>> check_if_not(2 > 1, Warning, '2 is not bigger than 1')
     """
     __tracebackhide__ = True
-    _check_easycheck_arguments(
-        handle_with=handle_with, message=message, condition=condition
-    )
-
     check_if(not condition, handle_with=handle_with, message=message)
 
 
@@ -225,14 +210,6 @@ def check_length(
     >>> check_length('string', 6, Warning)
     """
     __tracebackhide__ = True
-    _check_easycheck_arguments(
-        handle_with=handle_with,
-        message=message,
-        operator=operator,
-        expected_length=expected_length,
-        assign_length_to_others=assign_length_to_others,
-    )
-
     if assign_length_to_others:
         if isinstance(item, (int, float, complex, bool)):
             item = [item]
@@ -300,10 +277,6 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
     >>> check_type('a', (str, None), Warning, 'Undesired instance')
     """
     __tracebackhide__ = True
-    _check_easycheck_arguments(
-        handle_with=handle_with, message=message, expected_type=expected_type
-    )
-
     if expected_type is None:
         check_if(item is None, handle_with=handle_with, message=message)
         return None
@@ -389,7 +362,6 @@ def check_if_isclose(x, y, /,
     ValueError
     """
     __tracebackhide__ = True
-    _check_easycheck_arguments(handle_with=handle_with, message=message)
     x = float(x)
     y = float(y)
 
@@ -460,9 +432,10 @@ def check_if_paths_exist(
     (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop'])
     """
     __tracebackhide__ = True
-    _check_easycheck_arguments(
-        handle_with=handle_with, message=message, execution_mode=execution_mode
-    )
+    check_if(execution_mode in ("raise", "return"),
+             ValueError,
+             "execution_mode must be either 'raise' or 'return'"
+             )
 
     is_allowed_type = isinstance(paths, (str, Path)) or (
         isinstance(paths, Iterable)
@@ -546,10 +519,6 @@ def check_comparison(
     ...                  message='Not less!')
     """
     __tracebackhide__ = True
-    _check_easycheck_arguments(
-        handle_with=handle_with, message=message, operator=operator
-    )
-
     check_if(
         operator(item_1, item_2), handle_with=handle_with, message=message
     )
@@ -987,7 +956,7 @@ def _raise(error, message=None):
         else:
             message = message
     else:
-        raise IncorrectMessageType(IncorrectMessageType.__doc__)
+        raise TypeError("Argument message must be either None or string")
 
     if issubclass(error, Warning):
         if message:
@@ -999,99 +968,6 @@ def _raise(error, message=None):
             raise error(message)
         else:
             raise error
-
-
-def _check_easycheck_arguments(
-    handle_with=None,
-    message=None,
-    condition=None,
-    operator=None,
-    assign_length_to_others=None,
-    execution_mode=None,
-    expected_length=None,
-    expected_type=None,
-):
-    """Validate the most common arguments used in easycheck functions.
-
-    This is a generic function that works for most easycheck functions, and can
-    be customized by providing selected arguments from a given function.
-    Other arguments, not included in this function, need to be checked using
-    other ways.
-
-    >>> _check_easycheck_arguments(handle_with=LengthError)
-    >>> _check_easycheck_arguments(handle_with=ValueError)
-
-    You must provide an exception (or warning) class, not its instance:
-    >>> _check_easycheck_arguments(handle_with=ValueError())
-    Traceback (most recent call last):
-        ...
-    TypeError: handle_with must be an exception
-
-    >>> _check_easycheck_arguments(handle_with=LengthError, message=False)
-    Traceback (most recent call last):
-        ...
-    TypeError: message must be either None or string
-    >>> _check_easycheck_arguments(handle_with=ValueError, condition=2<1)
-    """
-    __tracebackhide__ = True
-    if all(
-        argument is None
-        for argument in (
-            handle_with,
-            message,
-            condition,
-            operator,
-            assign_length_to_others,
-            execution_mode,
-            expected_length,
-            expected_type,
-        )
-    ):
-        raise ValueError("Provide at least one argument")
-
-    if handle_with is not None:
-        try:
-            is_subclass = issubclass(handle_with, Exception)
-        except TypeError:
-            is_subclass = False
-        if not is_subclass:
-            raise TypeError("handle_with must be an exception")
-    if message is not None:
-        if not isinstance(message, str):
-            raise TypeError("message must be either None or string")
-    if condition is not None:
-        if not isinstance(condition, bool):
-            raise ValueError("The condition does not return a boolean value")
-    if operator is not None:
-        if operator not in get_possible_operators():
-            raise OperatorError(
-                "Incorrect operator. Check get_possible_operators()"
-            )
-    if expected_length is not None:
-        if not isinstance(expected_length, (int, float)):
-            raise TypeError(
-                "expected_length should be an integer (or a float)"
-            )
-    if assign_length_to_others is not None:
-        if not isinstance(assign_length_to_others, bool):
-            raise TypeError(
-                "assign_length_to_others should be" " a boolean value"
-            )
-    if execution_mode is not None:
-        if execution_mode not in ("raise", "return"):
-            raise ValueError(
-                'execution_mode should be either "raise" or "return"'
-            )
-    if expected_type is not None:
-        if isinstance(expected_type, Iterable):
-            if any(
-                not isinstance(t, type) for t in expected_type if t is not None
-            ):
-                raise TypeError(
-                    "all items in expected_type must be valid types"
-                )
-        elif not isinstance(expected_type, type):
-            raise TypeError("expected_type must be a valid type")
 
 
 def get_possible_operators():
