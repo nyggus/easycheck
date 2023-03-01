@@ -14,7 +14,6 @@ from .easycheck import (
     ComparisonError,
     ArgumentValueError,
     LengthError,
-    OperatorError,
     NotCloseEnoughError,
     # Testing aliases
     assert_if,
