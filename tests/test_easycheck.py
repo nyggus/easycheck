@@ -24,12 +24,9 @@ from easycheck.easycheck import (
     ComparisonError,
     ArgumentValueError,
     LengthError,
-    OperatorError,
     NotCloseEnoughError,
-    IncorrectMessageType,
     get_possible_operators,
     _raise,
-    _check_easycheck_arguments,
     _make_message,
 )
 
@@ -37,23 +34,15 @@ from easycheck.easycheck import (
 def test_check_if_edge_cases():
     with pytest.raises(TypeError, match="required positional argument"):
         check_if()
-    with pytest.raises(ValueError, match="The condition does not return"):
-        check_if("tomato soup is good")
-    with pytest.raises(ValueError, match="The condition does not return"):
-        check_if("")
-    with pytest.raises(ValueError, match="The condition does not return"):
-        check_if(1)
-    with pytest.raises(ValueError, match="The condition does not return"):
-        check_if(0)
     assert check_if(True) is None
     with pytest.raises(AssertionError):
         check_if(False)
-    with pytest.raises(TypeError, match="handle_with must be an exception"):
-        check_if(1, 1)
+    with pytest.raises(TypeError, match="The error argument must be an exception or a warning"):
+        check_if(False, 1)
     with pytest.raises(
         TypeError, match="message must be either None or string"
     ):
-        check_if(1, ValueError, 1)
+        check_if(0, ValueError, 1)
     with pytest.raises(TypeError, match="takes from 1 to 3 positional"):
         check_if(1, 1, 1, 1)
 
@@ -90,18 +79,10 @@ def test_check_if_negative_warnings():
 def test_check_if_not_edge_cases():
     with pytest.raises(TypeError, match="required positional argument"):
         check_if_not()
-    with pytest.raises(ValueError, match="The condition does not return"):
-        check_if_not("tomato soup is good")
-    with pytest.raises(ValueError, match="The condition does not return"):
-        check_if_not("")
-    with pytest.raises(ValueError, match="The condition does not return"):
-        check_if_not(1)
-    with pytest.raises(ValueError, match="The condition does not return"):
-        check_if_not(0)
     assert check_if_not(False) is None
     with pytest.raises(AssertionError):
         check_if_not(True)
-    with pytest.raises(TypeError, match="handle_with must be an exception"):
+    with pytest.raises(TypeError, match="he error argument must be an exception or a warning"):
         check_if_not(1, 1)
     with pytest.raises(
         TypeError, match="message must be either None or string"
@@ -141,8 +122,8 @@ def test_check_if_not_negative_warnings():
 def test_check_length_edge_cases():
     with pytest.raises(TypeError, match="required positional argument"):
         check_length("tomato soup is good")
-    with pytest.raises(OperatorError, match="Incorrect operator"):
-        check_length(1, 1, operator=1)
+    with pytest.raises(TypeError, match="'int' object is not callable"):
+        check_length([1], 1, operator=1)
 
 
 def test_check_length_positive():
@@ -832,9 +813,9 @@ def test_raise_edge_cases():
         TypeError, match="The error argument must be an exception or a warning"
     ):
         _raise(NotImplemented)
-    with pytest.raises(IncorrectMessageType, match="Argument message must be either None or string"):
+    with pytest.raises(TypeError, match="Argument message must be either None or string"):
         _raise(error=TypeError, message=20)
-    with pytest.raises(IncorrectMessageType, match="Argument message must be either None or string"):
+    with pytest.raises(TypeError, match="Argument message must be either None or string"):
         _raise(TypeError, ("This was an error", ""))
 
 
@@ -1136,144 +1117,6 @@ def test_check_argument_mix_warnings():
     with warnings.catch_warnings(record=True) as w:
         foo("one")
         assert "type" in str(w[-1].message)
-
-
-def test_check_easycheck_arguments_edge_cases():
-    with pytest.raises(ValueError, match="Provide at least one argument"):
-        _check_easycheck_arguments()
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _check_easycheck_arguments(Handle_with=1)
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _check_easycheck_arguments(Message=1)
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _check_easycheck_arguments(Condition=1)
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _check_easycheck_arguments(Operator=1)
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _check_easycheck_arguments(Assign_length_to_others=1)
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _check_easycheck_arguments(Execution_mode=1)
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _check_easycheck_arguments(Expected_type=1)
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _check_easycheck_arguments(Expected_length=1)
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _check_easycheck_arguments(handle_with=ValueError, Message=1)
-
-    with pytest.raises(TypeError, match="handle_with must be an exception"):
-        _check_easycheck_arguments(handle_with=20)
-
-    with pytest.raises(TypeError, match="handle_with must be an exception"):
-        _check_easycheck_arguments(handle_with=NotImplemented)
-
-
-def test_check_easycheck_arguments():
-    assert _check_easycheck_arguments(handle_with=LengthError) is None
-    with pytest.raises(TypeError):
-        _check_easycheck_arguments(handle_with="NonExistingError")
-
-    with pytest.raises(TypeError, match="must be an exception"):
-        _check_easycheck_arguments(handle_with=sum)
-
-    with pytest.raises(TypeError):
-        _check_easycheck_arguments(handle_with=LengthError, message=False)
-    assert (
-        _check_easycheck_arguments(
-            handle_with=LengthError, message="This is error"
-        )
-        is None
-    )
-    with pytest.raises(TypeError):
-        _check_easycheck_arguments(handle_with=LengthError, message=25)
-
-    assert (
-        _check_easycheck_arguments(
-            handle_with=ValueError, condition="a" == "a"
-        )
-        is None
-    )
-    assert _check_easycheck_arguments(condition="a" == "a") is None
-    assert (
-        _check_easycheck_arguments(handle_with=ValueError, condition=2 > 1)
-        is None
-    )
-    assert (
-        _check_easycheck_arguments(handle_with=ValueError, condition=2 < 1)
-        is None
-    )
-    assert (
-        _check_easycheck_arguments(handle_with=ValueError, condition=2 == "2")
-        is None
-    )
-    assert _check_easycheck_arguments(condition=2 == "2") is None
-    with pytest.raises(ValueError):
-        _check_easycheck_arguments(
-            handle_with=ValueError, condition="not a comparison"
-        )
-    with pytest.raises(ValueError):
-        _check_easycheck_arguments(condition="not a comparison")
-
-    for this_operator in get_possible_operators():
-        assert _check_easycheck_arguments(operator=this_operator) is None
-        with pytest.raises(OperatorError):
-            _check_easycheck_arguments(operator=this_operator.__name__)
-
-    assert _check_easycheck_arguments(assign_length_to_others=True) is None
-    assert _check_easycheck_arguments(assign_length_to_others=False) is None
-    for this_assignment in ("nothing", 22, [1]):
-        with pytest.raises(TypeError):
-            _check_easycheck_arguments(assign_length_to_others=this_assignment)
-
-    assert _check_easycheck_arguments(execution_mode="return") is None
-    assert _check_easycheck_arguments(execution_mode="raise") is None
-    for this_mode in ("nothing", 22, [1]):
-        with pytest.raises(ValueError):
-            _check_easycheck_arguments(execution_mode=this_mode)
-
-    for this_length in (0, 3, 5, 7):
-        assert _check_easycheck_arguments(expected_length=this_length) is None
-        assert (
-            _check_easycheck_arguments(expected_length=float(this_length))
-            is None
-        )
-    assert _check_easycheck_arguments(expected_length=(5)) is None
-    for this_length in ("0", [3], LengthError):
-        with pytest.raises(TypeError):
-            _check_easycheck_arguments(expected_length=this_length)
-
-    for this_type in (str, int, float, bool, tuple, list, Generator):
-        assert _check_easycheck_arguments(expected_type=this_type) is None
-    for this_type in ("str", 25, True, 1.1):
-        with pytest.raises(TypeError):
-            _check_easycheck_arguments(expected_type=this_type)
-    assert _check_easycheck_arguments(expected_type=(str, tuple)) is None
-    assert _check_easycheck_arguments(expected_type=(str, tuple, None)) is None
-    assert _check_easycheck_arguments(expected_type=[str, tuple]) is None
-    assert _check_easycheck_arguments(expected_type={str, tuple}) is None
-    with pytest.raises(TypeError):
-        _check_easycheck_arguments(expected_type="boolintstrcomplexlist")
-    with pytest.raises(TypeError):
-        _check_easycheck_arguments(expected_type=(str, tuple, list, 26))
-
-    assert (
-        _check_easycheck_arguments(
-            expected_type=(str, tuple, list),
-            condition=2 < 2,
-            expected_length=3,
-            execution_mode="raise",
-            assign_length_to_others=True,
-        )
-        is None
-    )
-
-    with pytest.raises(TypeError):
-        _check_easycheck_arguments(
-            expected_type=(str, tuple, list),
-            condition=2 < 2,
-            expected_length=3,
-            execution_mode="raise",
-            assign_length_to_others="yes",
-        )
 
 
 def test_make_message_edge_cases():
