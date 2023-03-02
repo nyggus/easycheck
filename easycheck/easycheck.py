@@ -15,6 +15,7 @@ import warnings
 
 from collections.abc import Iterable, Callable
 from math import isclose
+from numbers import Number
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
 
@@ -218,7 +219,7 @@ def check_length(
     """
     __tracebackhide__ = True
     if assign_length_to_others:
-        if isinstance(item, (int, float, complex, bool)):
+        if isinstance(item, (Number, bool)):
             item = [item]
 
     condition_to_check = operator(len(item), expected_length)
@@ -298,7 +299,6 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
         handle_with=handle_with,
         message=message,
     )
-
 
 
 def check_if_isclose(x, y, /,
