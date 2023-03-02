@@ -87,12 +87,16 @@ def check_if(condition, handle_with=AssertionError, message=None):
     In such combined comparisons, you can easily use any logical operator:
     >>> check_if((a < 50 and b > 100) or isinstance(c, str))
 
-    To issue a warning, use the Warning class or its subclass:
-    >>> check_if(2 < 1, handle_with=Warning, message='2 is not smaller than 1')
+    To issue a warning, use the Warning class or its subclass
+    (we'll catch the warning here):
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...     check_if(2 < 1, handle_with=Warning, message='2 is not smaller than 1')
+    ...     assert_if("2 is not smaller than 1" in str(w[-1].message))
 
     or shorter
-    >>> check_if(2 < 1, Warning, '2 is not smaller than 1')
-
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...     check_if(2 < 1, Warning, '2 is not smaller than 1')
+    ...     assert_if("2 is not smaller than 1" in str(w[-1].message))
     """
     __tracebackhide__ = True
     if not condition:
@@ -157,8 +161,11 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
         ...
     AssertionError: BMI disaster! Watch out for candies!
 
-    To issue a warning, use the Warning class or one of its subclasses:
-    >>> check_if_not(2 > 1, Warning, '2 is not bigger than 1')
+    To issue a warning, use the Warning class or one of its subclasses
+    (we'll catch the warning):
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...     check_if_not(2 > 1, Warning, '2 is bigger than 1')
+    ...     assert_if("2 is bigger than 1" in str(w[-1].message))
     """
     __tracebackhide__ = True
     check_if(not condition, handle_with=handle_with, message=message)
@@ -419,8 +426,9 @@ def check_if_paths_exist(
     >>> check_if_paths_exist(os.listdir(), execution_mode='return')
     (None, [])
 
-    To issue a warning, do the following:
-    >>> check_if_paths_exist('Q:/Op/Oop', handle_with=Warning)
+    To issue a warning, do the following (we'll catch the warning):
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...     check_if_paths_exist('Q:/Op/Oop', handle_with=Warning)
     >>> check_if_paths_exist('Q:/Op/Oop',
     ...    execution_mode='return',
     ...    handle_with=Warning)
@@ -514,9 +522,11 @@ def check_comparison(
     ComparisonError: Not less!
 
     To issue a warning, do the following:
-    >>> check_comparison('one text', lt, 'another text',
-    ...                  handle_with=Warning,
-    ...                  message='Not less!')
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...     check_comparison('one text', lt, 'another text',
+    ...         handle_with=Warning,
+    ...         message='Not less!')
+    ...     assert_if("Not less" in str(w[-1].message))
     """
     __tracebackhide__ = True
     check_if(
@@ -685,11 +695,13 @@ def check_argument(
     >>> check_argument(TypeError(), 'error_arg', expected_type=Exception)
 
     You can also issue a warning instead of raising an exception:
-    >>> check_argument(
-    ...    x, 'x',
-    ...    expected_type=int,
-    ...    handle_with=Warning,
-    ...    message="Incorrect argument's value")
+    >>> with warnings.catch_warnings(record=True) as w:
+    ...     check_argument(
+    ...         x, 'x',
+    ...         expected_type=int,
+    ...         handle_with=Warning,
+    ...         message="Incorrect argument's value")
+    ...     assert_if("Incorrect argument's value" in str(w[-1].message))
     """
     __tracebackhide__ = True
     if all(
