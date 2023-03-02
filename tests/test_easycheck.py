@@ -1,6 +1,8 @@
-import warnings
+import decimal
+import fractions
 import os
 import pytest
+import warnings
 from collections.abc import Generator
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
@@ -140,6 +142,14 @@ def test_check_length_positive():
         check_length(10, 1, assign_length_to_others=True, handle_with=Warning)
         is None
     )
+    assert (
+        check_length(decimal.Decimal("3.55634"), 1, assign_length_to_others=True)
+        is None
+    )
+    assert (
+        check_length(fractions.Fraction(3, 55), 1, assign_length_to_others=True)
+        is None
+    )
 
 
 def test_check_length_negative():
@@ -147,8 +157,12 @@ def test_check_length_negative():
         check_length(len(i for i in range(3)), 3)
     with pytest.raises(TypeError):
         check_length(None)
-    with pytest.raises(TypeError, match="object of type 'int' has"):
+    with pytest.raises(TypeError, match="object of type 'int' has no len()"):
         check_length(10, 1)
+    with pytest.raises(TypeError, match="'decimal.Decimal' has no len()"):
+        check_length(decimal.Decimal("3.55634"), 1, assign_length_to_others=False)
+    with pytest.raises(TypeError, match="'Fraction' has no len()"):
+        check_length(fractions.Fraction(3, 55), 1, assign_length_to_others=False)
 
 
 def test_check_length_negative_warnings():
@@ -160,7 +174,7 @@ def test_check_length_negative_warnings():
             message="This is a testing warning",
         )
         assert "This is a testing warning" in str(w[-1].message)
-
+    
 
 def test_check_if_isclose_edge_cases():
     with pytest.raises(ValueError, match="tolerances must be non-negative"):
