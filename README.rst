@@ -1,9 +1,12 @@
 easycheck
 =========
 
-The :code:`easycheck` package offers a lightweight tool for running functionized assertion-like checks within Python code; it also offers functions to be used in testing - particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases. The idea is to use the :code:`easycheck` functions in a similar way as assertions, but with more functionality and with a slightly different aim: When a condition you define is met, nothing happens (in fact, the function returns :code:`None`); if the condition is violated, an exception is raised or a warning is issued. The main differences between :code:`easycheck` functions and assertions are as follows:
+The :code:`easycheck` package offers a lightweight tool for running functionized checks within Python code; it also offers functions to be used in testing - particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases (starting off with :code:`assert_` instead of :code:`check_`).
 
-* While you should not use assertions in your Python code, you can do so with the :code:`easycheck` functions.
+The idea is to use the :code:`easycheck` functions to check conditions that are _not_ assertions. The checks work in the following general way: When a condition is met, nothing happens (in fact, the function returns :code:`None`); if it is violated, an exception is raised or a warning is issued. The main differences between :code:`easycheck` functions and assertions are as follows:
+
+* Assertions are meant to be used conditions that _must_ be true (when only the code is correct). So, if an assertion is incorrect, it means something is wrong with the code. You should never use assertions to handle regular exceptions, like those related to data or arguments.
+* Unlike assertions, :code:`easycheck` functions are to be used to check conditions related to things like data and argument values, and to handle regular exceptions.
 * While assertions only raise :code:`AssertionError`, you can choose any exception to be raised by easycheck functions.
 * When using :code:`easycheck`, instead of raising an exception, you can issue a warning.
 
@@ -32,7 +35,10 @@ You can also issue a warning:
 
 .. code-block:: python
 
-    check_if(x <= 10, Warning, 'For stable functioning of the function, x should not be greater than 10.')
+    check_if(x <= 10,
+             Warning,
+             'For stable functioning of the function, '
+             'x should not be greater than 10.')
 
 The package also offers functions dedicated to testing, e.g.,
 
