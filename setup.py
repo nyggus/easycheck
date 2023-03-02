@@ -13,7 +13,7 @@ setuptools.setup(
     author="Nyggus & Ke Boan",
     author_email="nyggus@gmail.com",
     license="MIT",
-    description="A tool for simple functionalized assertions in Python",
+    description="A tool for checking conditions in Python",
     long_description=long_description,
     long_description_content_type="text/x-rst",
     url="https://github.com/nyggus/easycheck",
