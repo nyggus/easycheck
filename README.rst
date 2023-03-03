@@ -50,6 +50,9 @@ The package also offers functions dedicated to testing, e.g.,
 The :code:`message` argument has the default value of :code:`None`, which does the following. If the exception class provided in :code:`handle_with` is built-in (that is, can be found in :code:`dir(builtins)`), no message is provided. But if it is not a built-in exception (or warning) class, then the exception/warning class's docstring is taken as the message. This is a convenient way of providing a  typical message. If you want to customize the message (e.g., depending on the value of a variable), you should use a customized string (e.g., through an f-string). But if you do not want to use any message with a custom exception/warning, simply provide an empty string (:code:`message=''`).
 
 
+Read about :code:`easycheck`
+----------------------------
+
 You will find more about assertions in `this article <https://medium.com/towards-data-science/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_, entitled "Python Assertions, or Checking If a Cat Is a Dog" and published in *Towards Data Science*. It mentions :code:`easycheck`! You will read about :code:`easycheck` also in `the article "Comparing floating-point numbers with easycheck" <https://medium.com/towards-data-science/comparing-floating-point-numbers-with-easycheck-dcbae480f75f>`_  (also from *Towards Data Science*). The *Better Programming* article entitiled `"How to Overwrite AssertionError in Python and Use Custom Exceptions" <https://medium.com/better-programming/how-to-overwrite-asserterror-in-python-and-use-custom-exceptions-c0b252989977>`_, mentions the package, too.
 
 
