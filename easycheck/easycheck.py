@@ -18,6 +18,9 @@ from math import isclose
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
 
+class LimitError(Exception):
+    """Number out of limit."""
+
 
 class LengthError(Exception):
     """Violated length check."""
@@ -178,6 +181,60 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
 
     check_if(not condition, handle_with=handle_with, message=message)
 
+
+def check_if_in_limits(
+    x, 
+    lower_limit = float('-inf'), 
+    upper_limit = float('inf'), 
+    handle_with=LimitError, 
+    message=None,
+    include_equal=True   
+):
+    """Check if number is in range of limits
+    
+    Args:
+        x (float): number which will be check if fit to the limits
+        lower_limit (float): the number from which we expect x to be greater
+        upper_limit (float): the number from which we expect x to be smaller
+        handle_with (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message. 
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+        include_equal (bool): definie if limits should be included in range
+
+    Returns:
+        None, if check succeeded.
+
+    Raises:
+        Exception of the type provided by the handle_with parameter, LengthError
+        by default (unless handle_with is a warning).
+
+    >>> check_if_in_limits(3, 1, 5)
+    >>> check_if_in_limits(3, 1)
+    >>> check_if_in_limits(3, upper_limit = 5)
+    >>> check_if_in_limits(3, 1, 3, include_equal = True)
+    >>> check_if_in_limits(3, 1, 3, include_equal = False)
+    Traceback (most recent call last):
+        ...
+    LimitError: Number out of limit.
+    >>> check_if_in_limits(5, 1, 3)
+    Traceback (most recent call last):
+        ...
+    LimitError: Number out of limit.
+    >>> check_if_in_limits(5, 1, 3, Warning)
+    """
+    __tracebackhide__ = True
+    _check_easycheck_arguments(
+        handle_with=handle_with, 
+        message=message
+    )
+    x = float(x)
+    if include_equal:
+        condition = lower_limit <= x and x <= upper_limit
+    else:
+        condition = lower_limit < x and x < upper_limit
+    check_if(condition, handle_with=handle_with, message=message)
 
 def check_length(
     item,
@@ -1113,6 +1170,7 @@ def get_possible_operators():
 
 assert_if = check_if
 assert_if_not = check_if_not
+assert_if_in_limits = check_if_in_limits
 assert_length = check_length
 assert_type = check_type
 assert_paths = check_if_paths_exist

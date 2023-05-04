@@ -9,6 +9,8 @@ from easycheck.easycheck import (
     assert_if,
     check_if_not,
     assert_if_not,
+    check_if_in_limits,
+    assert_if_in_limits,
     check_type,
     assert_type,
     check_if_isclose,
@@ -21,6 +23,7 @@ from easycheck.easycheck import (
     check_argument,
     check_comparison,
     catch_check,
+    LimitError,
     ComparisonError,
     ArgumentValueError,
     LengthError,
@@ -136,6 +139,36 @@ def test_check_if_not_negative_warnings():
         check_if_not(2 > 1, UserWarning, "This is a testing warning")
         assert issubclass(w[-1].category, Warning)
         assert "This is a testing warning" in str(w[-1].message)
+
+def test_check_if_in_limits():
+    assert check_if_in_limits(3, 1, 5) is None
+    assert check_if_in_limits(3, 1, 5, handle_with=Warning) is None
+    assert check_if_in_limits(3, 1) is None
+    assert check_if_in_limits(3, 1, handle_with=Warning) is None
+    assert check_if_in_limits(3, 3, include_equal=True) is None
+    assert check_if_in_limits(3, 3, include_equal=True, handle_with=Warning) is None
+    assert check_if_in_limits(3, 1, include_equal=False) is None
+    assert check_if_in_limits(3, 1, include_equal=False, handle_with=Warning) is None
+    assert check_if_in_limits(3, upper_limit=5) is None
+    assert check_if_in_limits(3, upper_limit=5, handle_with=Warning) is None
+    assert check_if_in_limits(3, lower_limit=3) is None
+    assert check_if_in_limits(3, lower_limit=3, handle_with=Warning) is None
+    assert check_if_in_limits(3, upper_limit=3) is None
+    assert check_if_in_limits(3, upper_limit=3, handle_with=Warning) is None
+
+def test_check_if_in_limits_negative():
+    with pytest.raises(LimitError):
+        check_if_in_limits(3, 1, 3, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(3, 3, 5, include_equal=False)
+
+    with pytest.raises(LimitError):
+        check_if_in_limits(1, 3, 5)       
+    with pytest.raises(LimitError):
+        check_if_in_limits(5, 1, 3)
+
+    with pytest.raises(TypeError):
+        check_if_in_limits(None)
 
 
 def test_check_length_edge_cases():
