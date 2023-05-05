@@ -193,15 +193,16 @@ def check_if_in_limits(
     """Check if number is in range of limits
     
     Args:
-        x (float): number which will be check if fit to the limits
-        lower_limit (float): the number from which we expect x to be greater
-        upper_limit (float): the number from which we expect x to be smaller
+        x (float): number to be checked if it's within specified limits
+        lower_limit (float): the lower limit of the interval
+        upper_limit (float): the upper limit of the interval
         handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message. 
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
-        include_equal (bool): definie if limits should be included in range
+        include_equal (bool): True for strict checks (lower ≤ x ≤ upper), 
+        False otherwise (lower < x < upper)
 
     Returns:
         None, if check succeeded.
@@ -212,6 +213,10 @@ def check_if_in_limits(
 
     >>> check_if_in_limits(3, 1, 5)
     >>> check_if_in_limits(3, 1)
+    >>> check_if_in_limits(-3, -5, -1)
+    >>> check_if_in_limits(1.0, -1, 3)
+    >>> check_if_in_limits(-1.0, -100.0, 100.0)
+    >>> check_if_in_limits(0.0001, 0.00005, 0.0003)
     >>> check_if_in_limits(3, upper_limit = 5)
     >>> check_if_in_limits(3, 1, 3, include_equal = True)
     >>> check_if_in_limits(3, 1, 3, include_equal = False)
@@ -231,9 +236,10 @@ def check_if_in_limits(
     )
     x = float(x)
     if include_equal:
-        condition = lower_limit <= x and x <= upper_limit
+        condition = lower_limit <= x <= upper_limit
     else:
-        condition = lower_limit < x and x < upper_limit
+        condition = lower_limit < x < upper_limit
+
     check_if(condition, handle_with=handle_with, message=message)
 
 def check_length(
@@ -964,6 +970,8 @@ def catch_check(check_function, *args, **kwargs):
             assert_if,
             check_if_not,
             assert_if_not,
+            check_if_in_limits,
+            assert_if_in_limits,
             check_argument,
             check_comparison,
             check_if_paths_exist,
