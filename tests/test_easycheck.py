@@ -179,6 +179,8 @@ def test_check_if_in_limits_negative():
     with pytest.raises(LimitError):
         check_if_in_limits(5, 1, 3)
     with pytest.raises(LimitError):
+        check_if_in_limits(0, 1, 1000)
+    with pytest.raises(LimitError):
         check_if_in_limits(3, 1, 3, include_equal=False)
     with pytest.raises(LimitError):
         check_if_in_limits(3, 3, 5, include_equal=False)
@@ -191,7 +193,17 @@ def test_check_if_in_limits_negative():
     with pytest.raises(LimitError):
         check_if_in_limits(0.0000001, 0.0000002, 0.0000003)
     with pytest.raises(LimitError):
-        check_if_in_limits(0, 1, 1000)
+        check_if_in_limits(5.0, 1.0, 3.0)
+    with pytest.raises(LimitError):
+        check_if_in_limits(3.05, 3.05, 5.05, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(5.00005, 1.2345, 5.00005, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(0.00, 0.00, 0.00, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(-1.05, -0.05, 0.05, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(-1000.00, -999.999, -999.998, include_equal=False)
 
     with pytest.raises(TypeError):
         check_if_in_limits(None)
