@@ -117,6 +117,7 @@ Here is a list of :code:`easycheck` functions the module offers, along with thei
 * :code:`check_if()`, with the alias of :code:`assert_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
 * :code:`check_if_not()`, with the alias of :code:`assert_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is _not_ met;
 * :code:`check_if_isclose()`, with the alias of :code:`assert_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
+* :code:`check_if_in_limits()`, with the alias of :code:`assert_if_in_limits()`;
 * :code:`check_length()`, with the alias of :code:`assert_length()`; to compare length (equal to, smaller than, greater than, and the like);
 * :code:`check_type()`, with the alias of :code:`assert_type()`; to check expected type, similar to :code:`isinstance()`;
 * :code:`check_if_paths_exist()`, with the alias of :code:`assert_paths()`; to compare paths (or just one path) exist;
