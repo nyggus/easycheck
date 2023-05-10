@@ -172,8 +172,9 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
     ...     assert_if("2 is bigger than 1" in str(w[-1].message))
     """
     __tracebackhide__ = True
-    check_if(not condition, handle_with=handle_with, message=message)
-
+    if condition:
+        _raise(handle_with, message)
+    
 
 def check_if_in_limits(
     x, 
@@ -223,17 +224,14 @@ def check_if_in_limits(
     >>> check_if_in_limits(5, 1, 3, Warning)
     """
     __tracebackhide__ = True
-    _check_easycheck_arguments(
-        handle_with=handle_with, 
-        message=message
-    )
     x = float(x)
     if include_equal:
         condition = lower_limit <= x <= upper_limit
     else:
         condition = lower_limit < x < upper_limit
 
-    check_if(condition, handle_with=handle_with, message=message)
+    if not condition:
+        _raise(handle_with, message)
 
 def check_length(
     item,
@@ -285,8 +283,9 @@ def check_length(
         if isinstance(item, (Number, bool)):
             item = [item]
 
-    condition_to_check = operator(len(item), expected_length)
-    check_if(condition_to_check, handle_with=handle_with, message=message)
+    condition = operator(len(item), expected_length)
+    if not condition:
+        _raise(handle_with, message)
 
 
 def check_type(item, expected_type, handle_with=TypeError, message=None):
@@ -349,7 +348,8 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
     """
     __tracebackhide__ = True
     if expected_type is None:
-        check_if(item is None, handle_with=handle_with, message=message)
+        if item is not None:
+            _raise(handle_with, message)
         return None
 
     if isinstance(expected_type, Iterable):
@@ -357,11 +357,8 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
             return None
         expected_type = tuple(t for t in expected_type if t is not None)
 
-    check_if(
-        isinstance(item, expected_type),
-        handle_with=handle_with,
-        message=message,
-    )
+    if not isinstance(item, expected_type):
+        _raise(handle_with, message)
 
 
 def check_if_isclose(x, y, /,
@@ -435,11 +432,8 @@ def check_if_isclose(x, y, /,
     x = float(x)
     y = float(y)
 
-    check_if(
-        isclose(x, y, rel_tol=rel_tol, abs_tol=abs_tol),
-        handle_with,
-        message
-    )
+    if not isclose(x, y, rel_tol=rel_tol, abs_tol=abs_tol):
+        _raise(handle_with, message)
 
 
 def check_if_paths_exist(
@@ -503,21 +497,21 @@ def check_if_paths_exist(
     (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop'])
     """
     __tracebackhide__ = True
-    check_if(execution_mode in ("raise", "return"),
-             ValueError,
-             "execution_mode must be either 'raise' or 'return'"
-             )
+    if not execution_mode in ("raise", "return"):
+        _raise(ValueError,
+               "execution_mode must be either 'raise' or 'return'")
 
     is_allowed_type = isinstance(paths, (str, Path)) or (
         isinstance(paths, Iterable)
         and all(isinstance(path, (str, Path)) for path in paths)
     )
 
-    check_if(
-        is_allowed_type,
-        TypeError,
-        "Argument paths must be string or pathlib.Path or iterable thereof",
-    )
+    if not is_allowed_type:
+        _raise(
+            TypeError,
+            "Argument paths must be string"
+            " or pathlib.Path or iterable thereof",
+        )
 
     error = None
 
@@ -592,9 +586,8 @@ def check_comparison(
     ...     assert_if("Not less" in str(w[-1].message))
     """
     __tracebackhide__ = True
-    check_if(
-        operator(item_1, item_2), handle_with=handle_with, message=message
-    )
+    if not operator(item_1, item_2):
+        _raise(handle_with, message)
 
 
 def check_all_ifs(*args):
@@ -785,13 +778,11 @@ def check_argument(
     )
 
     if expected_type is not None:
-        instance_message = _make_message(
-            message,
-            (
-                f"Incorrect type of {argument_name}; valid type(s):"
-                f" {expected_type}"
-            ),
-        )
+        instance_message = (
+            message
+            or f"Incorrect type of {argument_name}; valid type(s):"
+               f" {expected_type}"
+            )
         check_type(
             item=argument,
             expected_type=expected_type,
@@ -799,26 +790,19 @@ def check_argument(
             message=instance_message,
         )
     if expected_choices is not None:
-        choices_message = _make_message(
-            message,
-            (
-                f"{argument_name}'s value, {argument}, "
-                f"is not among valid values: {expected_choices}."
-            ),
-        )
-        check_if(
-            argument in expected_choices,
-            handle_with=handle_with,
-            message=choices_message,
-        )
+        choices_message = (
+            message
+            or f"{argument_name}'s value, {argument}, "
+               f"is not among valid values: {expected_choices}."
+            )
+        if argument not in expected_choices:
+            _raise(handle_with, choices_message)
     if expected_length is not None:
-        length_message = _make_message(
-            message,
-            (
-                f"Unexpected length of {argument_name}"
-                f" (should be {expected_length})"
-            ),
-        )
+        length_message = (
+            message
+            or f"Unexpected length of {argument_name}"
+               f" (should be {expected_length})"
+            )
         check_length(
             item=argument,
             expected_length=expected_length,
@@ -826,27 +810,6 @@ def check_argument(
             message=length_message,
             **kwargs,
         )
-
-
-def _make_message(message_provided, message_otherwise):
-    """If message was provided, use it; otherwise, use the alternative one.
-
-    Args:
-        message_provided: message to use if provided
-        message_otherwise: message to use if the first one was not provided
-
-    Returns:
-        First message that evaluates to True
-
-    This function is used by the check_argument() function.
-
-    >>> _make_message(None, 'Otherwise')
-    'Otherwise'
-    >>> _make_message('Provided', 'Otherwise')
-    'Provided'
-    """
-    __tracebackhide__ = True
-    return message_provided or message_otherwise
 
 
 def catch_check(check_function, *args, **kwargs):
