@@ -11,6 +11,8 @@ from easycheck.easycheck import (
     assert_if,
     check_if_not,
     assert_if_not,
+    check_if_in_limits,
+    assert_if_in_limits,
     check_type,
     assert_type,
     check_if_isclose,
@@ -23,6 +25,7 @@ from easycheck.easycheck import (
     check_argument,
     check_comparison,
     catch_check,
+    LimitError,
     ComparisonError,
     ArgumentValueError,
     LengthError,
@@ -119,6 +122,74 @@ def test_check_if_not_negative_warnings():
         check_if_not(2 > 1, UserWarning, "This is a testing warning")
         assert issubclass(w[-1].category, Warning)
         assert "This is a testing warning" in str(w[-1].message)
+
+def test_check_if_in_limits():
+    assert check_if_in_limits(3, 1, 5) is None
+    assert check_if_in_limits(3, 1, 5, handle_with=Warning) is None
+    assert check_if_in_limits(3, 1) is None
+    assert check_if_in_limits(3, 1, handle_with=Warning) is None
+    assert check_if_in_limits(3, 3, include_equal=True) is None
+    assert check_if_in_limits(3, 3, include_equal=True, handle_with=Warning) is None
+    assert check_if_in_limits(3, 1, include_equal=False) is None
+    assert check_if_in_limits(3, 1, include_equal=False, handle_with=Warning) is None
+    assert check_if_in_limits(3, upper_limit=5) is None
+    assert check_if_in_limits(3, upper_limit=5, handle_with=Warning) is None
+    assert check_if_in_limits(3, lower_limit=3) is None
+    assert check_if_in_limits(3, lower_limit=3, handle_with=Warning) is None
+    assert check_if_in_limits(3, upper_limit=3) is None
+    assert check_if_in_limits(3, upper_limit=3, handle_with=Warning) is None
+
+    assert check_if_in_limits(0, 0, 0) is None
+    assert check_if_in_limits(0, 0, 0, handle_with=Warning) is None
+    assert check_if_in_limits(3.0, 1.0, 5.0) is None
+    assert check_if_in_limits(3.0, 1.0, 5.0, handle_with=Warning) is None
+    assert check_if_in_limits(3.0, 1, 5) is None
+    assert check_if_in_limits(3.0, 1, 5, handle_with=Warning) is None
+    assert check_if_in_limits(3, 1.0, 5.0) is None
+    assert check_if_in_limits(3, 1.0, 5.0, handle_with=Warning) is None
+    assert check_if_in_limits(-1, -3, 3) is None
+    assert check_if_in_limits(-1, -3, 3, handle_with=Warning) is None
+    assert check_if_in_limits(0, -1000.0, 1000.0) is None
+    assert check_if_in_limits(0, -1000.0, 1000.0, handle_with=Warning) is None
+    assert check_if_in_limits(0.0005, 0.0004, 0.0006) is None
+    assert check_if_in_limits(0.0005, 0.0004, 0.0006, handle_with=Warning) is None
+    assert check_if_in_limits(1000.0, 1000.0, 1000.0) is None
+    assert check_if_in_limits(1000.0, 1000.0, 1000.0, handle_with=Warning) is None
+
+def test_check_if_in_limits_negative():
+    with pytest.raises(LimitError):
+        check_if_in_limits(1, 3, 5)
+    with pytest.raises(LimitError):
+        check_if_in_limits(5, 1, 3)
+    with pytest.raises(LimitError):
+        check_if_in_limits(0, 1, 1000)
+    with pytest.raises(LimitError):
+        check_if_in_limits(3, 1, 3, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(3, 3, 5, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(0, 0, 0, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(-5, 0, 1000, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(1., 3., 5.)
+    with pytest.raises(LimitError):
+        check_if_in_limits(0.0000001, 0.0000002, 0.0000003)
+    with pytest.raises(LimitError):
+        check_if_in_limits(5.0, 1.0, 3.0)
+    with pytest.raises(LimitError):
+        check_if_in_limits(3.05, 3.05, 5.05, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(5.00005, 1.2345, 5.00005, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(0.00, 0.00, 0.00, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(-1.05, -0.05, 0.05, include_equal=False)
+    with pytest.raises(LimitError):
+        check_if_in_limits(-1000.00, -999.999, -999.998, include_equal=False)
+
+    with pytest.raises(TypeError):
+        check_if_in_limits(None)
 
 
 def test_check_length_edge_cases():
@@ -379,6 +450,31 @@ def test_catch_check_if_not():
     )
     assert isinstance(my_check_not, Warning)
 
+def test_catch_check_if_in_limits():
+    my_check = catch_check(check_if_in_limits, 3, 1, 5)
+    assert my_check is None
+
+    my_check = catch_check(check_if_in_limits, 3, 1, 5, handle_with=Warning)
+    assert my_check is None
+
+    my_check = catch_check(check_if_in_limits, 0, 1, 5, handle_with=Warning)
+    assert isinstance(my_check, Warning) 
+
+    my_check = catch_check(
+        check_if_in_limits, 
+        0, 
+        1, 
+        5, 
+        handle_with=Warning, 
+        message="Number out of limits",
+    )
+    assert isinstance(my_check, Warning) 
+    assert "Number out of limits" in str(my_check)
+
+    my_check = catch_check(check_if_in_limits, 0, 1, 5)
+    assert isinstance(my_check, LimitError) 
+    with pytest.raises(LimitError):
+        raise my_check
 
 def test_catch_check_length():
     my_check = catch_check(check_length, [2, 2], 2)
