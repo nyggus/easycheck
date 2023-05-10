@@ -32,7 +32,6 @@ from easycheck.easycheck import (
     NotCloseEnoughError,
     get_possible_operators,
     _raise,
-    _make_message,
 )
 
 
@@ -1227,23 +1226,6 @@ def test_check_argument_mix_warnings():
     with warnings.catch_warnings(record=True) as w:
         foo("one")
         assert "type" in str(w[-1].message)
-
-
-def test_make_message_edge_cases():
-    with pytest.raises(TypeError, match="required positional argument"):
-        _make_message("Provided")
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _make_message(message="Provided")
-    with pytest.raises(TypeError, match="unexpected keyword"):
-        _make_message(
-            message_provided="Provided", Message_otherwise="Otherwise"
-        )
-
-
-def test_make_message():
-    assert _make_message(None, "Otherwise") == "Otherwise"
-    assert _make_message("Provided", "Otherwise") == "Provided"
-    assert _make_message("Provided", "Otherwise") == "Provided"
 
 
 def test_assert_functions():
