@@ -6,6 +6,8 @@ import warnings
 from collections.abc import Generator
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
+from unittest import mock
+
 from easycheck.easycheck import (
     check_if,
     assert_if,
@@ -41,7 +43,9 @@ def test_check_if_edge_cases():
     assert check_if(True) is None
     with pytest.raises(AssertionError):
         check_if(False)
-    with pytest.raises(TypeError, match="The error argument must be an exception or a warning"):
+    with pytest.raises(
+        TypeError, match="The error argument must be an exception or a warning"
+    ):
         check_if(False, 1)
     with pytest.raises(
         TypeError, match="message must be either None or string"
@@ -69,6 +73,47 @@ def test_check_if_negative():
         check_if(2 < 1, handle_with=ValueError, message="incorrect value")
 
 
+def test_switched_off_checks_exceptions():
+    with mock.patch.dict(os.environ, {"EASYCHECK_RUN": "0"}):
+        assert check_if(2 < 1) is None
+        assert check_if_not(1 == 1) is None
+        assert check_if_in_limits(1, 3, 5) is None
+        assert check_length(10, 3) is None
+        assert check_if_isclose(1.12, 1.123, abs_tol=0.0005) is None
+        assert check_type(True, (str, complex)) is None
+        assert catch_check(check_if, 2 == 2) is None
+        assert check_comparison(3, eq, 2) is None
+        assert check_if_paths_exist("__file__", execution_mode="buuu") is None
+        assert check_if_paths_exist("Z:/Op/Oop") is None
+        assert check_argument(50, "my_arg", expected_type=str) is None
+        multiple_check = check_all_ifs(
+            (check_if, 2 > 1), (check_if, "a" != "a")
+        )
+        assert multiple_check is None
+
+
+def test_switched_off_checks_warnings():
+    with mock.patch.dict(os.environ, {"EASYCHECK_RUN": "0"}):
+        with warnings.catch_warnings(record=True) as issues:
+            check_if(2 < 1, Warning)
+        check_if_not(1 == 1, Warning)
+        check_if_in_limits(1, 3, 5, handle_with=Warning())
+        check_length(10, 3, handle_with=Warning)
+        check_type(True, (str, complex), handle_with=Warning)
+        catch_check(check_if, 2 == 2, handle_with=Warning)
+        check_comparison(3, eq, 2, handle_with=Warning)
+        check_if_paths_exist(
+            "__file__", execution_mode="buuu", handle_with=Warning
+        )
+        check_if_paths_exist("Z:/Op/Oop", handle_with=Warning)
+        check_argument(50, "my_arg", expected_type=str, handle_with=Warning)
+        multiple_check = check_all_ifs(
+            (check_if, 2 > 1, Warning), (check_if, "a" != "a", Warning)
+        )
+        multiple_check is None
+    assert not issues
+
+
 def test_check_if_negative_warnings():
     with warnings.catch_warnings(record=True) as w:
         check_if(2 < 1, Warning, "This is a testing warning")
@@ -86,7 +131,9 @@ def test_check_if_not_edge_cases():
     assert check_if_not(False) is None
     with pytest.raises(AssertionError):
         check_if_not(True)
-    with pytest.raises(TypeError, match="he error argument must be an exception or a warning"):
+    with pytest.raises(
+        TypeError, match="he error argument must be an exception or a warning"
+    ):
         check_if_not(1, 1)
     with pytest.raises(
         TypeError, match="message must be either None or string"
@@ -129,9 +176,15 @@ def test_check_if_in_limits():
     assert check_if_in_limits(3, 1) is None
     assert check_if_in_limits(3, 1, handle_with=Warning) is None
     assert check_if_in_limits(3, 3, include_equal=True) is None
-    assert check_if_in_limits(3, 3, include_equal=True, handle_with=Warning) is None
+    assert (
+        check_if_in_limits(3, 3, include_equal=True, handle_with=Warning)
+        is None
+    )
     assert check_if_in_limits(3, 1, include_equal=False) is None
-    assert check_if_in_limits(3, 1, include_equal=False, handle_with=Warning) is None
+    assert (
+        check_if_in_limits(3, 1, include_equal=False, handle_with=Warning)
+        is None
+    )
     assert check_if_in_limits(3, upper_limit=5) is None
     assert check_if_in_limits(3, upper_limit=5, handle_with=Warning) is None
     assert check_if_in_limits(3, lower_limit=3) is None
@@ -152,9 +205,13 @@ def test_check_if_in_limits():
     assert check_if_in_limits(0, -1000.0, 1000.0) is None
     assert check_if_in_limits(0, -1000.0, 1000.0, handle_with=Warning) is None
     assert check_if_in_limits(0.0005, 0.0004, 0.0006) is None
-    assert check_if_in_limits(0.0005, 0.0004, 0.0006, handle_with=Warning) is None
+    assert (
+        check_if_in_limits(0.0005, 0.0004, 0.0006, handle_with=Warning) is None
+    )
     assert check_if_in_limits(1000.0, 1000.0, 1000.0) is None
-    assert check_if_in_limits(1000.0, 1000.0, 1000.0, handle_with=Warning) is None
+    assert (
+        check_if_in_limits(1000.0, 1000.0, 1000.0, handle_with=Warning) is None
+    )
 
 
 def test_check_if_in_limits_negative():
@@ -173,7 +230,7 @@ def test_check_if_in_limits_negative():
     with pytest.raises(LimitError):
         check_if_in_limits(-5, 0, 1000, include_equal=False)
     with pytest.raises(LimitError):
-        check_if_in_limits(1., 3., 5.)
+        check_if_in_limits(1.0, 3.0, 5.0)
     with pytest.raises(LimitError):
         check_if_in_limits(0.0000001, 0.0000002, 0.0000003)
     with pytest.raises(LimitError):
@@ -215,11 +272,15 @@ def test_check_length_positive():
         is None
     )
     assert (
-        check_length(decimal.Decimal("3.55634"), 1, assign_length_to_others=True)
+        check_length(
+            decimal.Decimal("3.55634"), 1, assign_length_to_others=True
+        )
         is None
     )
     assert (
-        check_length(fractions.Fraction(3, 55), 1, assign_length_to_others=True)
+        check_length(
+            fractions.Fraction(3, 55), 1, assign_length_to_others=True
+        )
         is None
     )
 
@@ -232,9 +293,13 @@ def test_check_length_negative():
     with pytest.raises(TypeError, match="object of type 'int' has no len()"):
         check_length(10, 1)
     with pytest.raises(TypeError, match="'decimal.Decimal' has no len()"):
-        check_length(decimal.Decimal("3.55634"), 1, assign_length_to_others=False)
+        check_length(
+            decimal.Decimal("3.55634"), 1, assign_length_to_others=False
+        )
     with pytest.raises(TypeError, match="'Fraction' has no len()"):
-        check_length(fractions.Fraction(3, 55), 1, assign_length_to_others=False)
+        check_length(
+            fractions.Fraction(3, 55), 1, assign_length_to_others=False
+        )
 
 
 def test_check_length_negative_warnings():
@@ -246,7 +311,7 @@ def test_check_length_negative_warnings():
             message="This is a testing warning",
         )
         assert "This is a testing warning" in str(w[-1].message)
-    
+
 
 def test_check_if_isclose_edge_cases():
     with pytest.raises(ValueError, match="tolerances must be non-negative"):
@@ -254,54 +319,59 @@ def test_check_if_isclose_edge_cases():
     with pytest.raises(ValueError, match="tolerances must be non-negative"):
         check_if_isclose(1.1, 1.2, rel_tol=-1)
     with pytest.raises(TypeError, match="must be real number, not str"):
-        check_if_isclose(1.1, 1.2, rel_tol='.1')
+        check_if_isclose(1.1, 1.2, rel_tol=".1")
     with pytest.raises(TypeError, match="must be real number, not str"):
-        check_if_isclose(1.1, 1.2, abs_tol='.1')
-    with pytest.raises(ValueError,
-                       match="could not convert string to float: '1,1'"):
-        check_if_isclose('1,1', '1.2', abs_tol='.1')
-    with pytest.raises(TypeError,
-                       match=("positional-only arguments passed"
-                              " as keyword arguments")):
-        check_if_isclose(x='1.1', y='1.2')
-    
+        check_if_isclose(1.1, 1.2, abs_tol=".1")
+    with pytest.raises(
+        ValueError, match="could not convert string to float: '1,1'"
+    ):
+        check_if_isclose("1,1", "1.2", abs_tol=".1")
+    with pytest.raises(
+        TypeError,
+        match=("positional-only arguments passed" " as keyword arguments"),
+    ):
+        check_if_isclose(x="1.1", y="1.2")
+
 
 def test_check_if_isclose_positive():
-    assert check_if_isclose(1.12, 1.12, abs_tol=.01) is None
-    assert check_if_isclose(1.12, 1.123, abs_tol=.05) is None
-    assert check_if_isclose(1.12, 1.123, rel_tol=.01) is None
-    assert check_if_isclose(1.12, 1.123, rel_tol=.05) is None
+    assert check_if_isclose(1.12, 1.12, abs_tol=0.01) is None
+    assert check_if_isclose(1.12, 1.123, abs_tol=0.05) is None
+    assert check_if_isclose(1.12, 1.123, rel_tol=0.01) is None
+    assert check_if_isclose(1.12, 1.123, rel_tol=0.05) is None
 
-    assert check_if_isclose("1.12", 1.12, abs_tol=.01) is None
-    assert check_if_isclose(1.12, "1.12", abs_tol=.01) is None
-    assert check_if_isclose("1.12", "1.12", abs_tol=.01) is None
-    assert check_if_isclose(" 1.12 ", 1.12, abs_tol=.01) is None
-    assert check_if_isclose(" 1.12 ", "\t1.12\n", abs_tol=.01) is None
-    assert check_if_isclose(
-        " 1.12 ", "\t     1.12   \n  \n   \n\n\n",
-        abs_tol=.01) is None
-    
-    assert check_if_isclose(1.12, 1.123,
-                            rel_tol=.05,
-                            handle_with=ValueError) is None
+    assert check_if_isclose("1.12", 1.12, abs_tol=0.01) is None
+    assert check_if_isclose(1.12, "1.12", abs_tol=0.01) is None
+    assert check_if_isclose("1.12", "1.12", abs_tol=0.01) is None
+    assert check_if_isclose(" 1.12 ", 1.12, abs_tol=0.01) is None
+    assert check_if_isclose(" 1.12 ", "\t1.12\n", abs_tol=0.01) is None
+    assert (
+        check_if_isclose(
+            " 1.12 ", "\t     1.12   \n  \n   \n\n\n", abs_tol=0.01
+        )
+        is None
+    )
+
+    assert (
+        check_if_isclose(1.12, 1.123, rel_tol=0.05, handle_with=ValueError)
+        is None
+    )
 
     # any of the two check (abs_tol or rel_tol) is enough
     # for the test to pass:
-    assert check_if_isclose(1.12, 1.123, rel_tol=.05, abs_tol=.05) is None
-    
-    check_if_isclose(1.12, 1.123, rel_tol=.000005, abs_tol=.05)
+    assert check_if_isclose(1.12, 1.123, rel_tol=0.05, abs_tol=0.05) is None
+
+    check_if_isclose(1.12, 1.123, rel_tol=0.000005, abs_tol=0.05)
 
 
 def test_check_if_isclose_negative():
     with pytest.raises(NotCloseEnoughError):
-        check_if_isclose(1.12, 1.123, abs_tol=.0005)
+        check_if_isclose(1.12, 1.123, abs_tol=0.0005)
     with pytest.raises(NotCloseEnoughError):
-        check_if_isclose(1.12, 1.123,
-                         message="Not close",
-                         rel_tol=0,
-                         abs_tol=.0005)
+        check_if_isclose(
+            1.12, 1.123, message="Not close", rel_tol=0, abs_tol=0.0005
+        )
     with pytest.raises(NotCloseEnoughError):
-        check_if_isclose(1.12, 1.123, rel_tol=.0005)
+        check_if_isclose(1.12, 1.123, rel_tol=0.0005)
 
 
 def test_check_type_edge_cases():
@@ -460,21 +530,21 @@ def test_catch_check_if_in_limits():
     assert my_check is None
 
     my_check = catch_check(check_if_in_limits, 0, 1, 5, handle_with=Warning)
-    assert isinstance(my_check, Warning) 
+    assert isinstance(my_check, Warning)
 
     my_check = catch_check(
-        check_if_in_limits, 
-        0, 
-        1, 
-        5, 
-        handle_with=Warning, 
+        check_if_in_limits,
+        0,
+        1,
+        5,
+        handle_with=Warning,
         message="Number out of limits",
     )
-    assert isinstance(my_check, Warning) 
+    assert isinstance(my_check, Warning)
     assert "Number out of limits" in str(my_check)
 
     my_check = catch_check(check_if_in_limits, 0, 1, 5)
-    assert isinstance(my_check, LimitError) 
+    assert isinstance(my_check, LimitError)
     with pytest.raises(LimitError):
         raise my_check
 
@@ -631,29 +701,30 @@ def test_catch_check_paths_many_paths():
 
 
 def test_catch_check_if_isclose():
-    my_check = catch_check(check_if_isclose, 1.12, 1.12, abs_tol=.01)
+    my_check = catch_check(check_if_isclose, 1.12, 1.12, abs_tol=0.01)
     assert my_check is None
 
-    my_check = catch_check(check_if_isclose, 1.12, 1.123, abs_tol=.05)
+    my_check = catch_check(check_if_isclose, 1.12, 1.123, abs_tol=0.05)
     assert my_check is None
 
-    my_check = catch_check(check_if_isclose, 1.12, 1.123, rel_tol=.01)
+    my_check = catch_check(check_if_isclose, 1.12, 1.123, rel_tol=0.01)
     assert my_check is None
-    
-    my_check = catch_check(check_if_isclose, 1.12, 1.123, rel_tol=.05)
+
+    my_check = catch_check(check_if_isclose, 1.12, 1.123, rel_tol=0.05)
     assert my_check is None
-    
-    my_check_not = catch_check(check_if_isclose, 1.12, 1.123, abs_tol=.0005)
+
+    my_check_not = catch_check(check_if_isclose, 1.12, 1.123, abs_tol=0.0005)
     assert isinstance(my_check_not, NotCloseEnoughError)
     with pytest.raises(NotCloseEnoughError):
         raise my_check_not
 
     my_check_not = catch_check(
         check_if_isclose,
-        1.12, 1.123,
+        1.12,
+        1.123,
         message="Not close",
         rel_tol=0,
-        abs_tol=.0005
+        abs_tol=0.0005,
     )
     assert isinstance(my_check_not, NotCloseEnoughError)
     with pytest.raises(NotCloseEnoughError):
@@ -956,9 +1027,13 @@ def test_raise_edge_cases():
         TypeError, match="The error argument must be an exception or a warning"
     ):
         _raise(NotImplemented)
-    with pytest.raises(TypeError, match="Argument message must be either None or string"):
+    with pytest.raises(
+        TypeError, match="Argument message must be either None or string"
+    ):
         _raise(error=TypeError, message=20)
-    with pytest.raises(TypeError, match="Argument message must be either None or string"):
+    with pytest.raises(
+        TypeError, match="Argument message must be either None or string"
+    ):
         _raise(TypeError, ("This was an error", ""))
 
 

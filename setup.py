@@ -9,8 +9,8 @@ extras_requirements = {
 
 setuptools.setup(
     name="easycheck",
-    version="0.7.2",
-    author="Nyggus & Ke Boan",
+    version="0.9.0",
+    author="Nyggus, Ke Boan & Darsoo",
     author_email="nyggus@gmail.com",
     license="MIT",
     description="A tool for checking conditions in Python",

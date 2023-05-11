@@ -1,7 +1,7 @@
 easycheck
 =========
 
-The :code:`easycheck` package offers a lightweight tool for running functionized checks within Python code; it also offers functions to be used in testing - particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases (starting off with :code:`assert_` instead of :code:`check_`).
+The :code:`easycheck` package offers a lightweight tool for running functionized checks within Python code; it also offers functions to be used in testing - particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases (starting off with :code:`assert_` instead of :code:`check_`). You can also switch off all :code:`easycheck` checks, by setting the :code:`"EASYCHECK_RUN"` environmental variable to :code:`"0"`.
 
 The idea is to use the :code:`easycheck` functions to check conditions that are _not_ assertions. The checks work in the following general way: When a condition is met, nothing happens (in fact, the function returns :code:`None`); if it is violated, an exception is raised or a warning is issued. The main differences between :code:`easycheck` functions and assertions are as follows:
 
@@ -265,6 +265,29 @@ Other examples
 --------------
 
 You will find a number of examples in `doctest files <https://github.com/nyggus/easycheck/tree/master/docs/>`_, which also serve as doctests.
+
+
+Switching off :code:`easycheck`
+-------------------------------
+
+If you want to maximize performance, you may wish to switch off :code:`easycheck` checks. You would get the greatest increase in performance by removing (or commenting out) all calls to :code:`easycheck` functions, but this can be inconvenient. Hence, :code:`easycheck` offers you a more convenient way of doing so, namely, switching off via an environmental variable. This will be less efficient, as this will mean calling an empty function instead of actual :code:`easycheck` functions. While not the most performant, this approach can increase performance quite significantly. Its obvious advantage is that you do not need to do anything else than just setting the :code:`"EASYCHECK_RUN"` environmental variable to :code:`"0"`:
+
+.. code-block:: shell
+
+    > EASYCHECK_RUN = 0
+    > python my_script.py
+
+The my_script.py script will be run with all :code:`easycheck` functions replaced with an empty function.
+
+You can also switch off easycheck directly from Python:
+
+.. code-block:: python
+
+    import os
+
+    os.environ["EASYCHECK_RUN"] = "0"
+
+> **Warning**: Do remember to use this option wisely. While it will increase performance, it can also change the behavior of the Python program.
 
 
 Changelog
