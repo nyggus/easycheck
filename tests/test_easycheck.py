@@ -122,6 +122,7 @@ def test_check_if_not_negative_warnings():
         assert issubclass(w[-1].category, Warning)
         assert "This is a testing warning" in str(w[-1].message)
 
+
 def test_check_if_in_limits():
     assert check_if_in_limits(3, 1, 5) is None
     assert check_if_in_limits(3, 1, 5, handle_with=Warning) is None
@@ -154,6 +155,7 @@ def test_check_if_in_limits():
     assert check_if_in_limits(0.0005, 0.0004, 0.0006, handle_with=Warning) is None
     assert check_if_in_limits(1000.0, 1000.0, 1000.0) is None
     assert check_if_in_limits(1000.0, 1000.0, 1000.0, handle_with=Warning) is None
+
 
 def test_check_if_in_limits_negative():
     with pytest.raises(LimitError):
@@ -449,6 +451,7 @@ def test_catch_check_if_not():
     )
     assert isinstance(my_check_not, Warning)
 
+
 def test_catch_check_if_in_limits():
     my_check = catch_check(check_if_in_limits, 3, 1, 5)
     assert my_check is None
@@ -474,6 +477,7 @@ def test_catch_check_if_in_limits():
     assert isinstance(my_check, LimitError) 
     with pytest.raises(LimitError):
         raise my_check
+
 
 def test_catch_check_length():
     my_check = catch_check(check_length, [2, 2], 2)
@@ -624,6 +628,36 @@ def test_catch_check_paths_many_paths():
         message="Path issue",
     )
     assert isinstance(my_check_not, Warning)
+
+
+def test_catch_check_if_isclose():
+    my_check = catch_check(check_if_isclose, 1.12, 1.12, abs_tol=.01)
+    assert my_check is None
+
+    my_check = catch_check(check_if_isclose, 1.12, 1.123, abs_tol=.05)
+    assert my_check is None
+
+    my_check = catch_check(check_if_isclose, 1.12, 1.123, rel_tol=.01)
+    assert my_check is None
+    
+    my_check = catch_check(check_if_isclose, 1.12, 1.123, rel_tol=.05)
+    assert my_check is None
+    
+    my_check_not = catch_check(check_if_isclose, 1.12, 1.123, abs_tol=.0005)
+    assert isinstance(my_check_not, NotCloseEnoughError)
+    with pytest.raises(NotCloseEnoughError):
+        raise my_check_not
+
+    my_check_not = catch_check(
+        check_if_isclose,
+        1.12, 1.123,
+        message="Not close",
+        rel_tol=0,
+        abs_tol=.0005
+    )
+    assert isinstance(my_check_not, NotCloseEnoughError)
+    with pytest.raises(NotCloseEnoughError):
+        raise my_check_not
 
 
 def test_check_comparison_edge_cases():
