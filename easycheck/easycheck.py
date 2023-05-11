@@ -814,6 +814,9 @@ def check_argument(
 
 def catch_check(check_function, *args, **kwargs):
     """Catch an exception or warning raised/issued by a easycheck function.
+    
+    Warning: Be aware that catch_check() is a relatively slow function
+             compared to most other easycheck functions.
 
     Args:
         check_function: function to call (one of the public easycheck functions)
@@ -914,6 +917,8 @@ def catch_check(check_function, *args, **kwargs):
             assert_if,
             check_if_not,
             assert_if_not,
+            check_if_isclose,
+            assert_if_isclose,
             check_if_in_limits,
             assert_if_in_limits,
             check_argument,
