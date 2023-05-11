@@ -1032,13 +1032,41 @@ def get_possible_operators():
 
 # Aliases to be used for testing. Beware not to use warnings with them.
 
-assert_if = check_if
-assert_if_not = check_if_not
-assert_if_in_limits = check_if_in_limits
-assert_length = check_length
-assert_type = check_type
-assert_paths = check_if_paths_exist
-assert_if_isclose = check_if_isclose
+def assert_decorator(func):
+    def assert_func(*args, **kwargs):
+        if __debug__:
+            return func(*args, **kwargs)
+        else:
+            return
+    return assert_func
+
+@assert_decorator
+def assert_if(*args, **kwargs): 
+    return check_if(*args, **kwargs)
+
+@assert_decorator
+def assert_if_not(*args, **kwargs):
+    return check_if_not(*args, **kwargs)
+
+@assert_decorator
+def assert_if_in_limits(*args, **kwargs):
+    return check_if_in_limits(*args, **kwargs)
+
+@assert_decorator
+def assert_length(*args, **kwargs):
+    return check_length(*args, **kwargs)
+
+@assert_decorator
+def assert_type(*args, **kwargs):
+    return check_type(*args, **kwargs)
+
+@assert_decorator
+def assert_paths(*args, **kwargs):
+    return check_if_paths_exist(*args, **kwargs)
+
+@assert_decorator
+def assert_if_isclose(*args, **kwargs):
+    return check_if_isclose(*args, **kwargs)
 
 # Alias to ensure backward compatibility
 
