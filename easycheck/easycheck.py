@@ -11,13 +11,16 @@ word "assert" in their names (assert_if(), assert_if_not(),
 assert_type(), assert_length(), and assert_path()).
 """
 import builtins
+import os
 import warnings
 
 from collections.abc import Iterable, Callable
+from functools import wraps
 from math import isclose
 from numbers import Number
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
+
 
 class LimitError(Exception):
     """Number out of limit."""
@@ -34,10 +37,27 @@ class ComparisonError(Exception):
 class NotCloseEnoughError(Exception):
     """The two float numbers are not close enough."""
 
+
 class ArgumentValueError(Exception):
     """Argument's value is incorrect."""
 
 
+def switch(func):
+    """Decorator to switch off all easycheck checks.
+
+    It does so by getting the EASYCHECK_RUN environmental variable.
+    When it's set to "0", easycheck is switched off.
+    """
+
+    @wraps(func)
+    def inner(*args, **kwargs):
+        if os.environ.get("EASYCHECK_RUN", 1) != "0":
+            return func(*args, **kwargs)
+
+    return inner
+
+
+@switch
 def check_if(condition, handle_with=AssertionError, message=None):
     """Check if a condition is true.
 
@@ -45,7 +65,7 @@ def check_if(condition, handle_with=AssertionError, message=None):
         condition (bool): condition to check.
         handle_with (type): the type of exception to be raised or warning to
             be issued
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
@@ -107,13 +127,14 @@ def check_if(condition, handle_with=AssertionError, message=None):
         _raise(handle_with, message)
 
 
+@switch
 def check_if_not(condition, handle_with=AssertionError, message=None):
     """Check if a condition is not true.
 
     Args:
         condition (bool): condition to check.
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
@@ -174,28 +195,29 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
     __tracebackhide__ = True
     if condition:
         _raise(handle_with, message)
-    
 
+
+@switch
 def check_if_in_limits(
-    x, 
-    lower_limit = float('-inf'), 
-    upper_limit = float('inf'), 
-    handle_with=LimitError, 
+    x,
+    lower_limit=float("-inf"),
+    upper_limit=float("inf"),
+    handle_with=LimitError,
     message=None,
-    include_equal=True   
+    include_equal=True,
 ):
     """Check if number is in range of limits
-    
+
     Args:
         x (float): number to be checked if it's within specified limits
         lower_limit (float): the lower limit of the interval
         upper_limit (float): the upper limit of the interval
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
-        include_equal (bool): True for strict checks (lower ≤ x ≤ upper), 
+        include_equal (bool): True for strict checks (lower ≤ x ≤ upper),
         False otherwise (lower < x < upper)
 
     Returns:
@@ -233,6 +255,8 @@ def check_if_in_limits(
     if not condition:
         _raise(handle_with, message)
 
+
+@switch
 def check_length(
     item,
     expected_length,
@@ -247,7 +271,7 @@ def check_length(
         item: the object whose length we want to validate
         expected_length (int): the expected length of the item
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
@@ -288,6 +312,7 @@ def check_length(
         _raise(handle_with, message)
 
 
+@switch
 def check_type(item, expected_type, handle_with=TypeError, message=None):
     """Check if item has the type of expected_type.
 
@@ -295,7 +320,7 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
         item: the object whose type we want to validate
         expected_type (type, Iterable[type]): the expected type of the item
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
@@ -361,30 +386,30 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
         _raise(handle_with, message)
 
 
-def check_if_isclose(x, y, /,
-                     handle_with=NotCloseEnoughError,
-                     message=None,
-                     rel_tol=1e-09, abs_tol=0.0):
+@switch
+def check_if_isclose(
+    x, y, /, handle_with=NotCloseEnoughError, message=None, rel_tol=1e-09, abs_tol=0.0
+):
     """Check if two floats are close in value.
-    
+
     The function is just a wrapper around math.isclose(), and its defaults
     are exactly the same. Two values (x and y, both being positional-only
     parameters) will be considered close when the difference between them
     (either relative or absolute) is smaller than at least one of the
     tolerances. If you do not want to use any of the two tolerances, set it
     to 0.
-    
+
     Note: Before applying math.isclose(), x and y are first converted to
     floats, so you can provide them as integers or even strings.
-    
+
     At least one tolerance needs to be provided (so not be zero); otherwise
     the function will do nothing.
-    
+
     Unlike most easycheck functions, check_if_isclose() uses two
     positional-only and four keyword-only arguments. So when providing one of
     the two tolerances, you have to specify it using the argument's name. You
     have to do the same also for handle_with and message.
-    
+
     Args:
         x, y (float): two numbers to compare
         rel_tol (float): maximum difference for being considered "close",
@@ -392,7 +417,7 @@ def check_if_isclose(x, y, /,
         abs_tol (float): maximum difference for being considered "close",
             regardless of the magnitude of the input values
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
@@ -410,7 +435,7 @@ def check_if_isclose(x, y, /,
     Traceback (most recent call last):
         ...
     NotCloseEnoughError: The two float numbers are not close enough.
-    
+
     >>> check_if_isclose(1.12, 1.13, rel_tol=.05)
     >>> check_if_isclose(1.12, 1.13, abs_tol=.05)
     >>> check_if_isclose(1.12, 1.13, abs_tol=.005)
@@ -436,6 +461,7 @@ def check_if_isclose(x, y, /,
         _raise(handle_with, message)
 
 
+@switch
 def check_if_paths_exist(
     paths, handle_with=FileNotFoundError, message=None, execution_mode="raise"
 ):
@@ -448,7 +474,7 @@ def check_if_paths_exist(
         paths (str, pathlib.Path, Iterable[str or pathlib.Path]): path or paths
             to validate
         handle_with (type): type of exception or warning to be raised/returned
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
@@ -498,8 +524,7 @@ def check_if_paths_exist(
     """
     __tracebackhide__ = True
     if not execution_mode in ("raise", "return"):
-        _raise(ValueError,
-               "execution_mode must be either 'raise' or 'return'")
+        _raise(ValueError, "execution_mode must be either 'raise' or 'return'")
 
     is_allowed_type = isinstance(paths, (str, Path)) or (
         isinstance(paths, Iterable)
@@ -509,8 +534,7 @@ def check_if_paths_exist(
     if not is_allowed_type:
         _raise(
             TypeError,
-            "Argument paths must be string"
-            " or pathlib.Path or iterable thereof",
+            "Argument paths must be string" " or pathlib.Path or iterable thereof",
         )
 
     error = None
@@ -518,9 +542,7 @@ def check_if_paths_exist(
     if isinstance(paths, (str, Path)):
         paths = (paths,)
 
-    non_existing_paths = [
-        str(path) for path in paths if not Path(path).exists()
-    ]
+    non_existing_paths = [str(path) for path in paths if not Path(path).exists()]
 
     if non_existing_paths:
         if execution_mode == "raise":
@@ -535,9 +557,8 @@ def check_if_paths_exist(
         return error, non_existing_paths
 
 
-def check_comparison(
-    item_1, operator, item_2, handle_with=ValueError, message=None
-):
+@switch
+def check_comparison(item_1, operator, item_2, handle_with=ValueError, message=None):
     """Check if a comparison of two items is true.
 
     Args:
@@ -545,7 +566,7 @@ def check_comparison(
         operator: one of the functions returned by get_possible_operators()
         item_2: the second item to compare
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
@@ -590,6 +611,7 @@ def check_comparison(
         _raise(handle_with, message)
 
 
+@switch
 def check_all_ifs(*args):
     """Check all multiple conditions and return all checks.
 
@@ -649,8 +671,7 @@ def check_all_ifs(*args):
         message="Provide at least one condition.",
     )
     tuple_error_message = (
-        "Provide all function calls as tuples in the form of "
-        "(check_function, *args)"
+        "Provide all function calls as tuples in the form of " "(check_function, *args)"
     )
     for arg in args:
         check_type(arg, tuple, message=tuple_error_message)
@@ -672,6 +693,7 @@ def check_all_ifs(*args):
     return results_of_checks
 
 
+@switch
 def check_argument(
     argument,
     argument_name=None,
@@ -694,7 +716,7 @@ def check_argument(
         expected_choices (Iterable): a list of acceptable values of argument
         expected_length (int): the expected length of the item
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
@@ -760,10 +782,7 @@ def check_argument(
     ...     assert_if("Incorrect argument's value" in str(w[-1].message))
     """
     __tracebackhide__ = True
-    if all(
-        item is None
-        for item in (expected_type, expected_choices, expected_length)
-    ):
+    if all(item is None for item in (expected_type, expected_choices, expected_length)):
         raise ValueError(
             "check_argument() requires at least one condition" " to be checked"
         )
@@ -780,9 +799,8 @@ def check_argument(
     if expected_type is not None:
         instance_message = (
             message
-            or f"Incorrect type of {argument_name}; valid type(s):"
-               f" {expected_type}"
-            )
+            or f"Incorrect type of {argument_name}; valid type(s):" f" {expected_type}"
+        )
         check_type(
             item=argument,
             expected_type=expected_type,
@@ -793,16 +811,15 @@ def check_argument(
         choices_message = (
             message
             or f"{argument_name}'s value, {argument}, "
-               f"is not among valid values: {expected_choices}."
-            )
+            f"is not among valid values: {expected_choices}."
+        )
         if argument not in expected_choices:
             _raise(handle_with, choices_message)
     if expected_length is not None:
         length_message = (
             message
-            or f"Unexpected length of {argument_name}"
-               f" (should be {expected_length})"
-            )
+            or f"Unexpected length of {argument_name}" f" (should be {expected_length})"
+        )
         check_length(
             item=argument,
             expected_length=expected_length,
@@ -812,9 +829,10 @@ def check_argument(
         )
 
 
+@switch
 def catch_check(check_function, *args, **kwargs):
     """Catch an exception or warning raised/issued by a easycheck function.
-    
+
     Warning: Be aware that catch_check() is a relatively slow function
              compared to most other easycheck functions.
 
@@ -885,9 +903,7 @@ def catch_check(check_function, *args, **kwargs):
     check_if(
         isinstance(check_function, Callable),
         handle_with=TypeError,
-        message=(
-            f"{check_function} does not " "seem to be a easycheck function"
-        ),
+        message=(f"{check_function} does not " "seem to be a easycheck function"),
     )
     check_if_not(
         check_function == check_all_ifs,
@@ -946,12 +962,13 @@ def catch_check(check_function, *args, **kwargs):
         return e
 
 
+@switch
 def _raise(error, message=None):
     """Raise exception or issue a warning, with or without message.
 
     Args:
         error (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message. 
+        message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
@@ -985,9 +1002,7 @@ def _raise(error, message=None):
     """
     __tracebackhide__ = True
     if not isinstance(error, type) or not issubclass(error, Exception):
-        raise TypeError(
-            "The error argument must be an exception or a warning"
-        )
+        raise TypeError("The error argument must be an exception or a warning")
 
     if message is None:
         # Use docstring as a message only for custom exceptions.
@@ -1048,6 +1063,6 @@ assert_instance = assert_type
 
 if __name__ == "__main__":
     import doctest
-    
+
     flags = doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE
     doctest.testmod(optionflags=flags)
