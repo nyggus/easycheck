@@ -388,7 +388,13 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
 
 @switch
 def check_if_isclose(
-    x, y, /, handle_with=NotCloseEnoughError, message=None, rel_tol=1e-09, abs_tol=0.0
+    x,
+    y,
+    /,
+    handle_with=NotCloseEnoughError,
+    message=None,
+    rel_tol=1e-09,
+    abs_tol=0.0,
 ):
     """Check if two floats are close in value.
 
@@ -534,7 +540,8 @@ def check_if_paths_exist(
     if not is_allowed_type:
         _raise(
             TypeError,
-            "Argument paths must be string" " or pathlib.Path or iterable thereof",
+            "Argument paths must be string"
+            " or pathlib.Path or iterable thereof",
         )
 
     error = None
@@ -542,7 +549,9 @@ def check_if_paths_exist(
     if isinstance(paths, (str, Path)):
         paths = (paths,)
 
-    non_existing_paths = [str(path) for path in paths if not Path(path).exists()]
+    non_existing_paths = [
+        str(path) for path in paths if not Path(path).exists()
+    ]
 
     if non_existing_paths:
         if execution_mode == "raise":
@@ -558,7 +567,9 @@ def check_if_paths_exist(
 
 
 @switch
-def check_comparison(item_1, operator, item_2, handle_with=ValueError, message=None):
+def check_comparison(
+    item_1, operator, item_2, handle_with=ValueError, message=None
+):
     """Check if a comparison of two items is true.
 
     Args:
@@ -671,7 +682,8 @@ def check_all_ifs(*args):
         message="Provide at least one condition.",
     )
     tuple_error_message = (
-        "Provide all function calls as tuples in the form of " "(check_function, *args)"
+        "Provide all function calls as tuples in the form of "
+        "(check_function, *args)"
     )
     for arg in args:
         check_type(arg, tuple, message=tuple_error_message)
@@ -782,7 +794,10 @@ def check_argument(
     ...     assert_if("Incorrect argument's value" in str(w[-1].message))
     """
     __tracebackhide__ = True
-    if all(item is None for item in (expected_type, expected_choices, expected_length)):
+    if all(
+        item is None
+        for item in (expected_type, expected_choices, expected_length)
+    ):
         raise ValueError(
             "check_argument() requires at least one condition" " to be checked"
         )
@@ -799,7 +814,8 @@ def check_argument(
     if expected_type is not None:
         instance_message = (
             message
-            or f"Incorrect type of {argument_name}; valid type(s):" f" {expected_type}"
+            or f"Incorrect type of {argument_name}; valid type(s):"
+            f" {expected_type}"
         )
         check_type(
             item=argument,
@@ -818,7 +834,8 @@ def check_argument(
     if expected_length is not None:
         length_message = (
             message
-            or f"Unexpected length of {argument_name}" f" (should be {expected_length})"
+            or f"Unexpected length of {argument_name}"
+            f" (should be {expected_length})"
         )
         check_length(
             item=argument,
@@ -903,7 +920,9 @@ def catch_check(check_function, *args, **kwargs):
     check_if(
         isinstance(check_function, Callable),
         handle_with=TypeError,
-        message=(f"{check_function} does not " "seem to be a easycheck function"),
+        message=(
+            f"{check_function} does not " "seem to be a easycheck function"
+        ),
     )
     check_if_not(
         check_function == check_all_ifs,
