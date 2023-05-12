@@ -124,15 +124,15 @@ will raise :code:`TypeError` while this
 	
 will raise :code:`LengthError` (an exception class defined in the :code:`easycheck` module).
 
-Here is a list of :code:`easycheck` functions the module offers, along with their aliases to be used for testing:
+Here is a list of :code:`easycheck` check functions the module offers, all asserts is listed in next paragraph:
 
-* :code:`check_if()`, with the alias of :code:`assert_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
-* :code:`check_if_not()`, with the alias of :code:`assert_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is _not_ met;
-* :code:`check_if_isclose()`, with the alias of :code:`assert_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
-* :code:`check_if_in_limits()`, with the alias of :code:`assert_if_in_limits()`;
-* :code:`check_length()`, with the alias of :code:`assert_length()`; to compare length (equal to, smaller than, greater than, and the like);
-* :code:`check_type()`, with the alias of :code:`assert_type()`; to check expected type, similar to :code:`isinstance()`;
-* :code:`check_if_paths_exist()`, with the alias of :code:`assert_paths()`; to compare paths (or just one path) exist;
+* :code:`check_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
+* :code:`check_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is _not_ met;
+* :code:`check_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
+* :code:`check_if_in_limits()`; to check if number is in range of two other numbers;
+* :code:`check_length()`; to compare length (equal to, smaller than, greater than, and the like);
+* :code:`check_type()`; to check expected type, similar to :code:`isinstance()`;
+* :code:`check_if_paths_exist()`; to compare paths (or just one path) exist;
 * :code:`check_comparison()` (used to compare two items); to compare to objectsm just like you would do using :code:`if obj1 != obj2: raise`
 * :code:`check_all_ifs()`; used to check multiple conditions and return all the checks;
 * :code:`check_argument()`; used to make one or more checks of a function's argument.
@@ -141,6 +141,52 @@ You can also use a :code:`catch_check()` function, if you want to catch an excep
 
 > Note that some :code:`easycheck` functions are simple wrappers around built-in functions, but their behavior is different, as they have the typical behavior of an :code:`easycheck` function: if a condition is not met, an exception is raised or an issue is raised.
 
+
+Assertion
+-------
+
+This package provides a set of functions for assertion. They can be used in tests but they have a special functionalyty. You can read more about it here: https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143 . In short, assertions should only be called for __debug__ = True, i.e. in a non-production environment, and their function is to detect things that should never happen, and their appearance indicates bad code performance. 
+
+Some examples:
+
+You are working only on integers, for example pixels when rendering images, or placing objects on board. You are sure that output will be integer, so you can assert on integers:
+
+.. code-block:: python
+
+    pos.x = 10
+    assert_type(pos.x, int)
+
+Similar situation you will have when you have output from some `len` method:
+
+.. code-block:: python
+
+    out = len("example")
+    assert_type(out, int)
+
+You created the file and worked on it - path assert (note that we are talking about a situation where you have evidence bordering on the certainty that the file exists, you should not use assert if you are not sure if you created the file correctly) e.g. you are working on a README file with example code inside it:
+
+.. code-block:: python
+
+    file_path = "README.rst"
+    assert_paths(file_path)
+
+You are working on subset of some data. So the size of the data should not be larger than the initial one, but also not smaller than 0:
+
+.. code-block:: python
+
+    x = [1,2,3]
+    x1 = x[0:2]
+    assert_if_in_limits(len(x1), 0, len(x))
+
+Here is full list of supported assert functions:
+
+* :code:`assert_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
+* :code:`assert_if_not()`; the opposite of :code:`assert_if()`, helpful when you need to assure that a condition is _not_ met;
+* :code:`assert_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
+* :code:`assert_if_in_limits()`; to check if number is in range of two other numbers;
+* :code:`assert_length()`; to compare length (equal to, smaller than, greater than, and the like);
+* :code:`assert_type()`; to check expected type, similar to :code:`isinstance()`;
+* :code:`assert_paths()`; to compare paths (or just one path) exist;
 
 Use in code to issue warnings
 -----------------------------
@@ -235,7 +281,7 @@ Of course, the :code:`open()` context manager will itself throw an error, but wh
 Use in testing
 --------------
 
-As mentioned above, most :code:`easycheck` functions have aliases to be used in testing. Of course, you can use :code:`check_if()`, but to align with the common use of assertions, the :code:`easycheck` module offers those aliases so that the reader will immediately see that you're using these functions to test. Consider these examples:
+As mentioned above, most :code:`easycheck` functions have their asserts counterparts which can be used in testing. Of course, you can use :code:`check_if()`, but to align with the common use of assertions, the :code:`easycheck` module offers those aliases so that the reader will immediately see that you're using these functions to test. Consider these examples:
 
 .. code-block:: python
 
