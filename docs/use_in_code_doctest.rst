@@ -1,9 +1,9 @@
 Use easycheck in code
 -------------------
 
-The basic aim of :code:`easycheck` is to provide you with easy-to-use, simple and readable assertion-like functions to make sure that particular conditions you wish to check are met. They are similar to assertions because the functionality is indeed similar to the :code:`assert` expression, since these functions
+The basic aim of :code:`easycheck` is to provide you with easy-to-use, simple and readable functions for checking whether  particular conditions you wish to check are met. The functions
 
-* check a condition
+* check a condition (or more conditions),
 * do nothing when the condition is met,
 * raise an exception (or, alternatively, issue a warning) when the condition is not met.
 

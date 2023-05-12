@@ -1,9 +1,14 @@
 .. image:: https://github.com/darsoo/easycheck/actions/workflows/python-package.yml/badge.svg
    :target: https://github.com/darsoo/easycheck/actions/workflows/python-package.yml
-       
-The :code:`easycheck` package offers a lightweight tool for running functionized assertion-like checks within Python code; it also offers functions to be used in testing - particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases. The idea is to use the :code:`easycheck` functions in a similar way as assertions, but with more functionality and with a slightly different aim: When a condition you define is met, nothing happens (in fact, the function returns :code:`None`); if the condition is violated, an exception is raised or a warning is issued. The main differences between :code:`easycheck` functions and assertions are as follows:
+easycheck
+=========
 
-* While you should not use assertions in your Python code, you can do so with the :code:`easycheck` functions.
+The :code:`easycheck` package offers a lightweight tool for running functionized checks within Python code; it also offers functions to be used in testing - particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases (starting off with :code:`assert_` instead of :code:`check_`). You can also switch off all :code:`easycheck` checks, by setting the :code:`"EASYCHECK_RUN"` environmental variable to :code:`"0"`.
+
+The idea is to use the :code:`easycheck` functions to check conditions that are _not_ assertions. The checks work in the following general way: When a condition is met, nothing happens (in fact, the function returns :code:`None`); if it is violated, an exception is raised or a warning is issued. The main differences between :code:`easycheck` functions and assertions are as follows:
+
+* Assertions are meant to be used conditions that _must_ be true (when only the code is correct). So, if an assertion is incorrect, it means something is wrong with the code. You should never use assertions to handle regular exceptions, like those related to data or arguments.
+* Unlike assertions, :code:`easycheck` functions are to be used to check conditions related to things like data and argument values, and to handle regular exceptions.
 * While assertions only raise :code:`AssertionError`, you can choose any exception to be raised by easycheck functions.
 * When using :code:`easycheck`, instead of raising an exception, you can issue a warning.
 
@@ -32,7 +37,10 @@ You can also issue a warning:
 
 .. code-block:: python
 
-    check_if(x <= 10, Warning, 'For stable functioning of the function, x should not be greater than 10.')
+    check_if(x <= 10,
+             Warning,
+             'For stable functioning of the function, '
+             'x should not be greater than 10.')
 
 The package also offers functions dedicated to testing, e.g.,
 
@@ -42,6 +50,12 @@ The package also offers functions dedicated to testing, e.g.,
     assert_if(x <= 10)
 
 The :code:`message` argument has the default value of :code:`None`, which does the following. If the exception class provided in :code:`handle_with` is built-in (that is, can be found in :code:`dir(builtins)`), no message is provided. But if it is not a built-in exception (or warning) class, then the exception/warning class's docstring is taken as the message. This is a convenient way of providing a  typical message. If you want to customize the message (e.g., depending on the value of a variable), you should use a customized string (e.g., through an f-string). But if you do not want to use any message with a custom exception/warning, simply provide an empty string (:code:`message=''`).
+
+
+Read about :code:`easycheck`
+----------------------------
+
+You will find more about assertions in `this article <https://medium.com/towards-data-science/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_, entitled "Python Assertions, or Checking If a Cat Is a Dog" and published in *Towards Data Science*. It mentions :code:`easycheck`! You will read about :code:`easycheck` also in `the article "Comparing floating-point numbers with easycheck" <https://medium.com/towards-data-science/comparing-floating-point-numbers-with-easycheck-dcbae480f75f>`_  (also from *Towards Data Science*). The *Better Programming* article entitiled `"How to Overwrite AssertionError in Python and Use Custom Exceptions" <https://medium.com/better-programming/how-to-overwrite-asserterror-in-python-and-use-custom-exceptions-c0b252989977>`_, mentions the package, too.
 
 
 Installing
@@ -253,3 +267,32 @@ Other examples
 --------------
 
 You will find a number of examples in `doctest files <https://github.com/nyggus/easycheck/tree/master/docs/>`_, which also serve as doctests.
+
+
+Switching off :code:`easycheck`
+-------------------------------
+
+If you want to maximize performance, you may wish to switch off :code:`easycheck` checks. You would get the greatest increase in performance by removing (or commenting out) all calls to :code:`easycheck` functions, but this can be inconvenient. Hence, :code:`easycheck` offers you a more convenient way of doing so, namely, switching off via an environmental variable. This will be less efficient, as this will mean calling an empty function instead of actual :code:`easycheck` functions. While not the most performant, this approach can increase performance quite significantly. Its obvious advantage is that you do not need to do anything else than just setting the :code:`"EASYCHECK_RUN"` environmental variable to :code:`"0"`:
+
+.. code-block:: shell
+
+    > EASYCHECK_RUN = 0
+    > python my_script.py
+
+The my_script.py script will be run with all :code:`easycheck` functions replaced with an empty function.
+
+You can also switch off easycheck directly from Python:
+
+.. code-block:: python
+
+    import os
+
+    os.environ["EASYCHECK_RUN"] = "0"
+
+> **Warning**: Do remember to use this option wisely. While it will increase performance, it can also change the behavior of the Python program.
+
+
+Changelog
+---------
+
+* Version 0.6.0 came with significant optimization of performance. Before, :code:`easycheck` functions performed internal checks of the argument values provided to the function call. Most of these checks are not performed anymore, at least not for the most significant :code:`easycheck` functions, such as :code:`check_if()` or :code:`check_type()`. Some checks, however, are still done. These are mainly checks without which the behavior of the function would be either unwanted or unexpected. We decided to remove all checks that do not change much; for instance, they raise an error due to an incorrect type of an argument value — even though it would be raised anyway, but by the internal Python process, not by the :code:`easycheck` function itself. The point is to remove such unnecessary checks and that way remove the unnecessary :code:`if` blocks, which certainly add some cost to execution time. While one such check costs almost nothing, many of them (e.g., in a long loop) can mean a significant cost. As of version 0.6.0, we will try to optimize the performance of :code:`easycheck` by getting rid of such overhead costs, unless they are important for the behavior of the corresponding :code:`easycheck` function.
