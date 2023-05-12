@@ -1,7 +1,7 @@
 Using :code:`easycheck` for assertion
 --------------------------
 
-:code:`easycheck` gives the user a set of tools to add assertion to his code. There is two main reason to do it. First one is testing (check for more in `use_in_testing_doctest`). Second one is situation when we try to catch situation that should never happen (for more check `article <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`)
+:code:`easycheck` gives the user a set of tools to add assertion to his code. There is two main reason to do it. First one is testing (check for more in `use_in_testing_doctest`). Second one is situation when we try to catch situation that should never happen (for more check `article <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_)
 Here are some examples of when you might consider adding assertions (please note that these are just examples, you may find that in your similar situation you will need to use check function or not use anything):
 
 You are working only on integers, for example pixels when rendering images, or placing objects on board. You are sure that output will be integer, so you can assert on integers:
