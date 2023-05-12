@@ -1,5 +1,4 @@
-easycheck
-=========
+![example workflow](https://github.com/darsoo/easycheck/actions/workflows/python-package.yml/badge.svg)
 
 The :code:`easycheck` package offers a lightweight tool for running functionized assertion-like checks within Python code; it also offers functions to be used in testing - particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases. The idea is to use the :code:`easycheck` functions in a similar way as assertions, but with more functionality and with a slightly different aim: When a condition you define is met, nothing happens (in fact, the function returns :code:`None`); if the condition is violated, an exception is raised or a warning is issued. The main differences between :code:`easycheck` functions and assertions are as follows:
 
