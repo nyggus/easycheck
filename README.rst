@@ -124,16 +124,16 @@ will raise :code:`TypeError` while this
 	
 will raise :code:`LengthError` (an exception class defined in the :code:`easycheck` module).
 
-Here is a list of :code:`easycheck` check functions the module offers, all asserts is listed in next paragraph:
+Here is a list of :code:easycheck check functions the module offers, discluding assertions, which are listed in the next paragraph:
 
 * :code:`check_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
 * :code:`check_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is _not_ met;
 * :code:`check_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
-* :code:`check_if_in_limits()`; to check if number is in range of two other numbers;
+* :code:`check_if_in_limits()`; to check if a number lies between two other numbers;
 * :code:`check_length()`; to compare length (equal to, smaller than, greater than, and the like);
 * :code:`check_type()`; to check expected type, similar to :code:`isinstance()`;
 * :code:`check_if_paths_exist()`; to compare paths (or just one path) exist;
-* :code:`check_comparison()` (used to compare two items); to compare to objectsm just like you would do using :code:`if obj1 != obj2: raise`
+* :code:`check_comparison()` (used to compare two items); to compare to objects, just like you would do using :code:`if obj1 != obj2: raise`
 * :code:`check_all_ifs()`; used to check multiple conditions and return all the checks;
 * :code:`check_argument()`; used to make one or more checks of a function's argument.
 
@@ -142,14 +142,14 @@ You can also use a :code:`catch_check()` function, if you want to catch an excep
 > Note that some :code:`easycheck` functions are simple wrappers around built-in functions, but their behavior is different, as they have the typical behavior of an :code:`easycheck` function: if a condition is not met, an exception is raised or an issue is raised.
 
 
-Assertion
+Assertions
 -------
 
-This package provides a set of functions for assertion. They can be used in tests but they have a special functionalyty. You can read more about it here: https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143 . In short, assertions should only be called for __debug__ = True, i.e. in a non-production environment, and their function is to detect things that should never happen, and their appearance indicates bad code performance. 
+In addition to the above checking functions, :code:easycheck provides a set of functions for assertions. They can be used in both code and tests, just like regular assertions using the :code:assert statement. Assertion functions do have a specific functionality that makes them different from the corresponding check functions. You can read more about it here<https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>_. In short, assertions are called only in the development (non-production) mode, that is, when :code:__debug__ is set to :code:True. An assertion should check a condition that should never happen; when the corresponding exception is raised, it means something went wrong in the code, that something that should never happened has just happened.
 
 Some examples:
 
-You are working only on integers, for example pixels when rendering images, or placing objects on board. You are sure that output will be integer, so you can assert on integers:
+You are working only on integers, for example pixels when rendering images, or placing objects on a board. You are sure that output will be integer, so you can assert on integers:
 
 .. code-block:: python
 
