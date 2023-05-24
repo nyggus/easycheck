@@ -1,5 +1,21 @@
 easycheck
 =========
+.. image:: https://github.com/nyggus/easycheck/actions/workflows/python-package.yml/badge.svg
+   :target: https://github.com/nyggus/easycheck/actions/workflows/python-package.yml
+.. image:: https://codecov.io/github/nyggus/easycheck/branch/master/graph/badge.svg?token=EH4TLHQQWC 
+   :target: https://codecov.io/github/nyggus/easycheck
+.. image:: https://img.shields.io/pypi/l/easycheck.svg
+   :target: https://pypi.org/project/easycheck     
+.. image:: https://img.shields.io/pypi/v/easycheck.svg
+   :target: https://pypi.org/project/easycheck     
+.. image:: https://img.shields.io/pypi/wheel/easycheck
+   :target: https://pypi.org/project/easycheck     
+.. image:: https://img.shields.io/pypi/pyversions/easycheck
+   :target: https://pypi.org/project/easycheck
+.. image:: https://img.shields.io/github/stars/nyggus/easycheck?style=social
+   :target: https://github.com/nyggus/easycheck
+.. image:: https://img.shields.io/github/last-commit/nyggus/easycheck
+=========
 
 The :code:`easycheck` package offers a lightweight tool for running functionized checks within Python code; it also offers functions to be used in testing - particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases (starting off with :code:`assert_` instead of :code:`check_`). You can also switch off all :code:`easycheck` checks, by setting the :code:`"EASYCHECK_RUN"` environmental variable to :code:`"0"`.
 
