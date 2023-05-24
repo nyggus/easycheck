@@ -1074,32 +1074,32 @@ def make_it_true_assertion(func):
     return assert_func
 
 @make_it_true_assertion
-def assert_if(*args, **kwargs): 
-    return check_if(*args, **kwargs)
+def assert_if(*args, handle_with=AssertionError, **kwargs): 
+    return check_if(*args, handle_with=handle_with, **kwargs)
 
 @make_it_true_assertion
-def assert_if_not(*args, **kwargs):
-    return check_if_not(*args, **kwargs)
+def assert_if_not(*args, handle_with=AssertionError, **kwargs):
+    return check_if_not(*args, handle_with=handle_with, **kwargs)
 
 @make_it_true_assertion
-def assert_if_in_limits(*args, **kwargs):
-    return check_if_in_limits(*args, **kwargs)
+def assert_if_in_limits(*args, handle_with=AssertionError, **kwargs):
+    return check_if_in_limits(*args, handle_with=handle_with, **kwargs)
 
 @make_it_true_assertion
-def assert_length(*args, **kwargs):
-    return check_length(*args, **kwargs)
+def assert_length(*args, handle_with=AssertionError, **kwargs):
+    return check_length(*args, handle_with=handle_with, **kwargs)
 
 @make_it_true_assertion
-def assert_type(*args, **kwargs):
-    return check_type(*args, **kwargs)
+def assert_type(*args, handle_with=AssertionError, **kwargs):
+    return check_type(*args, handle_with=handle_with, **kwargs)
 
 @make_it_true_assertion
-def assert_paths(*args, **kwargs):
-    return check_if_paths_exist(*args, **kwargs)
+def assert_paths(*args, handle_with=AssertionError, **kwargs):
+    return check_if_paths_exist(*args, handle_with=handle_with, **kwargs)
 
 @make_it_true_assertion
-def assert_if_isclose(*args, **kwargs):
-    return check_if_isclose(*args, **kwargs)
+def assert_if_isclose(*args, handle_with=AssertionError, **kwargs):
+    return check_if_isclose(*args, handle_with=handle_with, **kwargs)
 
 # Alias to ensure backward compatibility
 
