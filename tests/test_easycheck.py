@@ -1347,7 +1347,7 @@ def test_assert_functions():
         assert_if_not(10 > 5) and check_if_not(10 > 5) is None
 
     assert assert_type((10, 10), tuple) == check_type((10, 10), tuple)
-    with pytest.raises(TypeError):
+    with pytest.raises(AssertionError):
         assert_type(10, tuple) and check_type(10, tuple) is None
 
     assert assert_length("str", 3) == check_length("str", 3)
@@ -1356,7 +1356,7 @@ def test_assert_functions():
     )
     with pytest.raises(TypeError):
         assert_length(5, 3) and check_length(5, 3) is None
-    with pytest.raises(LengthError):
+    with pytest.raises(AssertionError):
         (
             assert_length(5, 3, assign_length_to_others=True)
             and check_length(5, 3, assign_length_to_others=True) is None
@@ -1370,7 +1370,7 @@ def test_assert_functions():
         check_if_paths_exist("Q:/E/", execution_mode="return")[1]
         == assert_paths("Q:/E/", execution_mode="return")[1]
     )
-    with pytest.raises(FileNotFoundError):
+    with pytest.raises(AssertionError):
         assert_paths("Q:/E/") and check_if_paths_exist("Q:/E/") is None
 
 
