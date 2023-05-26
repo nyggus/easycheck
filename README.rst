@@ -161,7 +161,7 @@ You can also use a :code:`catch_check()` function, if you want to catch an excep
 Assertions
 -------
 
-In addition to the above checking functions, :code:easycheck provides a set of functions for assertions. They can be used in both code and tests, just like regular assertions using the :code:assert statement. Assertion functions do have a specific functionality that makes them different from the corresponding check functions. You can read more about it here<https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>_. In short, assertions are called only in the development (non-production) mode, that is, when :code:__debug__ is set to :code:True. An assertion should check a condition that should never happen; when the corresponding exception is raised, it means something went wrong in the code, that something that should never happened has just happened.
+In addition to the above checking functions, :code:`easycheck` provides a set of functions for assertions. They can be used in both code and tests, just like regular assertions using the :code:`assert` statement. Assertion functions do have a specific functionality that makes them different from the corresponding check functions. You can read more about it `here <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_. In short, assertions are called only in the development (non-production) mode, that is, when :code:`__debug__` is set to :code:`True`. An assertion should check a condition that should never happen; when the corresponding exception is raised, it means something went wrong in the code, that something that should never happened has just happened.
 
 Some examples:
 
