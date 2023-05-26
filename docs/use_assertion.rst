@@ -35,6 +35,8 @@ You are working on subset of some data. So the size of the data should not be la
 
 And some more examples:
 
+.. code-block:: python
+
     >>> x = 0
     >>> assert_if(x = 0)
     >>> assert_if_not(x > 0)
