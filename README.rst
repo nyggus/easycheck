@@ -168,9 +168,16 @@ Some examples:
 You are working only on integers, for example pixels when rendering images, or placing objects on a board. You are sure that output will be integer, so you can assert on integers:
 
 .. code-block:: python
+    def convert_to_pixel_position(real_pos: (float, float)):
+        pos_x = real_pos[0]
+        pos_y = real_pos[1]
+        pixel_pos_x = round(pos_x)
+        pixel_pos_y = round(pos_y)
+        return (pixel_pos_x, pixel_pos_y)
 
-    pos.x = 10
-    assert_type(pos.x, int)
+    pos = convert_to_pixel_position((1.2, 3.4))
+    assert_type(pos, tuple)
+    assert_type(pos[0], int)
 
 Similar situation you will have when you have output from some `len` method:
 
@@ -190,9 +197,12 @@ You are working on subset of some data. So the size of the data should not be la
 
 .. code-block:: python
 
-    x = [1,2,3]
-    x1 = x[0:2]
-    assert_if_in_limits(len(x1), 0, len(x))
+    def subset_of(data: pd.DataFrame, filter_condition: callable) -> pd.DataFrame:
+        # create a data frame that is a subset of `data` based on `filter_condition`
+        ...
+    x = pd.DataFrame({'x': [1, 2, 4], 'y': [3, 3, 5]})
+    x_subset = subset_of(x, lambda value: value < 3)
+    assert_if_in_limits(len(x_subset), 0, len(x))
 
 Here is full list of supported assert functions:
 
