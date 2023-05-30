@@ -1346,6 +1346,10 @@ def test_assert_functions():
     with pytest.raises(AssertionError):
         assert_if_not(10 > 5) and check_if_not(10 > 5) is None
 
+    assert assert_if_in_limits(3, 1, 5) == check_if_in_limits(3, 1, 5)
+    with pytest.raises(AssertionError):
+        assert_if_in_limits(1, 3, 5) and check_if_in_limits(1, 3, 5) is None
+
     assert assert_type((10, 10), tuple) == check_type((10, 10), tuple)
     with pytest.raises(AssertionError):
         assert_type(10, tuple) and check_type(10, tuple) is None
@@ -1354,6 +1358,11 @@ def test_assert_functions():
     assert assert_length(5, 1, assign_length_to_others=True) == check_length(
         5, 1, assign_length_to_others=True
     )
+
+    assert assert_if_isclose(1.12, 1.123, abs_tol=0.05) == check_if_isclose(1.12, 1.123, abs_tol=0.05)
+    with pytest.raises(AssertionError):
+        assert_if_isclose(1.12, 1.123, abs_tol=0.0005) and check_if_isclose(1.12, 1.123, abs_tol=0.0005) is None
+
     with pytest.raises(TypeError):
         assert_length(5, 3) and check_length(5, 3) is None
     with pytest.raises(AssertionError):
