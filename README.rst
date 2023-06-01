@@ -149,7 +149,7 @@ Here is a list of :code:easycheck check functions the module offers, discluding 
 * :code:`check_length()`; to compare length (equal to, smaller than, greater than, and the like);
 * :code:`check_type()`; to check expected type, similar to :code:`isinstance()`;
 * :code:`check_if_paths_exist()`; to compare paths (or just one path) exist;
-* :code:`check_comparison()` (used to compare two items); to compare to objects, just like you would do using :code:`if obj1 != obj2: raise`
+* :code:`check_comparison()` (used to compare two items); to compare two objects, just like you would do using :code:`if obj1 != obj2: raise`
 * :code:`check_all_ifs()`; used to check multiple conditions and return all the checks;
 * :code:`check_argument()`; used to make one or more checks of a function's argument.
 
@@ -161,37 +161,32 @@ You can also use a :code:`catch_check()` function, if you want to catch an excep
 Assertions
 -------
 
-In addition to the above checking functions, :code:`easycheck` provides a set of functions for assertions. They can be used in both code and tests, just like regular assertions using the :code:`assert` statement. Assertion functions do have a specific functionality that makes them different from the corresponding check functions. You can read more about it `here <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_. In short, assertions are called only in the development (non-production) mode, that is, when :code:`__debug__` is set to :code:`True`. An assertion should check a condition that should never happen; when the corresponding exception is raised, it means something went wrong in the code, that something that should never happened has just happened.
+In addition to the above checking functions, :code:`easycheck` provides a set of functions for assertions. They can be used in both code and tests, just like regular assertions using the :code:`assert` statement. Assertion functions do have a specific functionality that makes them different from the corresponding check functions. You can read more about it `here <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_. In short, assertions are called only in the development (non-production) mode, that is, when :code:`__debug__` is set to :code:`True`. An assertion should check a condition that should never happen; when the corresponding exception is raised, it means that something went wrong in the code, that something that should never happen has just happened.
 
 Some examples:
 
 You are working only on integers, for example pixels when rendering images, or placing objects on a board. You are sure that output will be integer, so you can assert on integers:
 
 .. code-block:: python
-    def convert_to_pixel_position(real_pos: (float, float)):
+    def convert_to_pixel_position(real_pos: tuple[float, float]):
         pos_x = real_pos[0]
         pos_y = real_pos[1]
         pixel_pos_x = round(pos_x)
         pixel_pos_y = round(pos_y)
-        return (pixel_pos_x, pixel_pos_y)
+        return pixel_pos_x, pixel_pos_y
 
     pos = convert_to_pixel_position((1.2, 3.4))
     assert_type(pos, tuple)
     assert_type(pos[0], int)
 
-Similar situation you will have when you have output from some `len` method:
+Now consider a different example. Imagine you have output from some `len()` method, or any other method calculating the length of something:
 
 .. code-block:: python
 
-    out = len("example")
-    assert_type(out, int)
-
-You created the file and worked on it - path assert (note that we are talking about a situation where you have evidence bordering on the certainty that the file exists, you should not use assert if you are not sure if you created the file correctly) e.g. you are working on a README file with example code inside it:
-
-.. code-block:: python
-
-    file_path = "README.rst"
-    assert_paths(file_path)
+    out = len(example_object)
+    # doing something with out, like
+    number_of_elements_required = out * no_of_objects
+    assert_type(out_for_something_else, int)
 
 You are working on subset of some data. So the size of the data should not be larger than the initial one, but also not smaller than 0:
 
@@ -207,12 +202,12 @@ You are working on subset of some data. So the size of the data should not be la
 Here is full list of supported assert functions:
 
 * :code:`assert_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
-* :code:`assert_if_not()`; the opposite of :code:`assert_if()`, helpful when you need to assure that a condition is _not_ met;
-* :code:`assert_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
-* :code:`assert_if_in_limits()`; to check if number is in range of two other numbers;
-* :code:`assert_length()`; to compare length (equal to, smaller than, greater than, and the like);
-* :code:`assert_type()`; to check expected type, similar to :code:`isinstance()`;
-* :code:`assert_paths()`; to compare paths (or just one path) exist;
+* :code:`assert_if_not()`; the opposite of :code:`assert_if()`, helpful when you need to assure that a condition is *not* met;
+* :code:`assert_if_isclose()`; to assert whether two floating-point numbers are close enough, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
+* :code:`assert_if_in_limits()`; to assert whether a number is in range of two other numbers;
+* :code:`assert_length()`; to assert length (equal to, smaller than, greater than, and the like);
+* :code:`assert_type()`;to assert that an object has a particular type, as you would do using :code:`assert isinstance`;
+* :code:`assert_paths()`; to assert that a path exists or paths exist.
 
 Use in code to issue warnings
 -----------------------------
