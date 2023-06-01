@@ -1337,40 +1337,42 @@ def test_check_argument_mix_warnings():
         assert "type" in str(w[-1].message)
 
 
-def test_assert_functions():
+def test_assert_if():
     assert assert_if(10 > 5) == check_if(10 > 5)
     with pytest.raises(AssertionError):
-        assert_if(10 < 5) and check_if(10 < 5) is None
+        assert_if(10 < 5)
 
+def test_assert_if_not():
     assert assert_if_not(10 < 5) == check_if_not(10 < 5)
     with pytest.raises(AssertionError):
-        assert_if_not(10 > 5) and check_if_not(10 > 5) is None
+        assert_if_not(10 > 5)
 
+def test_assert_if_in_linits():
     assert assert_if_in_limits(3, 1, 5) == check_if_in_limits(3, 1, 5)
     with pytest.raises(AssertionError):
-        assert_if_in_limits(1, 3, 5) and check_if_in_limits(1, 3, 5) is None
+        assert_if_in_limits(1, 3, 5)
 
+def test_assert_type():
     assert assert_type((10, 10), tuple) == check_type((10, 10), tuple)
     with pytest.raises(AssertionError):
-        assert_type(10, tuple) and check_type(10, tuple) is None
+        assert_type(10, tuple)
 
+def test_assert_length():
     assert assert_length("str", 3) == check_length("str", 3)
     assert assert_length(5, 1, assign_length_to_others=True) == check_length(
         5, 1, assign_length_to_others=True
     )
+    with pytest.raises(TypeError):
+        assert_length(5, 3)
+    with pytest.raises(AssertionError):                        
+        assert_length(5, 3, assign_length_to_others=True)
 
+def test_assert_if_iscolse():
     assert assert_if_isclose(1.12, 1.123, abs_tol=0.05) == check_if_isclose(1.12, 1.123, abs_tol=0.05)
     with pytest.raises(AssertionError):
-        assert_if_isclose(1.12, 1.123, abs_tol=0.0005) and check_if_isclose(1.12, 1.123, abs_tol=0.0005) is None
+        assert_if_isclose(1.12, 1.123, abs_tol=0.0005)
 
-    with pytest.raises(TypeError):
-        assert_length(5, 3) and check_length(5, 3) is None
-    with pytest.raises(AssertionError):
-        (
-            assert_length(5, 3, assign_length_to_others=True)
-            and check_length(5, 3, assign_length_to_others=True) is None
-        )
-
+def test_assert_paths():
     existing_file = os.listdir(".")[0]
     assert check_if_paths_exist(
         existing_file, execution_mode="return"
@@ -1380,8 +1382,7 @@ def test_assert_functions():
         == assert_paths("Q:/E/", execution_mode="return")[1]
     )
     with pytest.raises(AssertionError):
-        assert_paths("Q:/E/") and check_if_paths_exist("Q:/E/") is None
-
+        assert_paths("Q:/E/")
 
 class ForTestingErrorWithDoc(Exception):
     """This is error for testing purposes."""
@@ -1402,6 +1403,16 @@ def test_message_is_None_exception_with_docstring():
     with pytest.raises(ForTestingErrorWithDoc, match="for testing purposes"):
         check_if(1 == 2, ForTestingErrorWithDoc)
 
+def test_message_is_None_exception_with_docstring_asserts():
+    with pytest.raises(AssertionError, match=""):
+        assert_if(1 == 2, message=None)
+    with pytest.raises(AssertionError, match="Error"):
+        assert_if(1 == 2, message="Error")
+    with pytest.raises(AssertionError):
+        assert_if(1 == 2)
+    assert assert_if(1 == 1, handle_with = ForTestingErrorWithDoc) is None
+    with pytest.raises(ForTestingErrorWithDoc, match="for testing purposes"):
+        assert_if(1 == 2, handle_with = ForTestingErrorWithDoc)
 
 def test_message_is_None_exception_without_docstring():
     assert check_if(1 == 1, ForTestingErrorWithoutDoc) is None
@@ -1409,3 +1420,10 @@ def test_message_is_None_exception_without_docstring():
         check_if(1 == 2, ForTestingErrorWithoutDoc, message="Error! Shout!")
     with pytest.raises(ForTestingErrorWithoutDoc, match=""):
         check_if(1 == 2, ForTestingErrorWithoutDoc)
+
+def test_message_is_None_exception_without_docstring():
+    assert assert_if(1 == 1, handle_with = ForTestingErrorWithoutDoc) is None
+    with pytest.raises(ForTestingErrorWithoutDoc, match="Error! Shout!"):
+        assert_if(1 == 2,  handle_with = ForTestingErrorWithoutDoc, message="Error! Shout!")
+    with pytest.raises(ForTestingErrorWithoutDoc, match=""):
+        assert_if(1 == 2, handle_with = ForTestingErrorWithoutDoc)
