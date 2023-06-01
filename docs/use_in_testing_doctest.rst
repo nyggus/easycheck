@@ -1,13 +1,15 @@
 Use in testing
 --------------
 
-Although we stress that :code:`easycheck` check functions are designed to be used within code, it does not mean that they cannot be used in testing. In fact, they can be quite helpful, particularly in doctests, and also in pytests. The :code:`easycheck` package offers several assert functions of its main :code:`easycheck` check functions, which make the functions resemble the :code:`assert` expression. These functions are
+Although we stress that :code:`easycheck` check functions are designed to be used within code, it does not mean that they cannot be used in testing. In fact, they can be quite helpful. The :code:`easycheck` package offers several assert functions. They have very similar signatures to the corresponding check functions, but they work like the :code:`assert` expression, meaning they are run only in the debug mode (that is, when :code:`__debug__` is :code:`True`). These functions are
 
 * :code:`assert_if` (for :code:`check_if`)
 * :code:`assert_if_not` (for :code:`check_if_not`)
+* :code:`assert_if_in_limits` (for :code:`check_if_in_limits`)
 * :code:`assert_length` (for :code:`check_length`)
 * :code:`assert_type` (for :code:`check_type`)
 * :code:`assert_paths` (for :code:`check_if_paths_exist`)
+* :code:`assert_if_isclose` (for :code:`check_if_isclose`)
 
 They use the same syntax and arguments as their :code:`easycheck` counterparts, the only differences is that they work only for :code:`__debug__ = True`, which is always true for tests. See:
 

@@ -1,7 +1,7 @@
 The :code:`easycheck` module
 --------------------------
 
-Every check decreases performance. You can implement the checks in a way that they are run only in a particular scenario. You can also implement using :code:`__debug__` (see `this article <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_).
+Every check decreases performance. You can implement the checks in a way that they are run only in a particular scenario. You can also implement them using :code:`__debug__` (see `this article <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_).
 
 :code:`easycheck`, however, offers you a simpler way of _not_ running its checks. You do not have to change anything in your program to switch them off. Enough to set the :code:`"EASYCHECK_RUN"` environmental variable to :code:`"0"`, and the checks will be switched off.
 

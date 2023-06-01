@@ -140,10 +140,10 @@ will raise :code:`TypeError` while this
 	
 will raise :code:`LengthError` (an exception class defined in the :code:`easycheck` module).
 
-Here is a list of :code:easycheck check functions the module offers, discluding assertions, which are listed in the next paragraph:
+Here is a list of :code:`easycheck` check functions the module offers, discluding assertions, which are listed in the next paragraph:
 
 * :code:`check_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
-* :code:`check_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is _not_ met;
+* :code:`check_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is *not* met;
 * :code:`check_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
 * :code:`check_if_in_limits()`; to check if a number lies between two other numbers;
 * :code:`check_length()`; to compare length (equal to, smaller than, greater than, and the like);
