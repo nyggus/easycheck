@@ -15,7 +15,6 @@ easycheck
 .. image:: https://img.shields.io/github/stars/nyggus/easycheck?style=social
    :target: https://github.com/nyggus/easycheck
 .. image:: https://img.shields.io/github/last-commit/nyggus/easycheck
-=========
 
 The :code:`easycheck` package offers a lightweight tool for running functionized checks within Python code; it also offers functions to be used in testing - particularly in doctests, but also in pytests, for which purpose some of the functions have dedicated aliases (starting off with :code:`assert_` instead of :code:`check_`). You can also switch off all :code:`easycheck` checks, by setting the :code:`"EASYCHECK_RUN"` environmental variable to :code:`"0"`.
 
@@ -144,7 +143,7 @@ Here is a list of :code:`easycheck` check functions the module offers, discludin
 
 * :code:`check_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
 * :code:`check_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is *not* met;
-* :code:`check_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
+* :code:`check_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`__);
 * :code:`check_if_in_limits()`; to check if a number lies between two other numbers;
 * :code:`check_length()`; to compare length (equal to, smaller than, greater than, and the like);
 * :code:`check_type()`; to check expected type, similar to :code:`isinstance()`;
@@ -153,21 +152,22 @@ Here is a list of :code:`easycheck` check functions the module offers, discludin
 * :code:`check_all_ifs()`; used to check multiple conditions and return all the checks;
 * :code:`check_argument()`; used to make one or more checks of a function's argument.
 
-You can also use a :code:`catch_check()` function, if you want to catch an exception or a warning the :code:`easycheck` function you use would raise (see examples `here <https://github.com/nyggus/easycheck/blob/master/docs/catch_exceptions_doctest.rst>`_). Sometimes, however, you will do better using a :code:`try-except` block to catch exceptions (`see examples <https://github.com/nyggus/easycheck/blob/master/docs/use_with_try_doctest.rst>`_).
+You can also use a :code:`catch_check()` function, if you want to catch an exception or a warning the :code:`easycheck` function you use would raise (see examples `here <https://github.com/nyggus/easycheck/blob/master/docs/catch_exceptions_doctest.rst>`_). Sometimes, however, you will do better using a :code:`try-except` block to catch exceptions (`see examples <https://github.com/nyggus/easycheck/blob/master/docs/use_with_try_doctest.rst>`__).
 
 > Note that some :code:`easycheck` functions are simple wrappers around built-in functions, but their behavior is different, as they have the typical behavior of an :code:`easycheck` function: if a condition is not met, an exception is raised or an issue is raised.
 
 
 Assertions
--------
+----------
 
-In addition to the above checking functions, :code:`easycheck` provides a set of functions for assertions. They can be used in both code and tests, just like regular assertions using the :code:`assert` statement. Assertion functions do have a specific functionality that makes them different from the corresponding check functions. You can read more about it `here <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_. In short, assertions are called only in the development (non-production) mode, that is, when :code:`__debug__` is set to :code:`True`. An assertion should check a condition that should never happen; when the corresponding exception is raised, it means that something went wrong in the code, that something that should never happen has just happened.
+In addition to the above checking functions, :code:`easycheck` provides a set of functions for assertions. They can be used in both code and tests, just like regular assertions using the :code:`assert` statement. Assertion functions do have a specific functionality that makes them different from the corresponding check functions. You can read more about it `here <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`__. In short, assertions are called only in the development (non-production) mode, that is, when :code:`__debug__` is set to :code:`True`. An assertion should check a condition that should never happen; when the corresponding exception is raised, it means that something went wrong in the code, that something that should never happen has just happened.
 
 Some examples:
 
 You are working only on integers, for example pixels when rendering images, or placing objects on a board. You are sure that output will be integer, so you can assert on integers:
 
 .. code-block:: python
+    
     def convert_to_pixel_position(real_pos: tuple[float, float]):
         pos_x = real_pos[0]
         pos_y = real_pos[1]
@@ -203,7 +203,7 @@ Here is full list of supported assert functions:
 
 * :code:`assert_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
 * :code:`assert_if_not()`; the opposite of :code:`assert_if()`, helpful when you need to assure that a condition is *not* met;
-* :code:`assert_if_isclose()`; to assert whether two floating-point numbers are close enough, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
+* :code:`assert_if_isclose()`; to assert whether two floating-point numbers are close enough, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`__);
 * :code:`assert_if_in_limits()`; to assert whether a number is in range of two other numbers;
 * :code:`assert_length()`; to assert length (equal to, smaller than, greater than, and the like);
 * :code:`assert_type()`;to assert that an object has a particular type, as you would do using :code:`assert isinstance`;
