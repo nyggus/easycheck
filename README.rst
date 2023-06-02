@@ -140,16 +140,16 @@ will raise :code:`TypeError` while this
 	
 will raise :code:`LengthError` (an exception class defined in the :code:`easycheck` module).
 
-Here is a list of :code:`easycheck` functions the module offers, along with their aliases to be used for testing:
+Here is a list of :code:`easycheck` check functions the module offers, discluding assertions, which are listed in the next paragraph:
 
-* :code:`check_if()`, with the alias of :code:`assert_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
-* :code:`check_if_not()`, with the alias of :code:`assert_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is _not_ met;
-* :code:`check_if_isclose()`, with the alias of :code:`assert_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
-* :code:`check_if_in_limits()`, with the alias of :code:`assert_if_in_limits()`;
-* :code:`check_length()`, with the alias of :code:`assert_length()`; to compare length (equal to, smaller than, greater than, and the like);
-* :code:`check_type()`, with the alias of :code:`assert_type()`; to check expected type, similar to :code:`isinstance()`;
-* :code:`check_if_paths_exist()`, with the alias of :code:`assert_paths()`; to compare paths (or just one path) exist;
-* :code:`check_comparison()` (used to compare two items); to compare to objectsm just like you would do using :code:`if obj1 != obj2: raise`
+* :code:`check_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
+* :code:`check_if_not()`; the opposite of :code:`check_if()`, helpful when you need to assure that a condition is *not* met;
+* :code:`check_if_isclose()`; to compare two floating-point numbers, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
+* :code:`check_if_in_limits()`; to check if a number lies between two other numbers;
+* :code:`check_length()`; to compare length (equal to, smaller than, greater than, and the like);
+* :code:`check_type()`; to check expected type, similar to :code:`isinstance()`;
+* :code:`check_if_paths_exist()`; to compare paths (or just one path) exist;
+* :code:`check_comparison()` (used to compare two items); to compare two objects, just like you would do using :code:`if obj1 != obj2: raise`
 * :code:`check_all_ifs()`; used to check multiple conditions and return all the checks;
 * :code:`check_argument()`; used to make one or more checks of a function's argument.
 
@@ -157,6 +157,57 @@ You can also use a :code:`catch_check()` function, if you want to catch an excep
 
 > Note that some :code:`easycheck` functions are simple wrappers around built-in functions, but their behavior is different, as they have the typical behavior of an :code:`easycheck` function: if a condition is not met, an exception is raised or an issue is raised.
 
+
+Assertions
+-------
+
+In addition to the above checking functions, :code:`easycheck` provides a set of functions for assertions. They can be used in both code and tests, just like regular assertions using the :code:`assert` statement. Assertion functions do have a specific functionality that makes them different from the corresponding check functions. You can read more about it `here <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_. In short, assertions are called only in the development (non-production) mode, that is, when :code:`__debug__` is set to :code:`True`. An assertion should check a condition that should never happen; when the corresponding exception is raised, it means that something went wrong in the code, that something that should never happen has just happened.
+
+Some examples:
+
+You are working only on integers, for example pixels when rendering images, or placing objects on a board. You are sure that output will be integer, so you can assert on integers:
+
+.. code-block:: python
+    def convert_to_pixel_position(real_pos: tuple[float, float]):
+        pos_x = real_pos[0]
+        pos_y = real_pos[1]
+        pixel_pos_x = round(pos_x)
+        pixel_pos_y = round(pos_y)
+        return pixel_pos_x, pixel_pos_y
+
+    pos = convert_to_pixel_position((1.2, 3.4))
+    assert_type(pos, tuple)
+    assert_type(pos[0], int)
+
+Now consider a different example. Imagine you have output from some `len()` method, or any other method calculating the length of something:
+
+.. code-block:: python
+
+    out = len(example_object)
+    # doing something with out, like
+    number_of_elements_required = out * no_of_objects
+    assert_type(out_for_something_else, int)
+
+You are working on subset of some data. So the size of the data should not be larger than the initial one, but also not smaller than 0:
+
+.. code-block:: python
+
+    def subset_of(data: pd.DataFrame, filter_condition: callable) -> pd.DataFrame:
+        # create a data frame that is a subset of `data` based on `filter_condition`
+        ...
+    x = pd.DataFrame({'x': [1, 2, 4], 'y': [3, 3, 5]})
+    x_subset = subset_of(x, lambda value: value < 3)
+    assert_if_in_limits(len(x_subset), 0, len(x))
+
+Here is full list of supported assert functions:
+
+* :code:`assert_if()`; it's the most basic :code:`easycheck` function, similar to what you would get using :code:`if`;
+* :code:`assert_if_not()`; the opposite of :code:`assert_if()`, helpful when you need to assure that a condition is *not* met;
+* :code:`assert_if_isclose()`; to assert whether two floating-point numbers are close enough, based on :code:`match.isclose()` (see `this file <https://github.com/nyggus/easycheck/blob/master/docs/compare_floats_doctest.rst>`_);
+* :code:`assert_if_in_limits()`; to assert whether a number is in range of two other numbers;
+* :code:`assert_length()`; to assert length (equal to, smaller than, greater than, and the like);
+* :code:`assert_type()`;to assert that an object has a particular type, as you would do using :code:`assert isinstance`;
+* :code:`assert_paths()`; to assert that a path exists or paths exist.
 
 Use in code to issue warnings
 -----------------------------
@@ -251,7 +302,7 @@ Of course, the :code:`open()` context manager will itself throw an error, but wh
 Use in testing
 --------------
 
-As mentioned above, most :code:`easycheck` functions have aliases to be used in testing. Of course, you can use :code:`check_if()`, but to align with the common use of assertions, the :code:`easycheck` module offers those aliases so that the reader will immediately see that you're using these functions to test. Consider these examples:
+As mentioned above, most :code:`easycheck` functions have their asserts counterparts which can be used in testing. Of course, you can use :code:`check_if()`, but to align with the common use of assertions, the :code:`easycheck` module offers those aliases so that the reader will immediately see that you're using these functions to test. Consider these examples:
 
 .. code-block:: python
 

@@ -1066,13 +1066,47 @@ def get_possible_operators():
 
 # Aliases to be used for testing. Beware not to use warnings with them.
 
-assert_if = check_if
-assert_if_not = check_if_not
-assert_if_in_limits = check_if_in_limits
-assert_length = check_length
-assert_type = check_type
-assert_paths = check_if_paths_exist
-assert_if_isclose = check_if_isclose
+def make_it_true_assertion(func):
+    @wraps(func)
+    def assert_func(*args, **kwargs):
+        if __debug__:
+            return func(*args, **kwargs)
+    return assert_func
+
+@switch
+@make_it_true_assertion
+def assert_if(*args, handle_with=AssertionError, **kwargs): 
+    return check_if(*args, handle_with=handle_with, **kwargs)
+
+@switch
+@make_it_true_assertion
+def assert_if_not(*args, handle_with=AssertionError, **kwargs):
+    return check_if_not(*args, handle_with=handle_with, **kwargs)
+
+@switch
+@make_it_true_assertion
+def assert_if_in_limits(*args, handle_with=AssertionError, **kwargs):
+    return check_if_in_limits(*args, handle_with=handle_with, **kwargs)
+
+@switch
+@make_it_true_assertion
+def assert_length(*args, handle_with=AssertionError, **kwargs):
+    return check_length(*args, handle_with=handle_with, **kwargs)
+
+@switch
+@make_it_true_assertion
+def assert_type(*args, handle_with=AssertionError, **kwargs):
+    return check_type(*args, handle_with=handle_with, **kwargs)
+
+@switch
+@make_it_true_assertion
+def assert_paths(*args, handle_with=AssertionError, **kwargs):
+    return check_if_paths_exist(*args, handle_with=handle_with, **kwargs)
+
+@switch
+@make_it_true_assertion
+def assert_if_isclose(*args, handle_with=AssertionError, **kwargs):
+    return check_if_isclose(*args, handle_with=handle_with, **kwargs)
 
 # Alias to ensure backward compatibility
 
