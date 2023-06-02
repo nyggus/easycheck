@@ -1,7 +1,7 @@
 easycheck
 =========
-.. image:: https://github.com/nyggus/easycheck/actions/workflows/python-package.yml/badge.svg
-   :target: https://github.com/nyggus/easycheck/actions/workflows/python-package.yml
+.. image:: https://github.com/nyggus/easycheck/actions/workflows/check.yml/badge.svg
+   :target: https://github.com/nyggus/easycheck/actions/workflows/check.yml
 .. image:: https://codecov.io/github/nyggus/easycheck/branch/master/graph/badge.svg?token=EH4TLHQQWC 
    :target: https://codecov.io/github/nyggus/easycheck
 .. image:: https://img.shields.io/pypi/l/easycheck.svg
