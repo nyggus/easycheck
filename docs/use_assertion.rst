@@ -1,7 +1,7 @@
 Using :code:`easycheck` for assertion
 --------------------------
 
-:code:`easycheck` gives the users a set of tools to add assertions to their code. There are two main reasons to do it. The first one is, of course, testing (see the `use_in_testing_doctest <https://github.com/nyggus/easycheck/blob/master/docs/use_in_testing_doctest.rst>`_ file). The second one is when you try to catch a situation that should never happen (see `this article <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_)
+:code:`easycheck` gives the users a set of tools to add assertions to their code. There are two main reasons to do it. The first one is, of course, testing (see the `use_in_testing_doctest <https://github.com/nyggus/easycheck/blob/master/docs/use_in_testing_doctest.rst>`_ file). The second one is when you try to catch a situation that should never happen (see `this article <https://towardsdatascience.com/python-assertions-or-checking-if-a-cat-is-a-dog-ce11c55d143>`_).
 
 Imagine you want to write a function that calculates the cumulative length of all elements of a list. So, for :code:`[[1, 2, 3], "hey"]`, this should be 6. 
 
@@ -49,4 +49,4 @@ In our situation, the error came from the first assertion, since the condition :
 
 In this scenario, actually, the assertion was incorrect. It showed that our preliminary assumption that the cumulative length cannot be zero was incorrect. It can, when none of the elements has length or has length over zero. Hence, the only thing we need to do is to change the assertion to :code:`length >= 0`.
 
-This example showed that assertions can help catch not only incorrect implementation, but also incorrect understanding or implementation of the function or its purpose.
+This example showed that assertions can help catch not only incorrect implementation, but also incorrect understanding of the function or its purpose..
