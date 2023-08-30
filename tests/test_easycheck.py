@@ -476,7 +476,7 @@ def test_catch_check_edge_cases():
     with pytest.raises(TypeError, match="easycheck function"):
         catch_check(1)
     with pytest.raises(
-        ArgumentValueError, match="acceptable valid easycheck functions"
+        TypeError, match="does not seem to be a easycheck function"
     ):
         catch_check(sum)
 
