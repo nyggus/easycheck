@@ -9,7 +9,7 @@ extras_requirements = {
 
 setuptools.setup(
     name="easycheck",
-    version="0.9.2",
+    version="0.10.0",
     author="Nyggus, Ke Boan & Darsoo",
     author_email="nyggus@gmail.com",
     license="MIT",
