@@ -10,16 +10,28 @@ The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
 assert_type(), assert_length(), and assert_path()).
 """
+from __future__ import annotations
+
 import builtins
 import os
 import warnings
 
-from collections.abc import Iterable, Callable
+from collections import abc
 from functools import wraps
 from math import isclose
 from numbers import Number
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+
+
+# Type alias and variables
+
+PathType = Union[Path, str]
+T = TypeVar("T")
+
+
+# Exceptions
 
 
 class LimitError(Exception):
@@ -42,7 +54,7 @@ class ArgumentValueError(Exception):
     """Argument's value is incorrect."""
 
 
-def switch(func):
+def switch(func: abc.Callable) -> abc.Callable:
     """Decorator to switch off all easycheck checks.
 
     It does so by getting the EASYCHECK_RUN environmental variable.
@@ -50,7 +62,7 @@ def switch(func):
     """
 
     @wraps(func)
-    def inner(*args, **kwargs):
+    def inner(*args: Any, **kwargs: Any) -> Any:
         if os.environ.get("EASYCHECK_RUN", 1) != "0":
             return func(*args, **kwargs)
 
@@ -58,7 +70,9 @@ def switch(func):
 
 
 @switch
-def check_if(condition, handle_with=AssertionError, message=None):
+def check_if(
+    condition: bool, handle_with: type = AssertionError, message: Optional[str] = None
+) -> None:
     """Check if a condition is true.
 
     Args:
@@ -128,7 +142,9 @@ def check_if(condition, handle_with=AssertionError, message=None):
 
 
 @switch
-def check_if_not(condition, handle_with=AssertionError, message=None):
+def check_if_not(
+    condition: bool, handle_with: type = AssertionError, message: Optional[str] = None
+) -> None:
     """Check if a condition is not true.
 
     Args:
@@ -199,13 +215,13 @@ def check_if_not(condition, handle_with=AssertionError, message=None):
 
 @switch
 def check_if_in_limits(
-    x,
-    lower_limit=float("-inf"),
-    upper_limit=float("inf"),
-    handle_with=LimitError,
-    message=None,
-    include_equal=True,
-):
+    x: float,
+    lower_limit: float = float("-inf"),
+    upper_limit: float = float("inf"),
+    handle_with: type = LimitError,
+    message: Optional[str] = None,
+    include_equal: bool = True,
+) -> None:
     """Check if number is in range of limits
 
     Args:
@@ -258,13 +274,13 @@ def check_if_in_limits(
 
 @switch
 def check_length(
-    item,
-    expected_length,
-    handle_with=LengthError,
-    message=None,
-    operator=eq,
-    assign_length_to_others=False,
-):
+    item: Union[abc.Sized | Number],
+    expected_length: int,
+    handle_with: type = LengthError,
+    message: Optional[str] = None,
+    operator: abc.Callable = eq,
+    assign_length_to_others: bool = False,
+) -> None:
     """Compare item's length with expected_length, using operator.
 
     Args:
@@ -307,13 +323,18 @@ def check_length(
         if isinstance(item, (Number, bool)):
             item = [item]
 
-    condition = operator(len(item), expected_length)
+    condition = operator(len(item), expected_length)  # type: ignore
     if not condition:
         _raise(handle_with, message)
 
 
 @switch
-def check_type(item, expected_type, handle_with=TypeError, message=None):
+def check_type(
+    item: Any,
+    expected_type: Union[type, abc.Sequence[type]],
+    handle_with: type = TypeError,
+    message: Optional[str] = None,
+) -> None:
     """Check if item has the type of expected_type.
 
     Args:
@@ -377,7 +398,7 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
             _raise(handle_with, message)
         return None
 
-    if isinstance(expected_type, Iterable):
+    if isinstance(expected_type, abc.Iterable):
         if item is None and any(t is None for t in expected_type):
             return None
         expected_type = tuple(t for t in expected_type if t is not None)
@@ -388,14 +409,14 @@ def check_type(item, expected_type, handle_with=TypeError, message=None):
 
 @switch
 def check_if_isclose(
-    x,
-    y,
+    x: float,
+    y: float,
     /,
-    handle_with=NotCloseEnoughError,
-    message=None,
-    rel_tol=1e-09,
-    abs_tol=0.0,
-):
+    handle_with: type = NotCloseEnoughError,
+    message: Optional[str] = None,
+    rel_tol: float = 1e-09,
+    abs_tol: float = 0.0,
+) -> None:
     """Check if two floats are close in value.
 
     The function is just a wrapper around math.isclose(), and its defaults
@@ -469,15 +490,18 @@ def check_if_isclose(
 
 @switch
 def check_if_paths_exist(
-    paths, handle_with=FileNotFoundError, message=None, execution_mode="raise"
-):
+    paths: Union[PathType, abc.Iterable[PathType]],
+    handle_with: type = FileNotFoundError,
+    message: Optional[str] = None,
+    execution_mode: str = "raise",
+) -> Union[None, Tuple[Optional[Any], List[str]]]:
     """Check if a path or paths exist.
 
     If it does not, either raise (or return) an exception or issue (or return)
     a warning.
 
     Args:
-        paths (str, pathlib.Path, Iterable[str or pathlib.Path]): path or paths
+        paths (str, pathlib.Path, abc.Sequence[str or pathlib.Path]): path or paths
             to validate
         handle_with (type): type of exception or warning to be raised/returned
         message (str): a text to use as the exception/warning message.
@@ -529,19 +553,18 @@ def check_if_paths_exist(
     (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop'])
     """
     __tracebackhide__ = True
-    if not execution_mode in ("raise", "return"):
+    if execution_mode not in ("raise", "return"):
         _raise(ValueError, "execution_mode must be either 'raise' or 'return'")
 
     is_allowed_type = isinstance(paths, (str, Path)) or (
-        isinstance(paths, Iterable)
+        isinstance(paths, abc.Iterable)
         and all(isinstance(path, (str, Path)) for path in paths)
     )
 
     if not is_allowed_type:
         _raise(
             TypeError,
-            "Argument paths must be string"
-            " or pathlib.Path or iterable thereof",
+            "Argument paths must be string" " or pathlib.Path or iterable thereof",
         )
 
     error = None
@@ -549,9 +572,7 @@ def check_if_paths_exist(
     if isinstance(paths, (str, Path)):
         paths = (paths,)
 
-    non_existing_paths = [
-        str(path) for path in paths if not Path(path).exists()
-    ]
+    non_existing_paths = [str(path) for path in paths if not Path(path).exists()]
 
     if non_existing_paths:
         if execution_mode == "raise":
@@ -564,12 +585,17 @@ def check_if_paths_exist(
 
     if execution_mode == "return":
         return error, non_existing_paths
+    return None
 
 
 @switch
 def check_comparison(
-    item_1, operator, item_2, handle_with=ValueError, message=None
-):
+    item_1: Any,
+    operator: abc.Callable,
+    item_2: Any,
+    handle_with: type = ValueError,
+    message: Optional[str] = None,
+) -> None:
     """Check if a comparison of two items is true.
 
     Args:
@@ -623,7 +649,9 @@ def check_comparison(
 
 
 @switch
-def check_all_ifs(*args):
+def check_all_ifs(
+    *args: Tuple[abc.Callable, Tuple]
+) -> dict:  # abc.Mapping[str, Union[type, Warning, bool]]:
     """Check all multiple conditions and return all checks.
 
     Args:
@@ -682,40 +710,40 @@ def check_all_ifs(*args):
         message="Provide at least one condition.",
     )
     tuple_error_message = (
-        "Provide all function calls as tuples in the form of "
-        "(check_function, *args)"
+        "Provide all function calls as tuples in the form of " "(check_function, *args)"
     )
     for arg in args:
         check_type(arg, tuple, message=tuple_error_message)
 
     results_of_checks = dict()
+
     for i, this_check in enumerate(args):
-        function, *arguments = this_check
+        func, *arguments = this_check
         run_this_check = True
         try:
             with warnings.catch_warnings(record=True) as this_warn:
-                function(*arguments)
+                func(*arguments)
             if this_warn:
-                run_this_check = this_warn[-1].message
+                run_this_check = this_warn[-1].message  # type: ignore
         except Exception as e:
-            run_this_check = e
+            run_this_check = e  # type: ignore
 
-        results_of_checks[f"{i + 1}: {function.__name__}"] = run_this_check
+        results_of_checks[f"{i + 1}: {func.__name__}"] = run_this_check
 
     return results_of_checks
 
 
 @switch
 def check_argument(
-    argument,
-    argument_name=None,
-    expected_type=None,
-    expected_choices=None,
-    expected_length=None,
-    handle_with=ArgumentValueError,
-    message=None,
-    **kwargs,
-):
+    argument: T,
+    argument_name: Optional[str] = None,
+    expected_type: Union[type, abc.Sequence[type], None] = None,
+    expected_choices: Optional[abc.Sequence[T]] = None,
+    expected_length: Optional[int] = None,
+    handle_with: type = ArgumentValueError,
+    message: Optional[str] = None,
+    **kwargs: Any,
+) -> None:
     """Check if the user provided a correct argument value.
 
     Args:
@@ -794,12 +822,9 @@ def check_argument(
     ...     assert_if("Incorrect argument's value" in str(w[-1].message))
     """
     __tracebackhide__ = True
-    if all(
-        item is None
-        for item in (expected_type, expected_choices, expected_length)
-    ):
+    if all(item is None for item in (expected_type, expected_choices, expected_length)):
         raise ValueError(
-            "check_argument() requires at least one condition" " to be checked"
+            "check_argument() requires at least one condition to be checked"
         )
 
     if argument_name is None:
@@ -814,8 +839,7 @@ def check_argument(
     if expected_type is not None:
         instance_message = (
             message
-            or f"Incorrect type of {argument_name}; valid type(s):"
-            f" {expected_type}"
+            or f"Incorrect type of {argument_name}; valid type(s):" f" {expected_type}"
         )
         check_type(
             item=argument,
@@ -834,8 +858,7 @@ def check_argument(
     if expected_length is not None:
         length_message = (
             message
-            or f"Unexpected length of {argument_name}"
-            f" (should be {expected_length})"
+            or f"Unexpected length of {argument_name}" f" (should be {expected_length})"
         )
         check_length(
             item=argument,
@@ -847,7 +870,9 @@ def check_argument(
 
 
 @switch
-def catch_check(check_function, *args, **kwargs):
+def catch_check(
+    check_function: abc.Callable, *args: Any, **kwargs: Any
+):  # type: ignore
     """Catch an exception or warning raised/issued by a easycheck function.
 
     Warning: Be aware that catch_check() is a relatively slow function
@@ -918,11 +943,9 @@ def catch_check(check_function, *args, **kwargs):
     """
     __tracebackhide__ = True
     check_if(
-        isinstance(check_function, Callable),
+        check_function in ALL_FUNCTIONS,
         handle_with=TypeError,
-        message=(
-            f"{check_function} does not " "seem to be a easycheck function"
-        ),
+        message=(f"{check_function} does not seem to be a easycheck function"),
     )
     check_if_not(
         check_function == check_all_ifs,
@@ -1049,7 +1072,7 @@ def _raise(error, message=None):
             raise error
 
 
-def get_possible_operators():
+def get_possible_operators() -> Tuple[abc.Callable, ...]:
     """Provide a list of possible operators to be used in easycheck functions.
 
     All of these operators come from the operator module, but not all operators
@@ -1066,52 +1089,94 @@ def get_possible_operators():
 
 # Aliases to be used for testing. Beware not to use warnings with them.
 
-def make_it_true_assertion(func):
+
+def make_it_true_assertion(func: abc.Callable) -> abc.Callable:
     @wraps(func)
-    def assert_func(*args, **kwargs):
+    def assert_func(*args: Any, **kwargs: Any) -> Any:
         if __debug__:
             return func(*args, **kwargs)
+
     return assert_func
 
+
 @switch
 @make_it_true_assertion
-def assert_if(*args, handle_with=AssertionError, **kwargs): 
+def assert_if(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
     return check_if(*args, handle_with=handle_with, **kwargs)
 
+
 @switch
 @make_it_true_assertion
-def assert_if_not(*args, handle_with=AssertionError, **kwargs):
+def assert_if_not(
+    *args: Any, handle_with: type = AssertionError, **kwargs: Any
+) -> None:
     return check_if_not(*args, handle_with=handle_with, **kwargs)
 
+
 @switch
 @make_it_true_assertion
-def assert_if_in_limits(*args, handle_with=AssertionError, **kwargs):
+def assert_if_in_limits(
+    *args: Any, handle_with: type = AssertionError, **kwargs: Any
+) -> None:
     return check_if_in_limits(*args, handle_with=handle_with, **kwargs)
 
+
 @switch
 @make_it_true_assertion
-def assert_length(*args, handle_with=AssertionError, **kwargs):
+def assert_length(
+    *args: Any, handle_with: type = AssertionError, **kwargs: Any
+) -> None:
     return check_length(*args, handle_with=handle_with, **kwargs)
 
+
 @switch
 @make_it_true_assertion
-def assert_type(*args, handle_with=AssertionError, **kwargs):
+def assert_type(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
     return check_type(*args, handle_with=handle_with, **kwargs)
 
-@switch
-@make_it_true_assertion
-def assert_paths(*args, handle_with=AssertionError, **kwargs):
-    return check_if_paths_exist(*args, handle_with=handle_with, **kwargs)
 
 @switch
 @make_it_true_assertion
-def assert_if_isclose(*args, handle_with=AssertionError, **kwargs):
+def assert_paths(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
+    return check_if_paths_exist(*args, handle_with=handle_with, **kwargs)
+
+
+@switch
+@make_it_true_assertion
+def assert_if_isclose(
+    *args: Any, handle_with: type = AssertionError, **kwargs: Any
+) -> None:
     return check_if_isclose(*args, handle_with=handle_with, **kwargs)
+
 
 # Alias to ensure backward compatibility
 
 check_instance = check_type
 assert_instance = assert_type
+
+
+ALL_FUNCTIONS = (
+    assert_if,
+    assert_if_isclose,
+    assert_if_not,
+    assert_if_in_limits,
+    assert_instance,
+    assert_length,
+    assert_paths,
+    assert_type,
+    catch_check,
+    check_all_ifs,
+    check_argument,
+    check_comparison,
+    check_if,
+    check_if_isclose,
+    check_if_in_limits,
+    check_if_not,
+    check_if_paths_exist,
+    check_instance,
+    check_length,
+    check_type,
+)
 
 
 if __name__ == "__main__":
