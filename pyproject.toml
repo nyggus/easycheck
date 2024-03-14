@@ -1,0 +1,49 @@
+[build-system]
+requires = ["setuptools>=61.0", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "easycheck"
+version = "0.11.0"
+authors = [
+        { name = "Nyggus", email = "nyggus@gmail.com" },
+        { name = "KeBoan"},
+        { name = "Darsoo"}
+]
+description = "A tool for checking conditions in Python"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.8"
+dependencies = ["easycheck"]
+classifiers = [
+        "Intended Audience :: Developers",
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+        "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+[project.urls]
+Homepage = "https://github.com/nyggus/easycheck/"
+
+[tool.setuptools]
+packages = ["easycheck"]
+
+[project.optional-dependencies]
+dev = ["wheel", "black", "pytest", "mypy", "setuptools", "build"]
+
+[tool.black]
+line-length = 79
+
+[tool.pytest.ini_options]
+testpaths = ["tests", "easycheck", "docs"]
+addopts = '--doctest-modules --doctest-glob="*.rst"'
+doctest_optionflags = [
+    "ELLIPSIS",
+    "NORMALIZE_WHITESPACE",
+    "IGNORE_EXCEPTION_DETAIL"
+]
