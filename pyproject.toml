@@ -14,7 +14,6 @@ description = "A tool for checking conditions in Python"
 readme = "README.md"
 license = { file = "LICENSE" }
 requires-python = ">=3.8"
-dependencies = ["easycheck"]
 classifiers = [
         "Intended Audience :: Developers",
         "Programming Language :: Python :: 3",
