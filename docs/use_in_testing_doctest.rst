@@ -53,7 +53,9 @@ Do remember, however, *not* to use warnings in testing! Consider the following:
     Traceback (most recent call last):
         ...
     ValueError
-    >>> assert_if(2 < 1, Warning)
-    >>> assert_if(2 < 1, UserWarning)
+    >>> assert_if(2 < 1, handle_with=Warning)
+    >>> assert_if(2 < 1, handle_with=UserWarning)
     
 As you can see, the two last assertions issue warnings (see `here <https://github.com/nyggus/easycheck/blob/master/docs/use_with_warnings_doctest.rst>`_ to learn more about using :code:`easycheck` with warnings), but will not raise exceptions – this could dramatically affect your testing. However, warnings *do not* make the test fail! So, remember this basic rule: Never use warnings in testing when you want to catch critical errors.
+
+**Warning!** Do remember that when you use :code:`assert_*` functions with the :code:`handle_with` argument, you need to use it as a keyword (named) argument.

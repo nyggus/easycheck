@@ -64,6 +64,8 @@ The package also offers functions dedicated to testing, e.g.,
 
 The :code:`message` argument has the default value of :code:`None`, which does the following. If the exception class provided in :code:`handle_with` is built-in (that is, can be found in :code:`dir(builtins)`), no message is provided. But if it is not a built-in exception (or warning) class, then the exception/warning class's docstring is taken as the message. This is a convenient way of providing a  typical message. If you want to customize the message (e.g., depending on the value of a variable), you should use a customized string (e.g., through an f-string). But if you do not want to use any message with a custom exception/warning, simply provide an empty string (:code:`message=''`).
 
+**Warning!** Note that when you use :code:`assert_*` functions with the :code:`handle_with` argument, you need to use it as a keyword (named) argument.
+
 
 Read about :code:`easycheck`
 ----------------------------
@@ -360,4 +362,5 @@ You can also switch off easycheck directly from Python:
 Changelog
 ---------
 
+* Version 0.11.0 came with a change in the building backend, from setup.py-based to pyproject.toml- and `build`-based. Documentation tests are now configured to be run by :code:`pytest`, so the :code:`pytest` command runs all the :code:`pytest` and :code:`doctest` tests. Several documentation tests have been also fixed.
 * Version 0.6.0 came with significant optimization of performance. Before, :code:`easycheck` functions performed internal checks of the argument values provided to the function call. Most of these checks are not performed anymore, at least not for the most significant :code:`easycheck` functions, such as :code:`check_if()` or :code:`check_type()`. Some checks, however, are still done. These are mainly checks without which the behavior of the function would be either unwanted or unexpected. We decided to remove all checks that do not change much; for instance, they raise an error due to an incorrect type of an argument value — even though it would be raised anyway, but by the internal Python process, not by the :code:`easycheck` function itself. The point is to remove such unnecessary checks and that way remove the unnecessary :code:`if` blocks, which certainly add some cost to execution time. While one such check costs almost nothing, many of them (e.g., in a long loop) can mean a significant cost. As of version 0.6.0, we will try to optimize the performance of :code:`easycheck` by getting rid of such overhead costs, unless they are important for the behavior of the corresponding :code:`easycheck` function.

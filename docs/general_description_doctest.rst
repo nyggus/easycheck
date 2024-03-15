@@ -51,7 +51,9 @@ In case you want to issue a warning, do the following:
 
 .. code-block:: python
 
-    >>> check_if(0 > 1, handle_with=Warning, message='0 is too small')
+    >>> import warnings
+    >>> with warnings.catch_warnings():
+    ...     check_if(0 > 1, handle_with=Warning, message='0 is too small')
 
 or simpler
 
