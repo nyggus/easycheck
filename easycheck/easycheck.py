@@ -60,7 +60,7 @@ def switch(func: abc.Callable) -> abc.Callable:
     It does so by getting the EASYCHECK_RUN environmental variable.
     When it's set to "0", easycheck is switched off.
     """
-
+    __tracebackhide__ = True
     @wraps(func)
     def inner(*args: Any, **kwargs: Any) -> Any:
         if os.environ.get("EASYCHECK_RUN", 1) != "0":
