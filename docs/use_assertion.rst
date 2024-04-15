@@ -7,6 +7,7 @@ Imagine you want to write a function that calculates the cumulative length of al
 
 After some development, you come up with the following function:
 .. code-block:: python
+    >>> from easycheck import assert_if, assert_type
     >>> def inside_len(list_: list) -> int:
     ...     if not isinstance(list_, list):
     ...         raise TypeError("inside_len() works with lists only")
@@ -26,24 +27,27 @@ As you see, the function has two assertions, one that the cumulative length of a
 
 Let's use the function:
 .. code-block:: python
-    >>> cum_length([1, 2, 3], "hey")
+    >>> inside_len([[1, 2, 3], "hey"])
     6
-    >>> cum_length([[1]])
+    >>> inside_len([[1]])
     1
-    >>> cum_length("whatever", "works", "works", "for", "me")
+    >>> inside_len(["whatever", "works", "works", "for", "me"])
     23
-    >>> cum_length([1, 2, 3])
+    >>> inside_len([1, 2, 3])
     Traceback (most recent call last):
         ...
     AssertionError
 
 Ha? Something's wrong? Difficult to see without customizing the assertions. We could do this:
+
 .. code-block:: python
 
-...     assert_if(length > 0, ValueError)
-...     assert_type(length, int, TypeError)
+...     assert_if(length > 0, handle_with=ValueError)
+...     assert_type(length, int, handle_with=TypeError)
 
 or by adding messages. This shows that it does make sense to customize assertions.
+
+**Warning!** Note that when you use :code:`assert_*` functions with the :code:`handle_with` argument, you need to use it as a keyword (named) argument.
 
 In our situation, the error came from the first assertion, since the condition :code:`length > 0` was violated. Is the function incorrect?
 

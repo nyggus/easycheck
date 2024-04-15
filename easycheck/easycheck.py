@@ -60,7 +60,7 @@ def switch(func: abc.Callable) -> abc.Callable:
     It does so by getting the EASYCHECK_RUN environmental variable.
     When it's set to "0", easycheck is switched off.
     """
-
+    __tracebackhide__ = True
     @wraps(func)
     def inner(*args: Any, **kwargs: Any) -> Any:
         if os.environ.get("EASYCHECK_RUN", 1) != "0":
@@ -259,7 +259,8 @@ def check_if_in_limits(
     Traceback (most recent call last):
         ...
     LimitError: Number out of limit.
-    >>> check_if_in_limits(5, 1, 3, Warning)
+    >>> with warnings.catch_warnings():
+    ...     check_if_in_limits(5, 1, 3, Warning)
     """
     __tracebackhide__ = True
     x = float(x)
@@ -315,8 +316,10 @@ def check_length(
     >>> check_length(2, 0, operator=gt, assign_length_to_others=True)
     >>> check_length(True, 1, assign_length_to_others=True)
 
-    To issue a warning, use the Warning class or its subclass:
-    >>> check_length('string', 6, Warning)
+    To issue a warning, use the Warning class or its subclass
+    (for the same of doctests, we will catch the warning):
+    >>> with warnings.catch_warnings():
+    ...     check_length('string', 6, Warning)
     """
     __tracebackhide__ = True
     if assign_length_to_others:
