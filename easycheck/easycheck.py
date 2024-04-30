@@ -22,7 +22,7 @@ from math import isclose
 from numbers import Number
 from operator import eq, le, lt, gt, ge, ne, is_, is_not
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, List, Optional, Tuple, TypeVar, Union
 
 
 # Type alias and variables
@@ -54,7 +54,7 @@ class ArgumentValueError(Exception):
     """Argument's value is incorrect."""
 
 
-def switch(func: abc.Callable) -> abc.Callable:
+def switch(func: Callable) -> Callable:
     """Decorator to switch off all easycheck checks.
 
     It does so by getting the EASYCHECK_RUN environmental variable.
@@ -279,7 +279,7 @@ def check_length(
     expected_length: int,
     handle_with: type = LengthError,
     message: Optional[str] = None,
-    operator: abc.Callable = eq,
+    operator: Callable = eq,
     assign_length_to_others: bool = False,
 ) -> None:
     """Compare item's length with expected_length, using operator.
@@ -594,7 +594,7 @@ def check_if_paths_exist(
 @switch
 def check_comparison(
     item_1: Any,
-    operator: abc.Callable,
+    operator: Callable,
     item_2: Any,
     handle_with: type = ValueError,
     message: Optional[str] = None,
@@ -653,7 +653,7 @@ def check_comparison(
 
 @switch
 def check_all_ifs(
-    *args: Tuple[abc.Callable, Tuple]
+    *args: Tuple[Callable, Tuple]
 ) -> dict:  # abc.Mapping[str, Union[type, Warning, bool]]:
     """Check all multiple conditions and return all checks.
 
@@ -874,7 +874,7 @@ def check_argument(
 
 @switch
 def catch_check(
-    check_function: abc.Callable, *args: Any, **kwargs: Any
+    check_function: Callable, *args: Any, **kwargs: Any
 ):  # type: ignore
     """Catch an exception or warning raised/issued by a easycheck function.
 
@@ -1075,7 +1075,7 @@ def _raise(error, message=None):
             raise error
 
 
-def get_possible_operators() -> Tuple[abc.Callable, ...]:
+def get_possible_operators() -> Tuple[Callable, ...]:
     """Provide a list of possible operators to be used in easycheck functions.
 
     All of these operators come from the operator module, but not all operators
@@ -1093,7 +1093,7 @@ def get_possible_operators() -> Tuple[abc.Callable, ...]:
 # Aliases to be used for testing. Beware not to use warnings with them.
 
 
-def make_it_true_assertion(func: abc.Callable) -> abc.Callable:
+def make_it_true_assertion(func: Callable) -> Callable:
     @wraps(func)
     def assert_func(*args: Any, **kwargs: Any) -> Any:
         if __debug__:
