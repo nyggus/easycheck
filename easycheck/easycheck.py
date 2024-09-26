@@ -63,6 +63,7 @@ def switch(func: Callable) -> Callable:
     __tracebackhide__ = True
     @wraps(func)
     def inner(*args: Any, **kwargs: Any) -> Any:
+        __tracebackhide__ = True
         if os.environ.get("EASYCHECK_RUN", 1) != "0":
             return func(*args, **kwargs)
 
@@ -1096,6 +1097,7 @@ def get_possible_operators() -> Tuple[Callable, ...]:
 def make_it_true_assertion(func: Callable) -> Callable:
     @wraps(func)
     def assert_func(*args: Any, **kwargs: Any) -> Any:
+        __tracebackhide__ = True
         if __debug__:
             return func(*args, **kwargs)
 
@@ -1105,6 +1107,7 @@ def make_it_true_assertion(func: Callable) -> Callable:
 @switch
 @make_it_true_assertion
 def assert_if(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
+    # __tracebackhide__ = True
     return check_if(*args, handle_with=handle_with, **kwargs)
 
 
@@ -1113,6 +1116,7 @@ def assert_if(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> 
 def assert_if_not(
     *args: Any, handle_with: type = AssertionError, **kwargs: Any
 ) -> None:
+    __tracebackhide__ = True
     return check_if_not(*args, handle_with=handle_with, **kwargs)
 
 
