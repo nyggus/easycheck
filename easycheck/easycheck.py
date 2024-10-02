@@ -1107,7 +1107,7 @@ def make_it_true_assertion(func: Callable) -> Callable:
 @switch
 @make_it_true_assertion
 def assert_if(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
-    # __tracebackhide__ = True
+    __tracebackhide__ = True
     return check_if(*args, handle_with=handle_with, **kwargs)
 
 
@@ -1125,6 +1125,7 @@ def assert_if_not(
 def assert_if_in_limits(
     *args: Any, handle_with: type = AssertionError, **kwargs: Any
 ) -> None:
+    __tracebackhide__ = True
     return check_if_in_limits(*args, handle_with=handle_with, **kwargs)
 
 
@@ -1133,18 +1134,21 @@ def assert_if_in_limits(
 def assert_length(
     *args: Any, handle_with: type = AssertionError, **kwargs: Any
 ) -> None:
+    __tracebackhide__ = True
     return check_length(*args, handle_with=handle_with, **kwargs)
 
 
 @switch
 @make_it_true_assertion
 def assert_type(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
+    __tracebackhide__ = True
     return check_type(*args, handle_with=handle_with, **kwargs)
 
 
 @switch
 @make_it_true_assertion
 def assert_paths(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
+    __tracebackhide__ = True
     return check_if_paths_exist(*args, handle_with=handle_with, **kwargs)
 
 
@@ -1153,6 +1157,7 @@ def assert_paths(*args: Any, handle_with: type = AssertionError, **kwargs: Any) 
 def assert_if_isclose(
     *args: Any, handle_with: type = AssertionError, **kwargs: Any
 ) -> None:
+    __tracebackhide__ = True
     return check_if_isclose(*args, handle_with=handle_with, **kwargs)
 
 
