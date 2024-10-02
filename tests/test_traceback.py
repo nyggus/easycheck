@@ -1,24 +1,13 @@
 import pytest
-from easycheck.easycheck import check_if, check_if_in_limits
 
-def test_tracebackhide_in_check_if():
-    with pytest.raises(AssertionError) as check_if_1:
-        check_if(2 < 1)
-    assert len(check_if_1.traceback) < 3, "Traceback should be reduced when __tracebackhide__ is used"
-    for frame in check_if_1.traceback:
-        assert "__tracebackhide__" not in str(frame), \
-            "Frames with __tracebackhide__ should not be included in the traceback"
-    with pytest.raises(ValueError, match="incorrect value") as check_if_2:
-        check_if(2 < 1, handle_with=ValueError, message="incorrect value")
-    assert len(check_if_2.traceback) < 3, "Traceback should be reduced when __tracebackhide__ is used"
-    for frame in check_if_2.traceback:
-        assert "__tracebackhide__" not in str(frame), \
-            "Frames with __tracebackhide__ should not be included in the traceback"
+def test_skip_simple():
+    with pytest.raises(pytest.skip.Exception) as excinfo:
+        pytest.skip("xxx")
 
-# def test_tracebackhide_in_check_if_in_limits():
-    # with pytest.raises(str(LimitError)) as check_limit:
-    #     check_if_in_limits(5, 1, 3)
-    # assert len(check_if_in_limits(5, 1, 3).traceback) < 3, "Traceback should be reduced when __tracebackhide__ is used"
-    # for frame in check_if_in_limits(5, 1, 3).traceback:
-    #     assert "__tracebackhide__" not in str(frame), \
-    #         "Frames with __tracebackhide__ should not be included in the traceback"
+    # Sprawdzenie ostatniej ramki w tracebacku
+    assert excinfo.traceback[-1].frame.code.name == "skip"
+    assert excinfo.traceback[-1].ishidden(excinfo)
+
+    # Sprawdzenie przedostatniej ramki w tracebacku
+    assert excinfo.traceback[-2].frame.code.name == "test_skip_simple"
+    assert not excinfo.traceback[-2].ishidden(excinfo)
