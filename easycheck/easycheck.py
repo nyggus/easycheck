@@ -60,7 +60,6 @@ def switch(func: Callable) -> Callable:
     It does so by getting the EASYCHECK_RUN environmental variable.
     When it's set to "0", easycheck is switched off.
     """
-    __tracebackhide__ = True
     @wraps(func)
     def inner(*args: Any, **kwargs: Any) -> Any:
         __tracebackhide__ = True
@@ -137,7 +136,6 @@ def check_if(
     ...     check_if(2 < 1, Warning, '2 is not smaller than 1')
     ...     assert_if("2 is not smaller than 1" in str(w[-1].message))
     """
-    __tracebackhide__ = True
     if not condition:
         _raise(handle_with, message)
 
@@ -209,7 +207,6 @@ def check_if_not(
     ...     check_if_not(2 > 1, Warning, '2 is bigger than 1')
     ...     assert_if("2 is bigger than 1" in str(w[-1].message))
     """
-    __tracebackhide__ = True
     if condition:
         _raise(handle_with, message)
 
@@ -263,7 +260,6 @@ def check_if_in_limits(
     >>> with warnings.catch_warnings():
     ...     check_if_in_limits(5, 1, 3, Warning)
     """
-    __tracebackhide__ = True
     x = float(x)
     if include_equal:
         condition = lower_limit <= x <= upper_limit
@@ -322,7 +318,6 @@ def check_length(
     >>> with warnings.catch_warnings():
     ...     check_length('string', 6, Warning)
     """
-    __tracebackhide__ = True
     if assign_length_to_others:
         if isinstance(item, (Number, bool)):
             item = [item]
@@ -396,7 +391,6 @@ def check_type(
     To issue a warning, do the following:
     >>> check_type('a', (str, None), Warning, 'Undesired instance')
     """
-    __tracebackhide__ = True
     if expected_type is None:
         if item is not None:
             _raise(handle_with, message)
@@ -484,7 +478,6 @@ def check_if_isclose(
         ...
     ValueError
     """
-    __tracebackhide__ = True
     x = float(x)
     y = float(y)
 
@@ -556,7 +549,6 @@ def check_if_paths_exist(
     ...    message='Attempt to use a non-existing path')
     (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop'])
     """
-    __tracebackhide__ = True
     if execution_mode not in ("raise", "return"):
         _raise(ValueError, "execution_mode must be either 'raise' or 'return'")
 
@@ -647,7 +639,6 @@ def check_comparison(
     ...         message='Not less!')
     ...     assert_if("Not less" in str(w[-1].message))
     """
-    __tracebackhide__ = True
     if not operator(item_1, item_2):
         _raise(handle_with, message)
 
@@ -705,7 +696,6 @@ def check_all_ifs(
     ...    )
     {'1: check_if': True, '2: check_if_not': Warning('It might be wrong!')}
     """
-    __tracebackhide__ = True
     check_length(
         args,
         0,
@@ -825,7 +815,6 @@ def check_argument(
     ...         message="Incorrect argument's value")
     ...     assert_if("Incorrect argument's value" in str(w[-1].message))
     """
-    __tracebackhide__ = True
     if all(item is None for item in (expected_type, expected_choices, expected_length)):
         raise ValueError(
             "check_argument() requires at least one condition to be checked"
@@ -945,7 +934,6 @@ def catch_check(
     ...    message='Beware of this problem')
     UserWarning('Beware of this problem')
     """
-    __tracebackhide__ = True
     check_if(
         check_function in ALL_FUNCTIONS,
         handle_with=TypeError,
@@ -1046,7 +1034,6 @@ def _raise(error, message=None):
     ...    _raise(Warning, 'Watch out! Something might be wrong.')
     ...    assert_if('Watch out!' in str(w[-1].message))
     """
-    __tracebackhide__ = True
     if not isinstance(error, type) or not issubclass(error, Exception):
         raise TypeError("The error argument must be an exception or a warning")
 
