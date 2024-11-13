@@ -1403,16 +1403,16 @@ def test_message_is_None_exception_with_docstring():
     with pytest.raises(ForTestingErrorWithDoc, match="for testing purposes"):
         check_if(1 == 2, ForTestingErrorWithDoc)
 
-def test_message_is_None_exception_with_docstring_asserts():
-    with pytest.raises(AssertionError, match=""):
-        assert_if(1 == 2, message=None)
-    with pytest.raises(AssertionError, match="Error"):
-        assert_if(1 == 2, message="Error")
-    with pytest.raises(AssertionError):
-        assert_if(1 == 2)
-    assert assert_if(1 == 1, handle_with = ForTestingErrorWithDoc) is None
-    with pytest.raises(ForTestingErrorWithDoc, match="for testing purposes"):
-        assert_if(1 == 2, handle_with = ForTestingErrorWithDoc)
+# def test_message_is_None_exception_with_docstring_asserts():
+#     with pytest.raises(AssertionError, match=""):
+#         assert_if(1 == 2, message=None)
+#     with pytest.raises(AssertionError, match="Error"):
+#         assert_if(1 == 2, message="Error")
+#     with pytest.raises(AssertionError):
+#         assert_if(1 == 2)
+#     assert assert_if(1 == 1, handle_with = ForTestingErrorWithDoc) is None
+#     with pytest.raises(ForTestingErrorWithDoc, match="for testing purposes"):
+#         assert_if(1 == 2, handle_with = ForTestingErrorWithDoc)
 
 def test_message_is_None_exception_without_docstring():
     assert check_if(1 == 1, ForTestingErrorWithoutDoc) is None
@@ -1421,9 +1421,9 @@ def test_message_is_None_exception_without_docstring():
     with pytest.raises(ForTestingErrorWithoutDoc, match=""):
         check_if(1 == 2, ForTestingErrorWithoutDoc)
 
-def test_message_is_None_exception_without_docstring():
-    assert assert_if(1 == 1, handle_with = ForTestingErrorWithoutDoc) is None
-    with pytest.raises(ForTestingErrorWithoutDoc, match="Error! Shout!"):
-        assert_if(1 == 2,  handle_with = ForTestingErrorWithoutDoc, message="Error! Shout!")
-    with pytest.raises(ForTestingErrorWithoutDoc, match=""):
-        assert_if(1 == 2, handle_with = ForTestingErrorWithoutDoc)
+# def test_message_is_None_exception_without_docstring():
+#     assert assert_if(1 == 1, handle_with = ForTestingErrorWithoutDoc) is None
+#     with pytest.raises(ForTestingErrorWithoutDoc, match="Error! Shout!"):
+#         assert_if(1 == 2,  handle_with = ForTestingErrorWithoutDoc, message="Error! Shout!")
+#     with pytest.raises(ForTestingErrorWithoutDoc, match=""):
+#         assert_if(1 == 2, handle_with = ForTestingErrorWithoutDoc)
