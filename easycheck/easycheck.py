@@ -10,6 +10,7 @@ The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
 assert_type(), assert_length(), and assert_path()).
 """
+
 from __future__ import annotations
 
 import builtins
@@ -60,6 +61,7 @@ def switch(func: Callable) -> Callable:
     It does so by getting the EASYCHECK_RUN environmental variable.
     When it's set to "0", easycheck is switched off.
     """
+
     @wraps(func)
     def inner(*args: Any, **kwargs: Any) -> Any:
         __tracebackhide__ = True
@@ -71,7 +73,9 @@ def switch(func: Callable) -> Callable:
 
 @switch
 def check_if(
-    condition: bool, handle_with: type = AssertionError, message: Optional[str] = None
+    condition: bool,
+    handle_with: type = AssertionError,
+    message: Optional[str] = None,
 ) -> None:
     """Check if a condition is true.
 
@@ -142,7 +146,9 @@ def check_if(
 
 @switch
 def check_if_not(
-    condition: bool, handle_with: type = AssertionError, message: Optional[str] = None
+    condition: bool,
+    handle_with: type = AssertionError,
+    message: Optional[str] = None,
 ) -> None:
     """Check if a condition is not true.
 
@@ -560,7 +566,8 @@ def check_if_paths_exist(
     if not is_allowed_type:
         _raise(
             TypeError,
-            "Argument paths must be string" " or pathlib.Path or iterable thereof",
+            "Argument paths must be string"
+            " or pathlib.Path or iterable thereof",
         )
 
     error = None
@@ -568,7 +575,9 @@ def check_if_paths_exist(
     if isinstance(paths, (str, Path)):
         paths = (paths,)
 
-    non_existing_paths = [str(path) for path in paths if not Path(path).exists()]
+    non_existing_paths = [
+        str(path) for path in paths if not Path(path).exists()
+    ]
 
     if non_existing_paths:
         if execution_mode == "raise":
@@ -704,7 +713,8 @@ def check_all_ifs(
         message="Provide at least one condition.",
     )
     tuple_error_message = (
-        "Provide all function calls as tuples in the form of " "(check_function, *args)"
+        "Provide all function calls as tuples in the form of "
+        "(check_function, *args)"
     )
     for arg in args:
         check_type(arg, tuple, message=tuple_error_message)
@@ -815,7 +825,10 @@ def check_argument(
     ...         message="Incorrect argument's value")
     ...     assert_if("Incorrect argument's value" in str(w[-1].message))
     """
-    if all(item is None for item in (expected_type, expected_choices, expected_length)):
+    if all(
+        item is None
+        for item in (expected_type, expected_choices, expected_length)
+    ):
         raise ValueError(
             "check_argument() requires at least one condition to be checked"
         )
@@ -832,7 +845,8 @@ def check_argument(
     if expected_type is not None:
         instance_message = (
             message
-            or f"Incorrect type of {argument_name}; valid type(s):" f" {expected_type}"
+            or f"Incorrect type of {argument_name}; valid type(s):"
+            f" {expected_type}"
         )
         check_type(
             item=argument,
@@ -851,7 +865,8 @@ def check_argument(
     if expected_length is not None:
         length_message = (
             message
-            or f"Unexpected length of {argument_name}" f" (should be {expected_length})"
+            or f"Unexpected length of {argument_name}"
+            f" (should be {expected_length})"
         )
         check_length(
             item=argument,
@@ -1103,7 +1118,7 @@ def assert_if(condition: bool, message: Optional[str] = None) -> None:
     __tracebackhide__ = True
     if __debug__:
         if not condition:
-            raise AssertionError(message)
+            raise AssertionError(message or "")
 
 
 @switch
@@ -1128,7 +1143,7 @@ def assert_if_not(condition: bool, message: Optional[str] = None) -> None:
     __tracebackhide__ = True
     if __debug__:
         if condition:
-            raise AssertionError(message)
+            raise AssertionError(message or "")
 
 
 @switch
@@ -1168,7 +1183,7 @@ def assert_if_in_limits(
     __tracebackhide__ = True
     if __debug__:
         if not condition:
-            raise AssertionError(message)
+            raise AssertionError(message or "")
 
 
 @switch
@@ -1209,7 +1224,7 @@ def assert_length(
     __tracebackhide__ = True
     if __debug__:
         if not condition:
-            raise AssertionError(message)
+            raise AssertionError(message or "")
 
 
 @switch
@@ -1240,7 +1255,7 @@ def assert_type(
     if __debug__:
         if expected_type is None:
             if item is not None:
-                raise AssertionError(message)
+                raise AssertionError(message or "")
             return None
 
         if isinstance(expected_type, abc.Iterable):
@@ -1249,14 +1264,13 @@ def assert_type(
             expected_type = tuple(t for t in expected_type if t is not None)
 
         if not isinstance(item, expected_type):
-            raise AssertionError(message)
+            raise AssertionError(message or "")
 
 
 @switch
 def assert_paths(
     paths: Union[PathType, abc.Iterable[PathType]],
     message: Optional[str] = None,
-    execution_mode: str = "raise",
 ) -> Union[None, Tuple[Optional[Any], List[str]]]:
     """Assert if a path or paths exist.
 
@@ -1287,36 +1301,26 @@ def assert_paths(
     """
     __tracebackhide__ = True
     if __debug__:
-        if execution_mode not in ("raise", "return"):
-            raise AssertionError("execution_mode must be either 'raise' or 'return'")
-
         is_allowed_type = isinstance(paths, (str, Path)) or (
             isinstance(paths, abc.Iterable)
             and all(isinstance(path, (str, Path)) for path in paths)
         )
 
         if not is_allowed_type:
-            raise AssertionError("Argument paths must be string" " or pathlib.Path or iterable thereof")
-
-        error = None
+            raise TypeError(
+                "Argument paths must be string"
+                " or pathlib.Path or iterable thereof"
+            )
 
         if isinstance(paths, (str, Path)):
             paths = (paths,)
 
-        non_existing_paths = [str(path) for path in paths if not Path(path).exists()]
+        non_existing_paths = [
+            str(path) for path in paths if not Path(path).exists()
+        ]
 
         if non_existing_paths:
-            if execution_mode == "raise":
-                raise AssertionError(message)
-            elif execution_mode == "return":
-                if message:
-                    error = AssertionError(str(message))
-                else:
-                    error = AssertionError()
-
-        if execution_mode == "return":
-            return error, non_existing_paths
-        return None
+            raise AssertionError(message or "")
 
 
 @switch
@@ -1365,13 +1369,13 @@ def assert_if_isclose(
     Raises:
         Exception of the type provided by the handle_with parameter,
         AssertionError by default.
-        """
+    """
     x = float(x)
     y = float(y)
     __tracebackhide__ = True
     if __debug__:
         if not isclose(x, y, rel_tol=rel_tol, abs_tol=abs_tol):
-            raise AssertionError(message)
+            raise AssertionError(message or "")
 
 
 # Alias to ensure backward compatibility

@@ -1377,13 +1377,7 @@ def test_assert_if_iscolse():
 
 def test_assert_paths():
     existing_file = os.listdir(".")[0]
-    assert check_if_paths_exist(
-        existing_file, execution_mode="return"
-    ) == assert_paths(existing_file, execution_mode="return")
-    assert (
-        check_if_paths_exist("Q:/E/", execution_mode="return")[1]
-        == assert_paths("Q:/E/", execution_mode="return")[1]
-    )
+    assert_paths(existing_file)
     with pytest.raises(AssertionError):
         assert_paths("Q:/E/")
 
