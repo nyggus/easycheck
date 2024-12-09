@@ -1078,28 +1078,16 @@ def get_possible_operators() -> Tuple[Callable, ...]:
     return eq, le, lt, gt, ge, ne, is_, is_not
 
 
-# Aliases to be used for testing. Beware not to use warnings with them.
-
-
-def make_it_true_assertion(func: Callable) -> Callable:
-    @wraps(func)
-    def assert_func(*args: Any, **kwargs: Any) -> Any:
-        __tracebackhide__ = True
-        if __debug__:
-            return func(*args, **kwargs)
-
-    return assert_func
+# Aliases to be used for testing
+# Remember that they raise only AssertionError
 
 
 @switch
-def assert_if(condition: bool, handle_with: type = AssertionError, message: Optional[str] = None
-) -> None:
+def assert_if(condition: bool, message: Optional[str] = None) -> None:
     """Assert if a condition is true.
 
     Args:
         condition (bool): condition to check.
-        handle_with (type): the type of exception to be raised or warning to
-            be issued
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
@@ -1117,14 +1105,13 @@ def assert_if(condition: bool, handle_with: type = AssertionError, message: Opti
         if not condition:
             raise AssertionError(message)
 
+
 @switch
-def assert_if_not(condition: bool, handle_with: type = AssertionError, message: Optional[str] = None
-) -> None:
+def assert_if_not(condition: bool, message: Optional[str] = None) -> None:
     """Assert if a condition is not true.
 
     Args:
         condition (bool): condition to check.
-        handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
@@ -1143,12 +1130,12 @@ def assert_if_not(condition: bool, handle_with: type = AssertionError, message: 
         if condition:
             raise AssertionError(message)
 
+
 @switch
 def assert_if_in_limits(
     x: float,
     lower_limit: float = float("-inf"),
     upper_limit: float = float("inf"),
-    handle_with: type = AssertionError,
     message: Optional[str] = None,
     include_equal: bool = True,
 ) -> None:
@@ -1158,7 +1145,6 @@ def assert_if_in_limits(
         x (float): number to be checked if it's within specified limits
         lower_limit (float): the lower limit of the interval
         upper_limit (float): the upper limit of the interval
-        handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
@@ -1185,12 +1171,10 @@ def assert_if_in_limits(
             raise AssertionError(message)
 
 
-
 @switch
 def assert_length(
     item: Union[abc.Sized | Number],
     expected_length: int,
-    handle_with: type = AssertionError,
     message: Optional[str] = None,
     operator: Callable = eq,
     assign_length_to_others: bool = False,
@@ -1200,7 +1184,6 @@ def assert_length(
     Args:
         item: the object whose length we want to validate
         expected_length (int): the expected length of the item
-        handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
@@ -1233,7 +1216,6 @@ def assert_length(
 def assert_type(
     item: Any,
     expected_type: Union[type, abc.Sequence[type]],
-    handle_with: type = AssertionError,
     message: Optional[str] = None,
 ) -> None:
     """Assert if item has the type of expected_type.
@@ -1269,10 +1251,10 @@ def assert_type(
         if not isinstance(item, expected_type):
             raise AssertionError(message)
 
+
 @switch
 def assert_paths(
     paths: Union[PathType, abc.Iterable[PathType]],
-    handle_with: type = AssertionError,
     message: Optional[str] = None,
     execution_mode: str = "raise",
 ) -> Union[None, Tuple[Optional[Any], List[str]]]:
@@ -1284,7 +1266,6 @@ def assert_paths(
     Args:
         paths (str, pathlib.Path, abc.Sequence[str or pathlib.Path]): path or paths
             to validate
-        handle_with (type): type of exception or warning to be raised/returned
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
@@ -1329,14 +1310,13 @@ def assert_paths(
                 raise AssertionError(message)
             elif execution_mode == "return":
                 if message:
-                    error = handle_with(str(message))
+                    error = AssertionError(str(message))
                 else:
-                    error = handle_with()
+                    error = AssertionError()
 
         if execution_mode == "return":
             return error, non_existing_paths
         return None
-
 
 
 @switch
@@ -1344,7 +1324,6 @@ def assert_if_isclose(
     x: float,
     y: float,
     /,
-    handle_with: type = AssertionError,
     message: Optional[str] = None,
     rel_tol: float = 1e-09,
     abs_tol: float = 0.0,
@@ -1375,7 +1354,6 @@ def assert_if_isclose(
             relative to the magnitude of the input values
         abs_tol (float): maximum difference for being considered "close",
             regardless of the magnitude of the input values
-        handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning

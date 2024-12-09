@@ -40,7 +40,7 @@ When you run doctests, all tests will run without error, as in the below simulat
     ...    assert_if(item == single_string)
     >>> assert_length(string_multiplied, 3)
 
-Do remember, however, *not* to use warnings in testing! Consider the following:
+Do remember, however, that the testing functions use only `AssertionError`! They do not have the `handle_with` argument, as they are designed to work in a similar way to regular assertions, the only difference being specificity of each function.
 
 .. code-block:: python
     
@@ -49,13 +49,4 @@ Do remember, however, *not* to use warnings in testing! Consider the following:
     Traceback (most recent call last):
 	    ...
     AssertionError
-    >>> check_if(2 < 1, ValueError)
-    Traceback (most recent call last):
-        ...
-    ValueError
-    >>> assert_if(2 < 1, handle_with=Warning)
-    >>> assert_if(2 < 1, handle_with=UserWarning)
     
-As you can see, the two last assertions issue warnings (see `here <https://github.com/nyggus/easycheck/blob/master/docs/use_with_warnings_doctest.rst>`_ to learn more about using :code:`easycheck` with warnings), but will not raise exceptions – this could dramatically affect your testing. However, warnings *do not* make the test fail! So, remember this basic rule: Never use warnings in testing when you want to catch critical errors.
-
-**Warning!** Do remember that when you use :code:`assert_*` functions with the :code:`handle_with` argument, you need to use it as a keyword (named) argument.
