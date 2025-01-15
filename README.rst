@@ -64,7 +64,7 @@ The package also offers functions dedicated to testing, e.g.,
 
 The :code:`message` argument has the default value of :code:`None`, which does the following. If the exception class provided in :code:`handle_with` is built-in (that is, can be found in :code:`dir(builtins)`), no message is provided. But if it is not a built-in exception (or warning) class, then the exception/warning class's docstring is taken as the message. This is a convenient way of providing a  typical message. If you want to customize the message (e.g., depending on the value of a variable), you should use a customized string (e.g., through an f-string). But if you do not want to use any message with a custom exception/warning, simply provide an empty string (:code:`message=''`).
 
-**Warning!** Note that when you use :code:`assert_*` functions with the :code:`handle_with` argument, you need to use it as a keyword (named) argument.
+**Warning!** Note that :code:`assert_*` functions do not have the :code:`handle_with` argument. This is because they are designed to work as true assertions, so they work with :code:`AssertionError` only.
 
 
 Read about :code:`easycheck`
