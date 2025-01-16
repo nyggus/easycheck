@@ -10,6 +10,7 @@ The module also offers aliases to be used in testing, all of which have the
 word "assert" in their names (assert_if(), assert_if_not(),
 assert_type(), assert_length(), and assert_path()).
 """
+
 from __future__ import annotations
 
 import builtins
@@ -60,9 +61,10 @@ def switch(func: Callable) -> Callable:
     It does so by getting the EASYCHECK_RUN environmental variable.
     When it's set to "0", easycheck is switched off.
     """
-    __tracebackhide__ = True
+
     @wraps(func)
     def inner(*args: Any, **kwargs: Any) -> Any:
+        __tracebackhide__ = True
         if os.environ.get("EASYCHECK_RUN", 1) != "0":
             return func(*args, **kwargs)
 
@@ -71,7 +73,9 @@ def switch(func: Callable) -> Callable:
 
 @switch
 def check_if(
-    condition: bool, handle_with: type = AssertionError, message: Optional[str] = None
+    condition: bool,
+    handle_with: type = AssertionError,
+    message: Optional[str] = None,
 ) -> None:
     """Check if a condition is true.
 
@@ -136,14 +140,15 @@ def check_if(
     ...     check_if(2 < 1, Warning, '2 is not smaller than 1')
     ...     assert_if("2 is not smaller than 1" in str(w[-1].message))
     """
-    __tracebackhide__ = True
     if not condition:
         _raise(handle_with, message)
 
 
 @switch
 def check_if_not(
-    condition: bool, handle_with: type = AssertionError, message: Optional[str] = None
+    condition: bool,
+    handle_with: type = AssertionError,
+    message: Optional[str] = None,
 ) -> None:
     """Check if a condition is not true.
 
@@ -208,7 +213,6 @@ def check_if_not(
     ...     check_if_not(2 > 1, Warning, '2 is bigger than 1')
     ...     assert_if("2 is bigger than 1" in str(w[-1].message))
     """
-    __tracebackhide__ = True
     if condition:
         _raise(handle_with, message)
 
@@ -262,7 +266,6 @@ def check_if_in_limits(
     >>> with warnings.catch_warnings():
     ...     check_if_in_limits(5, 1, 3, Warning)
     """
-    __tracebackhide__ = True
     x = float(x)
     if include_equal:
         condition = lower_limit <= x <= upper_limit
@@ -321,7 +324,6 @@ def check_length(
     >>> with warnings.catch_warnings():
     ...     check_length('string', 6, Warning)
     """
-    __tracebackhide__ = True
     if assign_length_to_others:
         if isinstance(item, (Number, bool)):
             item = [item]
@@ -395,7 +397,6 @@ def check_type(
     To issue a warning, do the following:
     >>> check_type('a', (str, None), Warning, 'Undesired instance')
     """
-    __tracebackhide__ = True
     if expected_type is None:
         if item is not None:
             _raise(handle_with, message)
@@ -483,7 +484,6 @@ def check_if_isclose(
         ...
     ValueError
     """
-    __tracebackhide__ = True
     x = float(x)
     y = float(y)
 
@@ -555,7 +555,6 @@ def check_if_paths_exist(
     ...    message='Attempt to use a non-existing path')
     (Warning('Attempt to use a non-existing path'), ['Q:/Op/Oop'])
     """
-    __tracebackhide__ = True
     if execution_mode not in ("raise", "return"):
         _raise(ValueError, "execution_mode must be either 'raise' or 'return'")
 
@@ -567,7 +566,8 @@ def check_if_paths_exist(
     if not is_allowed_type:
         _raise(
             TypeError,
-            "Argument paths must be string" " or pathlib.Path or iterable thereof",
+            "Argument paths must be string"
+            " or pathlib.Path or iterable thereof",
         )
 
     error = None
@@ -575,7 +575,9 @@ def check_if_paths_exist(
     if isinstance(paths, (str, Path)):
         paths = (paths,)
 
-    non_existing_paths = [str(path) for path in paths if not Path(path).exists()]
+    non_existing_paths = [
+        str(path) for path in paths if not Path(path).exists()
+    ]
 
     if non_existing_paths:
         if execution_mode == "raise":
@@ -646,7 +648,6 @@ def check_comparison(
     ...         message='Not less!')
     ...     assert_if("Not less" in str(w[-1].message))
     """
-    __tracebackhide__ = True
     if not operator(item_1, item_2):
         _raise(handle_with, message)
 
@@ -704,7 +705,6 @@ def check_all_ifs(
     ...    )
     {'1: check_if': True, '2: check_if_not': Warning('It might be wrong!')}
     """
-    __tracebackhide__ = True
     check_length(
         args,
         0,
@@ -713,7 +713,8 @@ def check_all_ifs(
         message="Provide at least one condition.",
     )
     tuple_error_message = (
-        "Provide all function calls as tuples in the form of " "(check_function, *args)"
+        "Provide all function calls as tuples in the form of "
+        "(check_function, *args)"
     )
     for arg in args:
         check_type(arg, tuple, message=tuple_error_message)
@@ -824,8 +825,10 @@ def check_argument(
     ...         message="Incorrect argument's value")
     ...     assert_if("Incorrect argument's value" in str(w[-1].message))
     """
-    __tracebackhide__ = True
-    if all(item is None for item in (expected_type, expected_choices, expected_length)):
+    if all(
+        item is None
+        for item in (expected_type, expected_choices, expected_length)
+    ):
         raise ValueError(
             "check_argument() requires at least one condition to be checked"
         )
@@ -842,7 +845,8 @@ def check_argument(
     if expected_type is not None:
         instance_message = (
             message
-            or f"Incorrect type of {argument_name}; valid type(s):" f" {expected_type}"
+            or f"Incorrect type of {argument_name}; valid type(s):"
+            f" {expected_type}"
         )
         check_type(
             item=argument,
@@ -861,7 +865,8 @@ def check_argument(
     if expected_length is not None:
         length_message = (
             message
-            or f"Unexpected length of {argument_name}" f" (should be {expected_length})"
+            or f"Unexpected length of {argument_name}"
+            f" (should be {expected_length})"
         )
         check_length(
             item=argument,
@@ -944,7 +949,6 @@ def catch_check(
     ...    message='Beware of this problem')
     UserWarning('Beware of this problem')
     """
-    __tracebackhide__ = True
     check_if(
         check_function in ALL_FUNCTIONS,
         handle_with=TypeError,
@@ -1045,7 +1049,6 @@ def _raise(error, message=None):
     ...    _raise(Warning, 'Watch out! Something might be wrong.')
     ...    assert_if('Watch out!' in str(w[-1].message))
     """
-    __tracebackhide__ = True
     if not isinstance(error, type) or not issubclass(error, Exception):
         raise TypeError("The error argument must be an exception or a warning")
 
@@ -1090,66 +1093,289 @@ def get_possible_operators() -> Tuple[Callable, ...]:
     return eq, le, lt, gt, ge, ne, is_, is_not
 
 
-# Aliases to be used for testing. Beware not to use warnings with them.
-
-
-def make_it_true_assertion(func: Callable) -> Callable:
-    @wraps(func)
-    def assert_func(*args: Any, **kwargs: Any) -> Any:
-        if __debug__:
-            return func(*args, **kwargs)
-
-    return assert_func
+# Aliases to be used for testing
+# Remember that they raise only AssertionError
 
 
 @switch
-@make_it_true_assertion
-def assert_if(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
-    return check_if(*args, handle_with=handle_with, **kwargs)
+def assert_if(condition: bool, message: Optional[str] = None) -> None:
+    """Assert if a condition is true.
+
+    Args:
+        condition (bool): condition to check.
+        message (str): a text to use as the exception/warning message.
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+
+    Returns:
+        None, if check succeeded.
+
+    Raises:
+        Exception of the type provided by the handle_with parameter,
+        AssertionError by default (unless handle_with is a warning).
+    """
+    __tracebackhide__ = True
+    if __debug__:
+        if not condition:
+            raise AssertionError(message or "")
 
 
 @switch
-@make_it_true_assertion
-def assert_if_not(
-    *args: Any, handle_with: type = AssertionError, **kwargs: Any
-) -> None:
-    return check_if_not(*args, handle_with=handle_with, **kwargs)
+def assert_if_not(condition: bool, message: Optional[str] = None) -> None:
+    """Assert if a condition is not true.
+
+    Args:
+        condition (bool): condition to check.
+        message (str): a text to use as the exception/warning message.
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+
+
+    Returns:
+        None, if check succeeded.
+
+    Raises:
+        Exception of the type provided by the handle_with parameter,
+        AssertionError by default (unless handle_with is a warning).
+    """
+    __tracebackhide__ = True
+    if __debug__:
+        if condition:
+            raise AssertionError(message or "")
 
 
 @switch
-@make_it_true_assertion
 def assert_if_in_limits(
-    *args: Any, handle_with: type = AssertionError, **kwargs: Any
+    x: float,
+    lower_limit: float = float("-inf"),
+    upper_limit: float = float("inf"),
+    message: Optional[str] = None,
+    include_equal: bool = True,
 ) -> None:
-    return check_if_in_limits(*args, handle_with=handle_with, **kwargs)
+    """Assert if number is in range of limits
+
+    Args:
+        x (float): number to be checked if it's within specified limits
+        lower_limit (float): the lower limit of the interval
+        upper_limit (float): the upper limit of the interval
+        message (str): a text to use as the exception/warning message.
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+        include_equal (bool): True for strict checks (lower ≤ x ≤ upper),
+        False otherwise (lower < x < upper)
+
+    Returns:
+        None, if check succeeded.
+
+    Raises:
+        Exception of the type provided by the handle_with parameter, AssertionError
+        by default (unless handle_with is a warning).
+    """
+    x = float(x)
+    if include_equal:
+        condition = lower_limit <= x <= upper_limit
+    else:
+        condition = lower_limit < x < upper_limit
+
+    __tracebackhide__ = True
+    if __debug__:
+        if not condition:
+            raise AssertionError(message or "")
 
 
 @switch
-@make_it_true_assertion
 def assert_length(
-    *args: Any, handle_with: type = AssertionError, **kwargs: Any
+    item: Union[abc.Sized | Number],
+    expected_length: int,
+    message: Optional[str] = None,
+    operator: Callable = eq,
+    assign_length_to_others: bool = False,
 ) -> None:
-    return check_length(*args, handle_with=handle_with, **kwargs)
+    """Compare item's length with expected_length, using operator.
+
+    Args:
+        item: the object whose length we want to validate
+        expected_length (int): the expected length of the item
+        message (str): a text to use as the exception/warning message.
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+        operator: one of the functions returned by get_possible_operators()
+        assign_length_to_others (bool): treat all numeric types as having the
+            length of 1. If False, any attempt to validate a numeric type
+            will raise an exception/warning, as numeric types don't implement
+            __len__()
+
+    Returns:
+        None, if check succeeded.
+
+    Raises:
+        Exception of the type provided by the handle_with parameter, AssertionError
+        by default (unless handle_with is a warning).
+    """
+    if assign_length_to_others:
+        if isinstance(item, (Number, bool)):
+            item = [item]
+
+    condition = operator(len(item), expected_length)  # type: ignore
+    __tracebackhide__ = True
+    if __debug__:
+        if not condition:
+            raise AssertionError(message or "")
 
 
 @switch
-@make_it_true_assertion
-def assert_type(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
-    return check_type(*args, handle_with=handle_with, **kwargs)
+def assert_type(
+    item: Any,
+    expected_type: Union[type, abc.Sequence[type]],
+    message: Optional[str] = None,
+) -> None:
+    """Assert if item has the type of expected_type.
+
+    Args:
+        item: the object whose type we want to validate
+        expected_type (type, Iterable[type]): the expected type of the item
+        handle_with (type): the type of exception or warning to be raised
+        message (str): a text to use as the exception/warning message.
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+
+    Returns:
+        None, if check succeeded.
+
+    Raises:
+        Exception of the type provided by the handle_with parameter, AssertionError
+        by default.
+    """
+    __tracebackhide__ = True
+    if __debug__:
+        if expected_type is None:
+            if item is not None:
+                raise AssertionError(message or "")
+            return None
+
+        if isinstance(expected_type, abc.Iterable):
+            if item is None and any(t is None for t in expected_type):
+                return None
+            expected_type = tuple(t for t in expected_type if t is not None)
+
+        if not isinstance(item, expected_type):
+            raise AssertionError(message or "")
 
 
 @switch
-@make_it_true_assertion
-def assert_paths(*args: Any, handle_with: type = AssertionError, **kwargs: Any) -> None:
-    return check_if_paths_exist(*args, handle_with=handle_with, **kwargs)
+def assert_paths(
+    paths: Union[PathType, abc.Iterable[PathType]],
+    message: Optional[str] = None,
+) -> Union[None, Tuple[Optional[Any], List[str]]]:
+    """Assert if a path or paths exist.
+
+    If it does not, either raise (or return) an exception or issue (or return)
+    a warning.
+
+    Args:
+        paths (str, pathlib.Path, abc.Sequence[str or pathlib.Path]): path or paths
+            to validate
+        message (str): a text to use as the exception/warning message.
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+        execution_mode (str): defines what happens if not all the paths exist
+            May take one of the following values:
+                - 'raise': exception/warning will be raised
+                - 'return': function will return information about the errors
+
+    Returns:
+        None, if execution_mode is 'raise' and check succeeded
+        A tuple, if execution_mode is 'return'. The tuple has two elements:
+            - an instance of the type provided by the handle_with parameter
+            - a list of the non-existing paths
+
+    Raises:
+        Exception of the type provided by the handle_with parameter,
+        AssertionError by default (unless handle_with is a warning).
+    """
+    __tracebackhide__ = True
+    if __debug__:
+        is_allowed_type = isinstance(paths, (str, Path)) or (
+            isinstance(paths, abc.Iterable)
+            and all(isinstance(path, (str, Path)) for path in paths)
+        )
+
+        if not is_allowed_type:
+            raise TypeError(
+                "Argument paths must be string"
+                " or pathlib.Path or iterable thereof"
+            )
+
+        if isinstance(paths, (str, Path)):
+            paths = (paths,)
+
+        non_existing_paths = [
+            str(path) for path in paths if not Path(path).exists()
+        ]
+
+        if non_existing_paths:
+            raise AssertionError(message or "")
 
 
 @switch
-@make_it_true_assertion
 def assert_if_isclose(
-    *args: Any, handle_with: type = AssertionError, **kwargs: Any
+    x: float,
+    y: float,
+    /,
+    message: Optional[str] = None,
+    rel_tol: float = 1e-09,
+    abs_tol: float = 0.0,
 ) -> None:
-    return check_if_isclose(*args, handle_with=handle_with, **kwargs)
+    """Assert if two floats are close in value.
+
+    The function is just a wrapper around math.isclose(), and its defaults
+    are exactly the same. Two values (x and y, both being positional-only
+    parameters) will be considered close when the difference between them
+    (either relative or absolute) is smaller than at least one of the
+    tolerances. If you do not want to use any of the two tolerances, set it
+    to 0.
+
+    Note: Before applying math.isclose(), x and y are first converted to
+    floats, so you can provide them as integers or even strings.
+
+    At least one tolerance needs to be provided (so not be zero); otherwise
+    the function will do nothing.
+
+    Unlike most easycheck functions, assert_if_isclose() uses two
+    positional-only and four keyword-only arguments. So when providing one of
+    the two tolerances, you have to specify it using the argument's name. You
+    have to do the same also for handle_with and message.
+
+    Args:
+        x, y (float): two numbers to compare
+        rel_tol (float): maximum difference for being considered "close",
+            relative to the magnitude of the input values
+        abs_tol (float): maximum difference for being considered "close",
+            regardless of the magnitude of the input values
+        message (str): a text to use as the exception/warning message.
+            Defaults to None, which means using no message for built-in
+            exceptions/warnings, and the docstrings of the exception/warning
+            class as a message for custom exceptions.
+
+    Returns:
+        None, if check succeeded.
+
+    Raises:
+        Exception of the type provided by the handle_with parameter,
+        AssertionError by default.
+    """
+    x = float(x)
+    y = float(y)
+    __tracebackhide__ = True
+    if __debug__:
+        if not isclose(x, y, rel_tol=rel_tol, abs_tol=abs_tol):
+            raise AssertionError(message or "")
 
 
 # Alias to ensure backward compatibility
