@@ -15,7 +15,10 @@ This will raise a warning (of the :code:`Warning` class), with a default (and un
 
 .. code-block:: python
 
+    >>> import warnings
+    >>> warnings.filterwarnings("ignore")
     >>> check_if(2 > 2, Warning, 'Incorrect value')
+    >>> warnings.filterwarnings("default")
 	
 By using the :code:`easycheck` module, your warnings can be as informative as the message you provide (for example, :code:`Warning: Incorrect value`, although you can make it much more specific). You really should define messages for all warnings, since while an exception without a message can be informative, a warning without a message is not.
 
