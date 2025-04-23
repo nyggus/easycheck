@@ -36,10 +36,6 @@ from easycheck.easycheck import (
     _raise,
 )
 
-@pytest.mark.skip(reason="nie chce mi się testować tego testu bo jest gupi jak marchewka!")
-def test_something():
-    ...
-
 def test_check_if_edge_cases():
     with pytest.raises(TypeError, match="required positional argument"):
         check_if()
