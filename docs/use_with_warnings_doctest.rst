@@ -6,7 +6,10 @@ One of the aims of the :code:`easycheck` package is to enable you to issue a war
 .. code-block:: python
 
     >>> from easycheck import check_if, check_type, check_length
+    >>> import warnings
+    >>> warnings.filterwarnings("ignore", category=UserWarning)
     >>> check_if(2 > 2, Warning)
+    >>> warnings.filterwarnings("default", category=UserWarning)
 
 This will raise a warning (of the :code:`Warning` class), with a default (and unhelpful) message 'Warning', leading to the warning :code:`Warning: Warning`. To change this (rather unhelpful) message, use the :code:`message` parameter, as below:
 
