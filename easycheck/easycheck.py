@@ -870,7 +870,7 @@ def check_argument(
         )
         check_length(
             item=argument,
-            expected_length=expected_length,
+            compare_to=expected_length,
             handle_with=handle_with,
             message=length_message,
             **kwargs,

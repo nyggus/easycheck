@@ -1225,39 +1225,39 @@ def test_check_argument_length():
         is None
     )
 
-    # def foo(x):
-    #     check_argument(x, "x", expected_length=3, assign_length_to_others=True)
-    #     pass
+    def foo(x):
+        check_argument(x, "x", expected_length=3, assign_length_to_others=True)
+        pass
 
-    # assert foo([1, 2, 3]) is None
-    # with pytest.raises(ArgumentValueError):
-    #     foo(1)
+    assert foo([1, 2, 3]) is None
+    with pytest.raises(ArgumentValueError):
+        foo(1)
 
-    # def foo(x):
-    #     check_argument(x, expected_length=3, assign_length_to_others=True)
-    #     pass
+    def foo(x):
+        check_argument(x, expected_length=3, assign_length_to_others=True)
+        pass
 
-    # assert foo([1, 2, 3]) is None
-    # with pytest.raises(ArgumentValueError):
-    #     foo(1)
+    assert foo([1, 2, 3]) is None
+    with pytest.raises(ArgumentValueError):
+        foo(1)
 
-    # def foo(big_x):
-    #     check_argument(
-    #         big_x, "big_x", expected_length=3, assign_length_to_others=True
-    #     )
-    #     pass
+    def foo(big_x):
+        check_argument(
+            big_x, "big_x", expected_length=3, assign_length_to_others=True
+        )
+        pass
 
-    # assert foo([1, 2, 3]) is None
-    # with pytest.raises(ArgumentValueError, match="big_x"):
-    #     foo(1)
+    assert foo([1, 2, 3]) is None
+    with pytest.raises(ArgumentValueError, match="big_x"):
+        foo(1)
 
-    # def foo(big_x):
-    #     check_argument(big_x, expected_length=3, assign_length_to_others=True)
-    #     pass
+    def foo(big_x):
+        check_argument(big_x, expected_length=3, assign_length_to_others=True)
+        pass
 
-    # assert foo([1, 2, 3]) is None
-    # with pytest.raises(ArgumentValueError, match="argument"):
-    #     foo(1)
+    assert foo([1, 2, 3]) is None
+    with pytest.raises(ArgumentValueError, match="argument"):
+        foo(1)
 
 
 def test_check_argument_length_warnings():
