@@ -34,7 +34,7 @@ You can use warnings in most :code:`easycheck` functions, and you can catch them
     >>> from easycheck import catch_check
     >>> catch_check(check_length,
     ...    [1, 2, 3],
-    ...    expected_length=5,
+    ...    compare_to=5,
     ...    handle_with=Warning,
     ...    message='The list should be 5-element long')
     Warning('The list should be 5-element long')
