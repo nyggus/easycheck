@@ -279,17 +279,17 @@ def check_if_in_limits(
 @switch
 def check_length(
     item: Union[abc.Sized | Number],
-    expected_length: int,
+    compare_to: int,
     handle_with: type = LengthError,
     message: Optional[str] = None,
     operator: Callable = eq,
     assign_length_to_others: bool = False,
 ) -> None:
-    """Compare item's length with expected_length, using operator.
+    """Compare item's length with compare_to, using operator.
 
     Args:
         item: the object whose length we want to validate
-        expected_length (int): the expected length of the item
+        compare_to (int): the value to compare the item's length to
         handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
@@ -328,7 +328,7 @@ def check_length(
         if isinstance(item, (Number, bool)):
             item = [item]
 
-    condition = operator(len(item), expected_length)  # type: ignore
+    condition = operator(len(item), compare_to)  # type: ignore
     if not condition:
         _raise(handle_with, message)
 
