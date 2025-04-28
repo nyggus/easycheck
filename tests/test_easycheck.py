@@ -58,6 +58,30 @@ def test_check_if_edge_cases():
         check_if(1, 1, 1, 1)
 
 
+def test_check_if_various_types():
+    with pytest.raises(AssertionError):
+        check_if([])
+    with pytest.raises(AssertionError):
+        check_if({})
+    with pytest.raises(AssertionError):
+        check_if(())
+    with pytest.raises(AssertionError):
+        check_if(set())
+    assert check_if([1, 2, 3]) is None
+    assert check_if({'a': 1}) is None
+    assert check_if((0,)) is None
+    assert check_if({1}) is None
+    with pytest.raises(AssertionError):
+        check_if(None)
+    with pytest.raises(AssertionError):
+        check_if(0)
+    assert check_if(1) is None
+    assert check_if(-1) is None
+    with pytest.raises(AssertionError):
+        check_if("")
+    assert check_if("non-empty") is None
+
+
 def test_check_if_positive():
     assert check_if(2 > 1) is None
     assert check_if(2 > 1, Warning) is None
@@ -144,6 +168,30 @@ def test_check_if_not_edge_cases():
         check_if_not(1, ValueError, 1)
     with pytest.raises(TypeError, match="takes from 1 to 3 positional"):
         check_if_not(1, 1, 1, 1)
+
+
+def test_check_if_not_various_types():
+    with pytest.raises(AssertionError):
+        check_if_not([1, 2, 3])	
+    with pytest.raises(AssertionError):
+        check_if_not({'a': 1})
+    with pytest.raises(AssertionError):
+        check_if_not((0,))
+    with pytest.raises(AssertionError):
+        check_if_not({1})
+    assert check_if_not([]) is None
+    assert check_if_not({}) is None
+    assert check_if_not(()) is None
+    assert check_if_not(set()) is None
+    assert check_if_not(None) is None
+    assert check_if_not(0) is None
+    with pytest.raises(AssertionError):
+        check_if_not(1)
+    with pytest.raises(AssertionError):
+        check_if_not(-1)
+    assert check_if_not("") is None
+    with pytest.raises(AssertionError):
+        check_if_not("non-empty")
 
 
 def test_check_if_not_positive():
