@@ -80,7 +80,7 @@ def check_if(
     """Check if a condition is true.
 
     Args:
-        condition (Any): condition to check.
+        condition (Any): condition to check; evaluated in a boolean context.
         handle_with (type): the type of exception to be raised or warning to
             be issued
         message (str): a text to use as the exception/warning message.
@@ -153,7 +153,7 @@ def check_if_not(
     """Check if a condition is not true.
 
     Args:
-        condition (Any): condition to check.
+        condition (Any): condition to check; evaluated in a boolean context.
         handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
