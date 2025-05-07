@@ -743,7 +743,7 @@ def check_argument(
     argument_name: Optional[str] = None,
     expected_type: Union[type, abc.Sequence[type], None] = None,
     expected_choices: Optional[abc.Sequence[T]] = None,
-    expected_length: Optional[int] = None,
+    compare_length_to: Optional[int] = None,
     handle_with: type = ArgumentValueError,
     message: Optional[str] = None,
     **kwargs: Any,
@@ -758,7 +758,7 @@ def check_argument(
             the default text 'argument'
         expected_type (type, Iterable[type]): the expected type of the item
         expected_choices (Iterable): a list of acceptable values of argument
-        expected_length (int): the expected length of the item
+        compare_length_to (int): the expected length of the item
         handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
@@ -786,7 +786,7 @@ def check_argument(
     >>> check_argument(
     ...    [1, 2, 3], 'x',
     ...    expected_type=tuple,
-    ...    expected_length=3
+    ...    compare_length_to=3
     ...    )
     Traceback (most recent call last):
         ...
@@ -827,7 +827,7 @@ def check_argument(
     """
     if all(
         item is None
-        for item in (expected_type, expected_choices, expected_length)
+        for item in (expected_type, expected_choices, compare_length_to)
     ):
         raise ValueError(
             "check_argument() requires at least one condition to be checked"
@@ -862,15 +862,15 @@ def check_argument(
         )
         if argument not in expected_choices:
             _raise(handle_with, choices_message)
-    if expected_length is not None:
+    if compare_length_to is not None:
         length_message = (
             message
             or f"Unexpected length of {argument_name}"
-            f" (should be {expected_length})"
+            f" (should be {compare_length_to})"
         )
         check_length(
             item=argument,
-            compare_to=expected_length,
+            compare_to=compare_length_to,
             handle_with=handle_with,
             message=length_message,
             **kwargs,
