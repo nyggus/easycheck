@@ -751,20 +751,20 @@ def check_argument(
     """Check if the user provided a correct argument value.
 
     Args:
-        argument: argument value to be validated
-        argument_name (str): original name of the argument in the calling
+        argument (T): argument value to be validated
+        argument_name (Optional[str]): original name of the argument in the calling
             function. If argument_name is not defined, the error messages will
             not include the name of the argument, but will instead only report
             the default text 'argument'
-        expected_type (type, Iterable[type]): the expected type of the item
-        expected_choices (Iterable): a list of acceptable values of argument
-        compare_length_to (int): the value to compare the argument's length to
+        expected_type (Union[type, abc.Sequence[type], None]): the expected type of the item
+        expected_choices (Optional[abc.Sequence[T]]): a list of acceptable values of argument
+        compare_length_to (Optional[int]): the value to compare the argument's length to
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message.
+        message (Optional[str]): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
-        **kwargs: additional arguments passed to check_length (i.e.,
+        **kwargs (Any): additional arguments passed to check_length (i.e.,
             operator=eq and assign_length_to_others)
 
     Returns:
