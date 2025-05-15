@@ -1331,7 +1331,7 @@ def test_check_argument_mix():
 def test_check_argument_mix_warnings():
     def foo(x):
         check_argument(
-            x, "x", expected_type=int, compare_to=3, handle_with=Warning
+            x, "x", expected_type=int, compare_length_to=3, handle_with=Warning
         )
         pass
 
