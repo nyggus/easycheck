@@ -758,7 +758,7 @@ def check_argument(
             the default text 'argument'
         expected_type (type, Iterable[type]): the expected type of the item
         expected_choices (Iterable): a list of acceptable values of argument
-        compare_length_to (int): the expected length of the item
+        compare_length_to (int): the value to compare the argument's length to
         handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
