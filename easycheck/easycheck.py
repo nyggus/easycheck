@@ -1189,16 +1189,16 @@ def assert_if_in_limits(
 @switch
 def assert_length(
     item: abc.Sized | Number,
-    expected_length: int,
+    compare_lenght_to: int,
     message: Optional[str] = None,
     operator: Callable = eq,
     assign_length_to_others: bool = False,
 ) -> None:
-    """Compare item's length with expected_length, using operator.
+    """Compares the length of `item` to `compare_to` using the specified `operator`.
 
     Args:
         item: the object whose length we want to validate
-        expected_length (int): the expected length of the item
+        compare_lenght_to (int): the value to compare the length of item to.
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
@@ -1220,7 +1220,7 @@ def assert_length(
         if isinstance(item, (Number, bool)):
             item = [item]
 
-    condition = operator(len(item), expected_length)  # type: ignore
+    condition = operator(len(item), compare_length_to)  # type: ignore
     __tracebackhide__ = True
     if __debug__:
         if not condition:
