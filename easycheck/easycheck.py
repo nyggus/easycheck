@@ -1189,7 +1189,7 @@ def assert_if_in_limits(
 @switch
 def assert_length(
     item: abc.Sized | Number,
-    compare_lenght_to: int,
+    compare_length_to: int,
     message: Optional[str] = None,
     operator: Callable = eq,
     assign_length_to_others: bool = False,
