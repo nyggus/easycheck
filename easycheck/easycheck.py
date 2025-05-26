@@ -278,7 +278,7 @@ def check_if_in_limits(
 
 @switch
 def check_length(
-    item: Union[abc.Sized | Number],
+    item: abc.Sized | Number,
     compare_to: int,
     handle_with: type = LengthError,
     message: Optional[str] = None,
@@ -1188,7 +1188,7 @@ def assert_if_in_limits(
 
 @switch
 def assert_length(
-    item: Union[abc.Sized | Number],
+    item: abc.Sized | Number,
     expected_length: int,
     message: Optional[str] = None,
     operator: Callable = eq,
