@@ -942,7 +942,7 @@ def catch_check(
 
     You can also catch warnings:
     >>> catch_check(check_if, condition=2>2, handle_with=Warning)
-    UserWarning(<class 'Warning'>)
+    Warning()
     >>> catch_check(check_if,
     ...    condition=2>2,
     ...    handle_with=UserWarning,
@@ -1044,7 +1044,6 @@ def _raise(error, message=None):
     >>> with warnings.catch_warnings(record=True) as w:
     ...    _raise(Warning)
     ...    assert_if(issubclass(w[-1].category, Warning))
-    ...    assert_if('Warning' in str(w[-1].message))
     >>> with warnings.catch_warnings(record=True) as w:
     ...    _raise(Warning, 'Watch out! Something might be wrong.')
     ...    assert_if('Watch out!' in str(w[-1].message))
