@@ -1070,7 +1070,7 @@ def _raise(error, message=None):
         if message:
             warnings.warn(message, error)
         else:
-            warnings.warn(error)
+            warnings.warn(error())
     elif issubclass(error, Exception):
         if message:
             raise error(message)
