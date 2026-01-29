@@ -278,18 +278,18 @@ def check_if_in_limits(
 
 @switch
 def check_length(
-    item: Union[abc.Sized | Number],
-    expected_length: int,
+    item: abc.Sized | Number,
+    compare_to: int,
     handle_with: type = LengthError,
     message: Optional[str] = None,
     operator: Callable = eq,
     assign_length_to_others: bool = False,
 ) -> None:
-    """Compare item's length with expected_length, using operator.
+    """Compare item's length with compare_to, using operator.
 
     Args:
         item: the object whose length we want to validate
-        expected_length (int): the expected length of the item
+        compare_to (int): the value to compare the item's length to
         handle_with (type): the type of exception or warning to be raised
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
@@ -328,7 +328,7 @@ def check_length(
         if isinstance(item, (Number, bool)):
             item = [item]
 
-    condition = operator(len(item), expected_length)  # type: ignore
+    condition = operator(len(item), compare_to)  # type: ignore
     if not condition:
         _raise(handle_with, message)
 
@@ -743,7 +743,7 @@ def check_argument(
     argument_name: Optional[str] = None,
     expected_type: Union[type, abc.Sequence[type], None] = None,
     expected_choices: Optional[abc.Sequence[T]] = None,
-    expected_length: Optional[int] = None,
+    compare_length_to: Optional[int] = None,
     handle_with: type = ArgumentValueError,
     message: Optional[str] = None,
     **kwargs: Any,
@@ -751,20 +751,20 @@ def check_argument(
     """Check if the user provided a correct argument value.
 
     Args:
-        argument: argument value to be validated
-        argument_name (str): original name of the argument in the calling
+        argument (T): argument value to be validated
+        argument_name (Optional[str]): original name of the argument in the calling
             function. If argument_name is not defined, the error messages will
             not include the name of the argument, but will instead only report
             the default text 'argument'
-        expected_type (type, Iterable[type]): the expected type of the item
-        expected_choices (Iterable): a list of acceptable values of argument
-        expected_length (int): the expected length of the item
+        expected_type (Union[type, abc.Sequence[type], None]): the expected type of the item
+        expected_choices (Optional[abc.Sequence[T]]): a list of acceptable values of argument
+        compare_length_to (Optional[int]): the value to compare the argument's length to
         handle_with (type): the type of exception or warning to be raised
-        message (str): a text to use as the exception/warning message.
+        message (Optional[str]): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
             class as a message for custom exceptions.
-        **kwargs: additional arguments passed to check_length (i.e.,
+        **kwargs (Any): additional arguments passed to check_length (i.e.,
             operator=eq and assign_length_to_others)
 
     Returns:
@@ -786,7 +786,7 @@ def check_argument(
     >>> check_argument(
     ...    [1, 2, 3], 'x',
     ...    expected_type=tuple,
-    ...    expected_length=3
+    ...    compare_length_to=3
     ...    )
     Traceback (most recent call last):
         ...
@@ -827,7 +827,7 @@ def check_argument(
     """
     if all(
         item is None
-        for item in (expected_type, expected_choices, expected_length)
+        for item in (expected_type, expected_choices, compare_length_to)
     ):
         raise ValueError(
             "check_argument() requires at least one condition to be checked"
@@ -862,15 +862,15 @@ def check_argument(
         )
         if argument not in expected_choices:
             _raise(handle_with, choices_message)
-    if expected_length is not None:
+    if compare_length_to is not None:
         length_message = (
             message
             or f"Unexpected length of {argument_name}"
-            f" (should be {expected_length})"
+            f" (should be {compare_length_to})"
         )
         check_length(
             item=argument,
-            expected_length=expected_length,
+            compare_to=compare_length_to,
             handle_with=handle_with,
             message=length_message,
             **kwargs,
@@ -1188,17 +1188,17 @@ def assert_if_in_limits(
 
 @switch
 def assert_length(
-    item: Union[abc.Sized | Number],
-    expected_length: int,
+    item: abc.Sized | Number,
+    compare_length_to: int,
     message: Optional[str] = None,
     operator: Callable = eq,
     assign_length_to_others: bool = False,
 ) -> None:
-    """Compare item's length with expected_length, using operator.
+    """Compares the length of `item` to `compare_to` using the specified `operator`.
 
     Args:
         item: the object whose length we want to validate
-        expected_length (int): the expected length of the item
+        compare_lenght_to (int): the value to compare the length of item to.
         message (str): a text to use as the exception/warning message.
             Defaults to None, which means using no message for built-in
             exceptions/warnings, and the docstrings of the exception/warning
@@ -1220,7 +1220,7 @@ def assert_length(
         if isinstance(item, (Number, bool)):
             item = [item]
 
-    condition = operator(len(item), expected_length)  # type: ignore
+    condition = operator(len(item), compare_length_to)  # type: ignore
     __tracebackhide__ = True
     if __debug__:
         if not condition:

@@ -309,7 +309,7 @@ def test_check_length_negative_warnings():
     with warnings.catch_warnings(record=True) as w:
         check_length(
             [1, 2],
-            expected_length=1,
+            compare_to=1,
             handle_with=Warning,
             message="This is a testing warning",
         )
@@ -559,7 +559,7 @@ def test_catch_check_length():
     my_check = catch_check(
         check_length,
         [2, 2],
-        expected_length=2,
+        compare_to=2,
         handle_with=Warning,
         message="Length problem",
     )
@@ -573,7 +573,7 @@ def test_catch_check_length():
     my_check = catch_check(
         check_length,
         [2, 2],
-        expected_length=3,
+        compare_to=3,
         handle_with=Warning,
         message="Length problem",
     )
@@ -1216,17 +1216,17 @@ def test_check_argument_choices_warnings():
 def test_check_argument_length():
     assert (
         check_argument(
-            5, "my_arg", expected_length=1, assign_length_to_others=True
+            5, "my_arg", compare_length_to=1, assign_length_to_others=True
         )
         is None
     )
     assert (
-        check_argument(5, expected_length=1, assign_length_to_others=True)
+        check_argument(5, compare_length_to=1, assign_length_to_others=True)
         is None
     )
 
     def foo(x):
-        check_argument(x, "x", expected_length=3, assign_length_to_others=True)
+        check_argument(x, "x", compare_length_to=3, assign_length_to_others=True)
         pass
 
     assert foo([1, 2, 3]) is None
@@ -1234,7 +1234,7 @@ def test_check_argument_length():
         foo(1)
 
     def foo(x):
-        check_argument(x, expected_length=3, assign_length_to_others=True)
+        check_argument(x, compare_length_to=3, assign_length_to_others=True)
         pass
 
     assert foo([1, 2, 3]) is None
@@ -1243,7 +1243,7 @@ def test_check_argument_length():
 
     def foo(big_x):
         check_argument(
-            big_x, "big_x", expected_length=3, assign_length_to_others=True
+            big_x, "big_x", compare_length_to=3, assign_length_to_others=True
         )
         pass
 
@@ -1252,7 +1252,7 @@ def test_check_argument_length():
         foo(1)
 
     def foo(big_x):
-        check_argument(big_x, expected_length=3, assign_length_to_others=True)
+        check_argument(big_x, compare_length_to=3, assign_length_to_others=True)
         pass
 
     assert foo([1, 2, 3]) is None
@@ -1265,7 +1265,7 @@ def test_check_argument_length_warnings():
         check_argument(
             5,
             "my_arg",
-            expected_length=1,
+            compare_length_to=1,
             assign_length_to_others=True,
             handle_with=Warning,
         )
@@ -1274,7 +1274,7 @@ def test_check_argument_length_warnings():
     assert (
         check_argument(
             5,
-            expected_length=1,
+            compare_length_to=1,
             assign_length_to_others=True,
             handle_with=Warning,
         )
@@ -1285,7 +1285,7 @@ def test_check_argument_length_warnings():
         check_argument(
             x,
             "x",
-            expected_length=3,
+            compare_length_to=3,
             assign_length_to_others=True,
             handle_with=Warning,
         )
@@ -1299,7 +1299,7 @@ def test_check_argument_length_warnings():
     def foo(x):
         check_argument(
             x,
-            expected_length=3,
+            compare_length_to=3,
             assign_length_to_others=True,
             handle_with=Warning,
         )
@@ -1331,7 +1331,7 @@ def test_check_argument_mix():
 def test_check_argument_mix_warnings():
     def foo(x):
         check_argument(
-            x, "x", expected_type=int, expected_length=3, handle_with=Warning
+            x, "x", expected_type=int, compare_length_to=3, handle_with=Warning
         )
         pass
 
