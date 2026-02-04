@@ -1,7 +1,7 @@
 The :code:`easycheck` module
 --------------------------
 
-The main function is :code:`check_if()`, with its negative counterpart :code:`check_if_not()`. The other functions are actually wrappers built around :code:`check_if()`, customized to particular situations and conditions. :code:`check_if()` checks a condition provided as its argument; if the condition is not met, the function raises an exception (which can be either one of the exception classes, built-in ones, ones from the easycheck module, or user-created) or issues a warning (which must derive from the Warning class); you can (optionally) send a message along with the exception, and you should send a message with the warning. Note that when you use the built-in assert expression, you're limited to :code:`AssertionError`, but when using easycheck assert functions, you can use any exception you want.
+The main function is :code:`check_if()`, with its negative counterpart :code:`check_if_not()`. The other functions are actually wrappers built around :code:`check_if()`, customized to particular situations and conditions. :code:`check_if()` evaluates the given condition in a boolean context (like a standard Python `if` statement); if the condition is not met, the function raises an exception (which can be either one of the exception classes, built-in ones, ones from the easycheck module, or user-created) or issues a warning (which must derive from the Warning class); you can (optionally) send a message along with the exception, and you should send a message with the warning. Note that when you use the built-in assert expression, you're limited to :code:`AssertionError`, but when using easycheck assert functions, you can use any exception you want.
 
 Consider the following example:
 
