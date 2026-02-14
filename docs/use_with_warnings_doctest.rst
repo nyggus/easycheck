@@ -6,13 +6,19 @@ One of the aims of the :code:`easycheck` package is to enable you to issue a war
 .. code-block:: python
 
     >>> from easycheck import check_if, check_type, check_length
+    >>> import warnings
+    >>> warnings.filterwarnings("ignore", category=UserWarning)
     >>> check_if(2 > 2, Warning)
+    >>> warnings.filterwarnings("default", category=UserWarning)
 
 This will raise a warning (of the :code:`Warning` class), with a default (and unhelpful) message 'Warning', leading to the warning :code:`Warning: Warning`. To change this (rather unhelpful) message, use the :code:`message` parameter, as below:
 
 .. code-block:: python
 
+    >>> import warnings
+    >>> warnings.filterwarnings("ignore")
     >>> check_if(2 > 2, Warning, 'Incorrect value')
+    >>> warnings.filterwarnings("default")
 	
 By using the :code:`easycheck` module, your warnings can be as informative as the message you provide (for example, :code:`Warning: Incorrect value`, although you can make it much more specific). You really should define messages for all warnings, since while an exception without a message can be informative, a warning without a message is not.
 
